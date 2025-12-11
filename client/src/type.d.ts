@@ -117,5 +117,5 @@ interface CartItem {
   color: string;
   title: string;
   thumbnail: string,
-  discountPercentage:string
+  discountPercentage:number
 }

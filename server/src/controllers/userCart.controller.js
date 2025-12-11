@@ -156,7 +156,8 @@ export const removeItemFromCart = async (req, res) => {
     await userCart.save()
     return res.status(200).json({
       success: true,
-      message: "Item removed"
+      message: "Item removed",
+      id: productId
     })
   } catch (error) {
     return res.status(500).json({

@@ -7,9 +7,13 @@ interface CartCardProps {
   price: number;
   thumbnail: string;
  quan: number;
+ setIsOpen: (isOpen: boolean) => void;
+ setItem: (item:string) => void;
+ discountPercentage: number;
+ productId: string;
 }
 const Cart_Card = (
-  { title, color, price, thumbnail, quan }: CartCardProps
+  { title, color, price, thumbnail, quan, discountPercentage,setIsOpen,setItem,productId }: CartCardProps
 ) => {
   const [quantity, setQuantity] = useState(quan);
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -74,7 +78,9 @@ const Cart_Card = (
                 </div>
               </div>
               
-              <button className="flex items-center gap-1 text-gray-500 hover:text-red-500 transition-colors">
+              <button className="flex cursor-pointer items-center gap-1 text-gray-500 hover:text-red-500 transition-colors"
+              onClick={()=>{setItem(productId);setIsOpen(true);}}
+              >
                 <Trash2 size={16} />
                 <span className="text-sm">REMOVE</span>
               </button>
@@ -84,7 +90,7 @@ const Cart_Card = (
           {/* Price */}
           <div className="text-right">
             <div className="text-2xl font-bold text-gray-900">₹{price}.00</div>
-            <div className="text-sm text-green-600 font-medium">(41% off)</div>
+            <div className="text-sm text-green-600 font-medium">({discountPercentage}% off)</div>
           </div>
         </div>
       </div>

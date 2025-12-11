@@ -4,15 +4,18 @@ import { Minus, Plus, Trash2, Heart, Tag, Truck } from 'lucide-react';
 import Cart_Card from '@/components/cards/Cart_Card';
 import { useGetCartItems } from '@/hooks/buyer/useUserCart';
 import { useUserCart } from '@/stores/buyer/cart.user';
+import DeleteCartItem from '@/components/models/DeleteCartItem';
 
 const ShoppingCartPage = () => {
   const [quantity, setQuantity] = useState(1);
+  const [item, setItem] = useState<string>();
+  const [isOpen, setIsOpen] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [showCouponInput, setShowCouponInput] = useState(false);
   const [couponCode, setCouponCode] = useState('');
-  const {isPending} = useGetCartItems()
+  const { isPending } = useGetCartItems()
   const items = useUserCart((s) => s.items);
-  if(isPending){
+  if (isPending) {
     return <div>Loading...</div>
   }
   console.log(items);
@@ -42,23 +45,26 @@ const ShoppingCartPage = () => {
               </div>
 
               {/* Cart Item */}
-            {
-              items && items.length > 0 ? (
-                items.map((item) => (
-                  <Cart_Card 
-                    key={item.productId}
-                    title={item.title}
-                    color={item.color}
-                    price={item.unitPrice}  
-                    thumbnail={item.thumbnail}
-                    quan={item.quantity}
-                    ={
-                  />
-                ))
-              ) : (
-                <div className="p-6 text-center text-gray-500">Your cart is empty.</div>
-              )
-            }
+              {
+                items && items.length > 0 ? (
+                  items.map((item) => (
+                    <Cart_Card
+                      key={item.productId}
+                      title={item.title}
+                      color={item.color}
+                      price={item.unitPrice}
+                      thumbnail={item.thumbnail}
+                      quan={item.quantity}
+                      productId={item.productId}
+                      setItem={setItem}
+                      setIsOpen={setIsOpen}
+                      discountPercentage={item.discountPercentage}
+                    />
+                  ))
+                ) : (
+                  <div className="p-6 text-center text-gray-500">Your cart is empty.</div>
+                )
+              }
             </div>
           </div>
 
@@ -66,7 +72,7 @@ const ShoppingCartPage = () => {
           <div className="xl:col-span-1 h-screen sticky top-6 right-0">
             <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
               <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4 md:mb-6">Price Details</h2>
-              
+
               <div className="space-y-3 md:space-y-4 mb-4 md:mb-6">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Total MRP</span>
@@ -97,7 +103,7 @@ const ShoppingCartPage = () => {
                   <Tag size={16} />
                   <span className="font-medium">Apply coupon</span>
                 </button>
-                
+
                 {showCouponInput && (
                   <div className="mt-3 flex flex-col sm:flex-row gap-2">
                     <input
@@ -105,6 +111,7 @@ const ShoppingCartPage = () => {
                       placeholder="Enter coupon code"
                       value={couponCode}
                       onChange={(e) => setCouponCode(e.target.value)}
+
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
                     <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors whitespace-nowrap">
@@ -120,7 +127,7 @@ const ShoppingCartPage = () => {
                   <span className="text-base md:text-lg font-semibold text-gray-700">Total Amount</span>
                   <span className="text-xl md:text-2xl font-bold text-gray-900">₹{totalAmount.toFixed(2)}</span>
                 </div>
-                
+
                 <button className="w-full bg-slate-700 text-white py-3 rounded-lg font-semibold hover:bg-slate-800 transition-colors">
                   CHECKOUT
                 </button>
@@ -129,6 +136,13 @@ const ShoppingCartPage = () => {
           </div>
         </div>
       </div>
+      {
+        isOpen && item && <DeleteCartItem
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          productId={item}
+        />
+      }
     </div>
   );
 };

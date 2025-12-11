@@ -2,6 +2,7 @@ import api from "@/lib/axios";
 import { useUserCart } from "@/stores/buyer/cart.user";
 import { useProductStore } from "@/stores/buyer/products.store";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 interface CartPayLoad {
   productId: string;
   quantity: number;
@@ -45,4 +46,22 @@ export const useAdditem = () => {
             return res.data.cartItem;
         },
     });
+};
+
+export const useDeleteItem = (id: string,onSuccessCallback:()=>void) => {
+  const removeItem = useUserCart(s => s.removeItem)
+  return useMutation({
+    mutationFn: async () => {
+      const res = await api.delete(`/usercart/${id}`);
+      return res.data.id;
+    },
+    onSuccess: (data) => { 
+      if (onSuccessCallback) onSuccessCallback();
+      removeItem(data)
+      toast.success("Item deleted successfully");
+    },
+    onError: () => {
+      toast.error("Failed to delete item. Please try again.");
+    }
+  });
 };
