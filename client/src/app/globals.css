@@ -1,0 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&display=swap');
+@import "tailwindcss";
+
+html, body {
+  font-family: var(--font-figtree), sans-serif;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.fraunces {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+}
