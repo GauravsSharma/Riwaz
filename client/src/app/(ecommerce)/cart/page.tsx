@@ -7,27 +7,24 @@ import { useUserCart } from '@/stores/buyer/cart.user';
 import DeleteCartItem from '@/components/models/DeleteCartItem';
 
 const ShoppingCartPage = () => {
-  const [quantity, setQuantity] = useState(1);
   const [item, setItem] = useState<string>();
   const [isOpen, setIsOpen] = useState(false);
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const [showCouponInput, setShowCouponInput] = useState(false);
   const [couponCode, setCouponCode] = useState('');
   const { isPending } = useGetCartItems()
+  const totalAmount = useUserCart((s) => s.totalDiscountedAmount);
+  const totalActualAmount = useUserCart((s) => s.totalActualAmount);
   const items = useUserCart((s) => s.items);
+
   if (isPending) {
     return <div>Loading...</div>
   }
-  console.log(items);
   const handleCouponToggle = () => {
     setShowCouponInput(!showCouponInput);
   };
 
-  const basePrice = 699;
-  const mrp = 1199;
-  const discount = mrp - basePrice;
-  const totalAmount = basePrice * quantity;
-  const totalMRP = mrp * quantity;
+  const discount = totalActualAmount-totalAmount;  
+  const totalMRP = totalAmount
 
   return (
     <div className="min-h-screen bg-gray-50 relative mt-34">
@@ -47,9 +44,9 @@ const ShoppingCartPage = () => {
               {/* Cart Item */}
               {
                 items && items.length > 0 ? (
-                  items.map((item) => (
+                  items.map((item,i) => (
                     <Cart_Card
-                      key={item.productId}
+                      key={item.productId+i}
                       title={item.title}
                       color={item.color}
                       price={item.unitPrice}
@@ -80,7 +77,7 @@ const ShoppingCartPage = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Discount on MRP</span>
-                  <span className="font-medium text-green-600">-₹{(discount * quantity).toFixed(2)}</span>
+                  <span className="font-medium text-green-600">-₹{(discount).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Delivery</span>

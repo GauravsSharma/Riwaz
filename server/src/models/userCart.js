@@ -33,6 +33,9 @@ const cartItemSchema = new mongoose.Schema(
     },
     discountPercentage:{
       type:Number
+    },
+    originalPrice:{
+      type:Number
     }
   },
   { _id: false }

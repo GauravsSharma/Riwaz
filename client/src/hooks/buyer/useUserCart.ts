@@ -7,9 +7,10 @@ interface CartPayLoad {
   productId: string;
   quantity: number;
 }
-interface CartSummary{
-  total:number,
-  itemCount:number
+interface CartSummary {
+  totalDiscountedPrice: number,
+  totalActualPrice: number
+  itemCount: number,
 }
 export const useGetCartItems = () => {
   const setCartItems = useUserCart((s) => s.setCartItems);
@@ -18,7 +19,6 @@ export const useGetCartItems = () => {
     queryFn: async () => {
       const res = await api.get(`/usercart`);
       setCartItems(res.data.cartItems);
-    console.log("Data------------>",res.data.cartItems);
       return res.data.cartItems;
     },
   });
@@ -26,11 +26,15 @@ export const useGetCartItems = () => {
 
 export const useGetCartSummary = () => {
   const setCount = useUserCart((s) => s.setCount);
+  const setTotalDiscountedAmount = useUserCart((s) => s.setTotalDiscountedAmount);
+  const setTotalActualAmount = useUserCart((s) => s.setTotalActualAmount);
   return useQuery<CartSummary>({
     queryKey: ["cart-summary-store"],
     queryFn: async () => {
       const res = await api.get(`/usercart/summary`);
       setCount(res.data.itemCount);
+      setTotalDiscountedAmount(res.data.totalDiscountedPrice);
+      setTotalActualAmount(res.data.totalActualPrice);
       return res.data;
     },
   });
@@ -38,24 +42,35 @@ export const useGetCartSummary = () => {
 
 
 export const useAdditem = () => {
-    const setSingleItem = useUserCart((s) => s.setSingleItem);
-    return useMutation({
-        mutationFn: async (data: CartPayLoad) => {
-            const res = await api.post("/usercart/add", data);
-            setSingleItem(res.data.cartItem);
-            return res.data.cartItem;
-        },
-    });
+  const setSingleItem = useUserCart((s) => s.setSingleItem);
+  return useMutation({
+    mutationFn: async (data: CartPayLoad) => {
+      const res = await api.post("/usercart/add", data);
+      setSingleItem(res.data.cartItem);
+      return res.data.cartItem;
+    },
+  });
 };
 
-export const useDeleteItem = (id: string,onSuccessCallback:()=>void) => {
+export const useUpdateItem = () => {
+  const setSingleItem = useUserCart((s) => s.setSingleItem);
+  return useMutation({
+    mutationFn: async (data: CartPayLoad) => {
+      const res = await api.put("/usercart/update", data);
+      setSingleItem(res.data.cartItem);
+      return res.data.cartItem;
+    },
+  });
+};
+
+export const useDeleteItem = (id: string, onSuccessCallback: () => void) => {
   const removeItem = useUserCart(s => s.removeItem)
   return useMutation({
     mutationFn: async () => {
       const res = await api.delete(`/usercart/${id}`);
       return res.data.id;
     },
-    onSuccess: (data) => { 
+    onSuccess: (data) => {
       if (onSuccessCallback) onSuccessCallback();
       removeItem(data)
       toast.success("Item deleted successfully");

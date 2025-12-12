@@ -4,6 +4,8 @@ import UserCart from "../models/userCart.js";
 export const addToCart = async (req, res) => {
   try {
     const { productId, quantity } = req.body;
+    console.log(quantity);
+    
     const userId = req.user.userId;
 
     const product = await Product.findById(productId)
@@ -23,7 +25,8 @@ export const addToCart = async (req, res) => {
     if (index === -1) {
       userCart.products.push({
         productId,
-        quantity,
+        quantity:quantity,
+        originalPrice:product.originalPrice,
         title: product.title,
         unitPrice: product.price,
         color: product.color,
@@ -41,9 +44,11 @@ export const addToCart = async (req, res) => {
       cartItem: {
         productId,
         title: product.title,
-        quantity:userCart.products[index].quantity,
+        quantity:index===-1?userCart.products[0].quantity:userCart.products[index].quantity,
         unitPrice: product.price,
         color: product.color,
+        originalPrice:product.price,
+        discountPercentage:product.discountPercentage,
         thumbnail: product.thumbnail.url
       },
     });
@@ -186,22 +191,23 @@ export const clearCart = async (req, res) => {
     })
   }
 }
-// getCartSummary - Get cart totals without full product details
-// Returns: item count, subtotal, tax, total
-// Useful for displaying cart badge/icon
 
 export const getCartSummary = async (req, res) => {
   try {
     const userId = req.user.userId;
     const userCart = await UserCart.findOne({ userId });
     const itemCount = userCart.products.length;
-    const total = userCart.products.reduce((acc, val) => {
+    const totalDiscountedPrice = userCart.products.reduce((acc, val) => {
       return acc + (val.quantity * val.unitPrice);
+    }, 0);
+    const totalActualPrice = userCart.products.reduce((acc, val) => {
+      return acc + (val.quantity * val.originalPrice);
     }, 0);
     return res.status(200).json({
       success: true,
       itemCount,
-      total
+      totalDiscountedPrice,
+      totalActualPrice
     })
   } catch (error) {
     return res.status(500).json({
@@ -235,7 +241,7 @@ export const updateItemQuantity = async (req, res) => {
     await userCart.save();
     return res.status(200).json({
       success: true,
-      item: userCart.products[index]
+      cartItem: userCart.products[index]
     })
 
   } catch (error) {

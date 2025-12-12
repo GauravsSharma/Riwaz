@@ -9,7 +9,7 @@ interface SingleProduct{
 export const useGetProducts = (query:string) => {
   const setProducts = useProductStore((s) => s.setProducts);
   return useQuery<Product[]>({
-    queryKey: ["product-store"],
+    queryKey: ["product-store",query],
     queryFn: async () => {
       const res = await api.get(`/product/search?query=${query}`);
       setProducts(res.data.products);

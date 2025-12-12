@@ -14,15 +14,14 @@ import { useRouter } from 'next/navigation'
 
 import { useEffect } from 'react'
 
+
 const page = () => {
   const { isLoading } = useCurrentUser();
   const { isPending: isNormalSareesLoading, data: normalSarees } = useGetProducts("georgette saree");
   const { isPending: isBaluchariSareesLoading, data: baluchariSarees } = useGetProducts("baluchari saree");
   const { isPending: isSilkSareesLoading, data: silkSarees } = useGetProducts("silk woven sarees");
   const { isLoading: singleProductLoading, data } = useGetSingleProduct()
-  const {data:count}=useGetCartSummary();
   // console.log(data?.variants);
-
   const user = useUserStore((s) => s.user);
   const router = useRouter();
 
@@ -31,10 +30,6 @@ const page = () => {
       router.push("/admin/dashboard");
     }
   }, [user, isLoading]);
-
-  const onViewDetails = (id: string) => {
-    router.push(`/item/${id}`);
-  }
 
   if (isBaluchariSareesLoading) {
     return <div>Loading.....</div>

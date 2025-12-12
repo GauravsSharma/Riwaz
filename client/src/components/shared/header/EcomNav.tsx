@@ -5,12 +5,15 @@ import Link from 'next/link';
 import LoginModal from '@/components/models/LoginModel';
 import { useUserStore } from '@/stores/user.store';
 import { useUserCart } from '@/stores/buyer/cart.user';
+import { useGetCartSummary } from '@/hooks/buyer/useUserCart';
 
 
 export default function Header() {
   const user = useUserStore((s) => s.user);
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const { data: cartSummary } = useGetCartSummary(); 
   const [becomeASeller, setBecomeASeller] = useState(false);
   const count = useUserCart((s) => s.count);
   const navItems = [
@@ -29,7 +32,7 @@ export default function Header() {
   ];
 
   return (
-    <div className='fixed top-0 left-0 w-full z-10'>
+    <div className='fixed z-50 top-0 left-0 w-full z-10'>
       {/* Top Bar */}
       <div className="bg-gradient-to-r from-pink-400 to-purple-400 hidden md:block">
         <div className="max-w-7xl mx-auto px-4 sm:px-2">
@@ -117,7 +120,7 @@ export default function Header() {
               <button className="text-gray-700 hover:text-pink-500 transition-colors">
                 <Search className="w-5 h-5" />
               </button>
-              {user ? <User className='w-5 h-5 cursor-pointer'/> : <div
+              {user ? <User className='w-5 h-5 cursor-pointer' /> : <div
                 onClick={() => { setBecomeASeller(false); setIsLoginOpen(true) }}
                 className="text-gray-700 cursor-pointer hover:text-pink-500 text-[15px] font-medium transition-colors">
                 Login
@@ -198,7 +201,7 @@ export default function Header() {
                   </li>
                 ))}
                 <li className="pt-2 border-t border-gray-200">
-                {user ?<User className='w-5 h-5 cursor-pointer'/>:  <div
+                  {user ? <User className='w-5 h-5 cursor-pointer' /> : <div
                     className="block cursor-pointer text-gray-700 hover:text-pink-500 text-sm font-medium py-2"
                     onClick={() => { setBecomeASeller(false); setIsLoginOpen(true); setMobileMenuOpen(false) }}
                   >

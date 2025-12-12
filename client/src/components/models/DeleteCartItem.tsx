@@ -2,6 +2,7 @@ import React from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
 import { useDeleteItem } from '@/hooks/buyer/useUserCart';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface DeleteCartItemProps {
     productId: string;
@@ -9,8 +10,10 @@ interface DeleteCartItemProps {
     setIsOpen: (isOpen: boolean) => void;
 }
 const DeleteCartItem: React.FC<DeleteCartItemProps> = ({ productId, isOpen, setIsOpen }) => {
+      const queryClient = useQueryClient();
     const { mutate: deleteItem,isPending } = useDeleteItem(productId,()=>{
         setIsOpen(false);
+         queryClient.invalidateQueries({ queryKey: ['cart-summary-store'] });
     });
     const handleDelete = () => {
         deleteItem()

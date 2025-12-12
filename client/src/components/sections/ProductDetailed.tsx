@@ -1,9 +1,10 @@
-import { useAdditem } from '@/hooks/buyer/useUserCart';
+import { useAdditem, useGetCartSummary } from '@/hooks/buyer/useUserCart';
 import { Banknote, ChevronDown, Minus, Plus, RotateCcw, Share2, Truck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 import { toast } from 'react-toastify';
 import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
+import { useQueryClient } from '@tanstack/react-query';
 type Section = 'details' | 'return' | 'shipping' | 'seller' | 'help';
 interface Props {
     product:MainProduct,
@@ -25,6 +26,7 @@ const ProductDetailed = ({
     isFromHome = false
 }:Props) => {
     const [selectedImage, setSelectedImage] = useState(0);
+
     const [expandedSections, setExpandedSections] = useState<Record<Section, boolean>>({
         details: true,
         return: false,
@@ -32,6 +34,7 @@ const ProductDetailed = ({
         seller: false,
         help: false
     });
+    const queryClient = useQueryClient();
     const router = useRouter()
     const [quantity, setQuantity] = useState(1);
     const {mutate,isPending}=useAdditem()
@@ -47,6 +50,7 @@ const ProductDetailed = ({
     const handleAddToCart=()=>{
        mutate({productId:product._id,quantity},{
         onSuccess:()=>{
+             queryClient.invalidateQueries({ queryKey: ['cart-summary-store'] });
             toast.success("Item added to cart successfully!")
         },
         onError:()=>{
