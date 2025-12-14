@@ -15,7 +15,7 @@ const ProductCard = ({
   originalPrice = 1099,
   discount = 18,
   onWishlist = () => console.log('Wishlist clicked'),
-  className = ""
+  isFromHome = true
 }) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -31,7 +31,7 @@ const ProductCard = ({
   };
 
   return (
-   <div className="group cursor-pointer w-80">
+   <div className={`group cursor-pointer ${isFromHome? "w-80":"w-60"}`}>
       <div className="relative overflow-hidden">
         <div className="absolute top-4 left-4 z-10">
           <span className="bg-red-400 text-white px-3 py-1 text-sm font-semibold">
@@ -42,7 +42,7 @@ const ProductCard = ({
         onClick={handleViewDetails}
           src={image}
           alt={title}
-          className="w-full h-92 object-cover transition-transform duration-500 group-hover:scale-105"
+          className={`w-full ${isFromHome?"h-92":"h-80"} object-cover transition-transform duration-500 group-hover:scale-105`}
         />
       </div>
       <div className="mt-4">

@@ -35,7 +35,7 @@ export const useGetMainProduct = (productId: string) => {
     return useQuery<MainProduct>({
         queryKey: ["main-product", productId],
         queryFn: async () => {
-            const res = await api.get(`/product/${productId}`)
+            const res = await api.get(`/product/id/${productId}`)
             setMainProduct(res.data.product);
             setVariants(res.data.variants)
             return res.data.product;

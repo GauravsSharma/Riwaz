@@ -17,9 +17,9 @@ import { useEffect } from 'react'
 
 const page = () => {
   const { isLoading } = useCurrentUser();
-  const { isPending: isNormalSareesLoading, data: normalSarees } = useGetProducts("georgette saree");
-  const { isPending: isBaluchariSareesLoading, data: baluchariSarees } = useGetProducts("baluchari saree");
-  const { isPending: isSilkSareesLoading, data: silkSarees } = useGetProducts("silk woven sarees");
+  const { isPending: isNormalSareesLoading, data: normalSarees } = useGetProducts("banarasi sarees");
+  const { isPending: isBaluchariSareesLoading, data: baluchariSarees } = useGetProducts("baluchari sarees");
+  const { isPending: isSilkSareesLoading, data: silkSarees } = useGetProducts("bandhani sarees");
   const { isLoading: singleProductLoading, data } = useGetSingleProduct()
   // console.log(data?.variants);
   const user = useUserStore((s) => s.user);

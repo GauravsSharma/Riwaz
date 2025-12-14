@@ -142,6 +142,48 @@ export const searchProducts = async (req, res) => {
     res.status(500).json({ message: "Server error during search" });
   }
 };
+export const getProductsByQuery = async (req, res) => {
+try {
+      const {
+      search,
+      priceMin,
+      priceMax,
+      color,
+      type,
+      fabric,
+      work,
+    } = req.query;
+
+  console.log("Filters received:", req.query);
+  res.status(200).json({ message: "Filters received", filters: req.query });
+} catch (error) {
+  res.status(500).json({ message: "Server Error" });
+}
+}
+export const getProductsByType = async (req, res) => {
+  try {
+    const { type } = req.params;
+    if (!type) {
+      return res.status(400).json({ message: "Product type is required" });
+    }
+    console.log("Product type:", type);
+    const products = await Product.find({
+      type: type,
+      isActive: true,
+    })
+      .select("title price thumbnail originalPrice discountPercentage _id")
+      .limit(4)
+    res.status(200).json({
+      success: true,
+      products
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+
 //review product route
 
 

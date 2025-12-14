@@ -13,16 +13,16 @@ export default function Header() {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const { data: cartSummary } = useGetCartSummary(); 
+  const { data: cartSummary } = useGetCartSummary();
   const [becomeASeller, setBecomeASeller] = useState(false);
   const count = useUserCart((s) => s.count);
   const navItems = [
     "Banarasi Sarees",
-    "Kanjivaram Sarees",
-    "Silk Sarees",
+    "Baluchari Sarees",
+    "Embellished Sarees",
+    "Zari Sarees",
+    "Foil Printed Sarees",
     "Cotton Sarees",
-    "Chiffon Sarees",
-    "Georgette Sarees",
   ];
 
   const topLinks = [
@@ -32,7 +32,7 @@ export default function Header() {
   ];
 
   return (
-    <div className='fixed z-50 top-0 left-0 w-full z-10'>
+    <div className='fixed z-50 top-0 left-0 w-full'>
       {/* Top Bar */}
       <div className="bg-gradient-to-r from-pink-400 to-purple-400 hidden md:block">
         <div className="max-w-7xl mx-auto px-4 sm:px-2">
@@ -67,12 +67,17 @@ export default function Header() {
             <div className="flex items-center">
               {topLinks.map((link, index) => (
                 <div key={link} className="flex items-center">
-                  <a
-                    href="#"
-                    className="text-white hover:opacity-80 text-xs font-medium transition-opacity px-3"
+                  <div
+                    onClick={() => {
+                      if (link === "Become a Seller") {
+                        setBecomeASeller(true);
+                        setIsLoginOpen(true);
+                      }
+                    }}
+                    className="text-white cursor-pointer hover:opacity-80 text-xs font-medium transition-opacity px-3"
                   >
                     {link}
-                  </a>
+                  </div>
                   {index < topLinks.length - 1 && (
                     <span className="text-white text-xs">|</span>
                   )}
@@ -89,14 +94,7 @@ export default function Header() {
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <div className="flex-shrink-0">
-              <div className="flex items-center gap-1">
-                <span className="text-3xl font-bold text-pink-500">peach</span>
-                <div className="w-7 h-7 bg-gradient-to-br from-orange-300 to-pink-400 rounded-full relative">
-                  <div className="absolute top-0 right-0 w-2 h-3 bg-green-400 rounded-br-full"></div>
-                </div>
-                <span className="text-3xl font-bold text-pink-500">mode</span>
-                <span className="text-pink-500 text-xs ml-0.5">®</span>
-              </div>
+              <img src="/logo.png" alt="" className='h-12' />
             </div>
 
             {/* Navigation */}
@@ -104,12 +102,12 @@ export default function Header() {
               <ul className="flex items-center space-x-6">
                 {navItems.map((item) => (
                   <li key={item}>
-                    <a
-                      href="#"
+                    <Link
+                      href={`/product-category/${item.toLowerCase().replace(/\s+/g, '-')}`}
                       className="text-gray-700 hover:text-pink-500 text-[15px] font-medium transition-colors"
                     >
                       {item}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -152,14 +150,7 @@ export default function Header() {
 
             {/* Logo */}
             <div className="flex-shrink-0">
-              <div className="flex items-center gap-1">
-                <span className="text-2xl font-bold text-pink-500">peach</span>
-                <div className="w-5 h-5 bg-gradient-to-br from-orange-300 to-pink-400 rounded-full relative">
-                  <div className="absolute top-0 right-0 w-1.5 h-2 bg-green-400 rounded-br-full"></div>
-                </div>
-                <span className="text-2xl font-bold text-pink-500">mode</span>
-                <span className="text-pink-500 text-xs ml-0.5">®</span>
-              </div>
+              <img src="/logo.png" alt="riwaz logo" className='h-12' />
             </div>
 
             {/* Right Icons */}
@@ -167,9 +158,6 @@ export default function Header() {
               <button className="text-gray-700">
                 <Search className="w-5 h-5" />
               </button>
-              {/* <button className="text-gray-700">
-                <User className="w-5 h-5" />
-              </button> */}
               <Link href={"/cart"}>
                 <button
 

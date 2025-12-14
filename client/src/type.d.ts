@@ -1,9 +1,9 @@
-interface User {
-  id: string;
-  name: string;
-  phone: string;
-  type: "buyer" | "seller"| null;
-}
+// interface User {
+//   id: string;
+//   name: string;
+//   phone: string;
+//   type: "buyer" | "seller"| null;
+// }
 
 interface User {
   _id: string;
@@ -28,8 +28,8 @@ interface Product{
   _id: string;
   title: string;
   price: number;
-  originalPrice:number,
-  discountPercentage:number
+  originalPrice:number;
+  discountPercentage:number;
   thumbnail: {
     url:string,
     public_id:string
