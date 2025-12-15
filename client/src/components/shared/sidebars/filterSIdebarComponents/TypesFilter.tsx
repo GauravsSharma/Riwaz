@@ -7,27 +7,16 @@ interface TypeFilterProps {
 }
 
 const types = [
+  'Banarasi',
   'Bandhani',
-  'Bandhej',
   'Embellished',
-  'Embroidery',
+  'Baluchari',
+  'Jamdani',
   'Foiled Printed',
   'Foil Printed',
-  'Handloom',
-  'Lace',
-  'Pathani',
-  'Plain',
   'Printed',
-  'Swarovski',
-  'Woven',
-  'Betelchun',
-  'Jamawar',
-  'Leheria',
-  'Patola',
-  'Sequence',
-  'Solid',
-  'Wash Printed',
-  'Wax Batik',
+  'Zari Stripe',
+  'Woven'
 ];
 
 export default function TypeFilter({ selectedTypes: selectedTypesFromProps, setSelectedTypes: setSelectedTypesFromProps }: TypeFilterProps) {
@@ -55,7 +44,12 @@ export default function TypeFilter({ selectedTypes: selectedTypesFromProps, setS
   return (
     <div className="w-full p-4">
       <div className="flex items-center justify-between mb-4">
-        <span className="text-base font-medium text-gray-900">Type</span>
+      <div className="flex gap-2">
+          <span className="text-base font-medium text-gray-900">Type</span>
+         <div className="w-5 h-5 bg-blue-900 rounded-full flex items-center justify-center">
+            <span className="text-white text-xs">{selectedTypes.length}</span>
+          </div>
+      </div>
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="text-gray-600 hover:text-gray-900 transition-transform"

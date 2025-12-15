@@ -8,16 +8,15 @@ interface WorkFilterProps {
 
 const workTypes = [
   'Bandhani',
-  'Dyed',
+  'Woven',
   'Embroidery',
+  'Stone Work',
+  'Minakari',
   'Floral Printed',
   'Foil Printed',
-  'Lace',
   'Patch Work',
   'Printed',
-  'Stone Work',
-  'Thread',
-  'Zari',
+  'Zari Stripe',
   'Embellished',
 ];
 
@@ -46,7 +45,12 @@ export default function WorkFilter({ selectedWork: selectedWorkFromProps, setSel
   return (
     <div className="w-full p-4">
       <div className="flex items-center justify-between mb-4">
-        <span className="text-base font-medium text-gray-900">Work</span>
+          <div className="flex gap-2">
+          <span className="text-base font-medium text-gray-900">Work</span>
+         <div className="w-5 h-5 bg-blue-900 rounded-full flex items-center justify-center">
+            <span className="text-white text-xs">{selectedWork.length}</span>
+          </div>
+      </div>
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="text-gray-600 hover:text-gray-900 transition-transform"

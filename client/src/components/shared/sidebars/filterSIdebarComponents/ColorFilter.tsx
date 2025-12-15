@@ -13,29 +13,17 @@ interface ColorOption {
 }
 
 const colors: ColorOption[] = [
-  { name: 'Beige', color: '#F5F5DC', borderColor: '#D3D3D3' },
-  { name: 'Black', color: '#000000' },
   { name: 'Blue', color: '#0000FF' },
-  { name: 'Brown', color: '#8B4513' },
-  { name: 'Cream', color: '#FFFDD0', borderColor: '#D3D3D3' },
-  { name: 'Green', color: '#008000' },
-  { name: 'Grey', color: '#808080' },
-  { name: 'Khaki', color: '#F0E68C', borderColor: '#D3D3D3' },
-  { name: 'Lavender', color: '#E6E6FA', borderColor: '#D3D3D3' },
-  { name: 'Magenta', color: '#FF00FF' },
-  { name: 'Maroon', color: '#800000' },
-  { name: 'Mauve', color: '#E0B0FF', borderColor: '#D3D3D3' },
-  { name: 'Multicoloured', color: 'linear-gradient(135deg, #FF0000 0%, #FF7F00 16.67%, #FFFF00 33.33%, #00FF00 50%, #0000FF 66.67%, #4B0082 83.33%, #9400D3 100%)', borderColor: '#D3D3D3' },
-  { name: 'Orange', color: '#FFA500' },
-  { name: 'Peach', color: '#FFE5B4', borderColor: '#D3D3D3' },
-  { name: 'Pink', color: '#FFC0CB', borderColor: '#D3D3D3' },
-  { name: 'Purple', color: '#800080' },
-  { name: 'Red', color: '#FF0000' },
-  { name: 'Turquoise', color: '#40E0D0' },
-  { name: 'Violet', color: '#EE82EE' },
-  { name: 'White', color: '#FFFFFF', borderColor: '#D3D3D3' },
-  { name: 'Wine', color: '#722F37' },
   { name: 'Yellow', color: '#FFFF00' },
+  { name: 'Beige', color: '#F5F5DC', borderColor: '#D3D3D3' },
+  { name: 'Peach', color: '#FFE5B4', borderColor: '#D3D3D3' },
+  { name: 'Purple', color: '#800080' },
+  { name: 'White', color: '#FFFFFF', borderColor: '#D3D3D3' },
+  { name: 'Green', color: '#008000' },
+  { name: 'Black', color: '#000000' },
+  { name: 'Cream', color: '#FFFDD0', borderColor: '#D3D3D3' },
+  { name: 'Grey', color: '#808080' },
+  { name: 'Pink', color: '#FFC0CB', borderColor: '#D3D3D3' },
 ];
 
 export default function ColorFilter({ selectedColors: selectedColorsFromProps, setSelectedColors: setSelectedColorsFromProps }: ColorFilterProps) {
@@ -66,7 +54,7 @@ export default function ColorFilter({ selectedColors: selectedColorsFromProps, s
         <div className="flex items-center gap-2">
           <span className="text-base font-medium text-gray-900">Color</span>
           <div className="w-5 h-5 bg-blue-900 rounded-full flex items-center justify-center">
-            <span className="text-white text-xs">✓</span>
+            <span className="text-white text-xs">{selectedColors.length}</span>
           </div>
         </div>
         <button

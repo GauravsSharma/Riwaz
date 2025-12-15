@@ -7,33 +7,78 @@ import FabricFilter from './filterSIdebarComponents/FabricFilter';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 
-export default function FilterSidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: (open: boolean) => void }) {
+export default function FilterSidebar({ isOpen, setIsOpen,search }: { isOpen: boolean,search:string, setIsOpen: (open: boolean) => void }) {
   const router = useRouter();
-  const [price, setPrice] = useState({ min: 0, max: 3799 });
+  const [price, setPrice] = useState({ min: 0, max: 2999 });
   const [colors, setColors] = useState<string[]>([]);
   const [types, setTypes] = useState<string[]>([]);
   const [fabrics, setFabrics] = useState<string[]>([]);
   const [work, setWork] = useState<string[]>([]);
   const searchParams = useSearchParams();
-  const params = new URLSearchParams(searchParams.toString());
-  useEffect(() => {
-    params.set("priceMin", price.min.toString());
-    params.set("priceMax", price.max.toString());
 
-    colors.length ? params.set("color", colors.join(",")) : params.delete("color");
-    types.length ? params.set("type", types.join(",")) : params.delete("type");
-    fabrics.length ? params.set("fabric", fabrics.join(",")) : params.delete("fabric");
-    work.length ? params.set("work", work.join(",")) : params.delete("work");
-     router.push(`?${params.toString()}`);
-  }, [price, colors, types, fabrics, work]);
+  useEffect(() => {
+  // price
+  const priceMin = searchParams.get("priceMin");
+  const priceMax = searchParams.get("priceMax");
+
+  if (priceMin && priceMax) {
+    setPrice({
+      min: Number(priceMin),
+      max: Number(priceMax),
+    });
+  }
+
+  // color
+  const colorParam = searchParams.get("color");
+  if (colorParam) {
+    setColors(colorParam.split(","));
+  }
+
+  // type
+  const typeParam = searchParams.get("type");
+  if (typeParam) {
+    setTypes(typeParam.split(","));
+  }
+
+  // fabric
+  const fabricParam = searchParams.get("fabric");
+  if (fabricParam) {
+    setFabrics(fabricParam.split(","));
+  }
+
+  // work
+  const workParam = searchParams.get("work");
+  if (workParam) {
+    setWork(workParam.split(","));
+  }
+}, [searchParams]);
+
+useEffect(() => {
+  const newParams = new URLSearchParams();
+  
+  if (search) newParams.set("search", search);
+  if(price.min!==0 || price.max!==2999){
+    newParams.set("priceMin", price.min.toString());
+    newParams.set("priceMax", price.max.toString());
+  }
+
+  if (colors.length) newParams.set("color", colors.join(","));
+  if (types.length) newParams.set("type", types.join(","));
+  if (fabrics.length) newParams.set("fabric", fabrics.join(","));
+  if (work.length) newParams.set("work", work.join(","));
+  //useGetProducts(`?${newParams.toString()}`);
+  router.push(`?${newParams.toString()}`);
+  // console.log(`?${newParams.toString()}`);
+  
+}, [search, price, colors, types, fabrics, work, router]);
   return (
     <div className={`lg:block ${isOpen ? "left-0" : "-left-[100%]"} fixed  duration-500 w-full z-10 lg:w-[20%] h-screen lg:sticky top-0 overflow-auto bg-white p  border-r border-gray-200`}>
       <div className='p-6'>
         {/* Header */}
-
+        <div className='text-xl font-semibold px-4 text-slate-700'>Filters</div>
         {/* Color Filter */}
-        <ColorFilter setSelectedColors={setColors} selectedColors={colors} />
         <PriceFilter setPrice={setPrice} price={price} />
+        <ColorFilter setSelectedColors={setColors} selectedColors={colors} />
         <TypeFilter setSelectedTypes={setTypes} selectedTypes={types} />
         <WorkFilter setSelectedWork={setWork} selectedWork={work} />
         <FabricFilter setSelectedFabrics={setFabrics} selectedFabrics={fabrics} />

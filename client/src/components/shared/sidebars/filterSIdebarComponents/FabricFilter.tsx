@@ -7,13 +7,9 @@ interface FabricFilterProps {
 }
 
 const fabrics = [
-  'Chiffon',
+ 
   'Cotton',
   'Georgette',
-  'Linen',
-  'Organza',
-  'Satin',
-  'Shimmer',
   'Silk',
   'Silk Blend',
   'Chanderi',
@@ -46,7 +42,12 @@ export default function FabricFilter({ selectedFabrics: selectedFabricsFromProps
   return (
     <div className="w-full p-4 ">
       <div className="flex items-center justify-between mb-4">
-        <span className="text-base font-medium text-gray-900">Fabric</span>
+          <div className="flex gap-2">
+          <span className="text-base font-medium text-gray-900">Fabric</span>
+         <div className="w-5 h-5 bg-blue-900 rounded-full flex items-center justify-center">
+            <span className="text-white text-xs">{selectedFabrics.length}</span>
+          </div>
+      </div>
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="text-gray-600 hover:text-gray-900 transition-transform"

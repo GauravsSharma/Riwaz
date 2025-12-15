@@ -11,7 +11,7 @@ export const useGetProducts = (query:string) => {
   return useQuery<Product[]>({
     queryKey: ["product-store",query],
     queryFn: async () => {
-      const res = await api.get(`/product/search?query=${query}`);
+      const res = await api.get(`/product/search${query}`);
       setProducts(res.data.products);
     // console.log("Data------------>",res.data);
       return res.data.products;

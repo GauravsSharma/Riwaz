@@ -103,7 +103,7 @@ export default function Header() {
                 {navItems.map((item) => (
                   <li key={item}>
                     <Link
-                      href={`/product-category/${item.toLowerCase().replace(/\s+/g, '-')}`}
+                      href={`/product-category?search=${item.toLowerCase()}`}
                       className="text-gray-700 hover:text-pink-500 text-[15px] font-medium transition-colors"
                     >
                       {item}

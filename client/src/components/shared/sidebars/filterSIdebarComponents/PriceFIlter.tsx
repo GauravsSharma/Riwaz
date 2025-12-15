@@ -26,7 +26,7 @@ export default function PriceFilter({ price: priceFromProps, setPrice: setPriceF
   };
 
   const handleReset = () => {
-    setPrice({ min: 0, max: 3799 });
+    setPrice({ min: 0, max: 2999 });
   };
 
   return (
@@ -62,7 +62,7 @@ export default function PriceFilter({ price: priceFromProps, setPrice: setPriceF
                 <input
                   type="range"
                   min="0"
-                  max="3799"
+                  max="2999"
                   value={price.min}
                   onChange={handleMinChange}
                   className="absolute w-full h-2 bg-transparent appearance-none pointer-events-none z-20"
@@ -73,7 +73,7 @@ export default function PriceFilter({ price: priceFromProps, setPrice: setPriceF
                 <input
                   type="range"
                   min="0"
-                  max="3799"
+                  max="2999"
                   value={price.max}
                   onChange={handleMaxChange}
                   className="absolute w-full h-2 bg-transparent appearance-none pointer-events-none z-20"
@@ -85,8 +85,8 @@ export default function PriceFilter({ price: priceFromProps, setPrice: setPriceF
                   <div
                     className="absolute h-2 bg-gray-800 rounded-full"
                     style={{
-                      left: `${(price.min / 3799) * 100}%`,
-                      right: `${100 - (price.max / 3799) * 100}%`,
+                      left: `${(price.min / 2999) * 100}%`,
+                      right: `${100 - (price.max / 2999) * 100}%`,
                     }}
                   />
                 </div>
