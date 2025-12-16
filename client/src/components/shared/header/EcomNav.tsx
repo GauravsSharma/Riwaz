@@ -34,11 +34,11 @@ export default function Header() {
   return (
     <div className='fixed z-50 top-0 left-0 w-full'>
       {/* Top Bar */}
-      <div className="bg-gradient-to-r from-pink-400 to-purple-400 hidden md:block">
-        <div className="max-w-7xl mx-auto px-4 sm:px-2">
-          <div className="flex items-center justify-between h-12">
+      <div className="bg-gradient-to-r from-pink-400 to-purple-400">
+        <div className=" mx-auto px-4 sm:px-2">
+          <div className="flex items-center justify-end sm:justify-between gap-2 h-10 sm:h-12 ">
             {/* Social Icons */}
-            <div className="flex items-center space-x-4">
+            <div className=" sm:flex hidden items-center space-x-4">
               <a href="#" className="text-white hover:opacity-80 transition-opacity">
                 <svg className="w-6 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" />
@@ -64,7 +64,7 @@ export default function Header() {
             </div>
 
             {/* Top Links */}
-            <div className="flex items-center">
+            <div className="flex  items-center ">
               {topLinks.map((link, index) => (
                 <div key={link} className="flex items-center">
                   <div
@@ -89,13 +89,13 @@ export default function Header() {
       </div>
 
       {/* Desktop Header */}
-      <header className="hidden  md:block bg-white border-b border-gray-200">
+      <header className="hidden  lg:block bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-2">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
-            <div className="flex-shrink-0">
+            <Link href="/" className="flex-shrink-0">
               <img src="/logo.png" alt="" className='h-12' />
-            </div>
+            </Link>
 
             {/* Navigation */}
             <nav className="flex-1 flex justify-center">
@@ -137,7 +137,7 @@ export default function Header() {
       </header>
 
       {/* Mobile Header */}
-      <header className="md:hidden bg-white border-b border-gray-200">
+      <header className="lg:hidden bg-white border-b border-gray-200">
         <div className="px-4">
           <div className="flex items-center justify-between h-14">
             {/* Mobile Menu Button */}

@@ -14,24 +14,17 @@ const ProductCard = ({
   price = 899,
   originalPrice = 1099,
   discount = 18,
-  onWishlist = () => console.log('Wishlist clicked'),
   isFromHome = true
 }) => {
-  const [isWishlisted, setIsWishlisted] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
+ 
     const router = useRouter();
-  const handleWishlistClick = (e:React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    setIsWishlisted(!isWishlisted);
-    onWishlist();
-  };
-
+ 
   const handleViewDetails = () => {
     router.push(`/item/${id}`);
   };
 
   return (
-   <div className={`group cursor-pointer ${isFromHome? "w-80":"w-60"}`}>
+   <div className={`group cursor-pointer ${isFromHome? "sm:w-80 w-1/2 ":"sm:w-60 w-1/2"}`}>
       <div className="relative overflow-hidden">
         <div className="absolute top-4 left-4 z-10">
           <span className="bg-red-400 text-white px-3 py-1 text-sm font-semibold">

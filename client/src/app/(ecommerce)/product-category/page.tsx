@@ -22,21 +22,21 @@ const page = () => {
     console.log('Sorting by:', sortOption);
   };
   if (isPending) {
-    return <div>Loading...</div>
+    return <div className="mt-20 md::mt-32">Loading...</div>
   }
   console.log(searchParams.toString());
 
   return (
-    <div className='flex relative mt-32'>
+    <div className='flex relative mt-20 md::mt-32'>
       <FilterSidebar setIsOpen={setIsOpen} isOpen={isOpen} search={search} />
       <div className='md:p-5 w-full lg:w-[80%]'>
         <div className='flex items-center justify-between mb-5 lg:p-0 p-3'>
-          <h1 className='text-xl text-slate-700 font-semibold pl-10'>
+          <h1 className='text-xl text-slate-700 font-semibold pl-2 md:pl-10'>
             Top results for "{decodeURIComponent(search || '').toLowerCase()}"
           </h1>
         </div>
 
-        <div className='flex items-center lg:gap-5 flex-wrap w-full justify-start pb-20 px-10'>
+        <div className='flex items-center gap-y-2 lg:gap-5 flex-wrap w-full justify-start pb-20 md:px-10'>
           {!isPending && products && products.length > 0 && products.map((item, idx) => (
             <ProductCard key={idx}
               title={item.title}

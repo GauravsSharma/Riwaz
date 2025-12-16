@@ -17,9 +17,10 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 app.use(cors({
-  origin: "http://localhost:3000",  // specific domain, NOT "*"
+  origin: true, // allow all origins dynamically
   credentials: true,
 }));
+
 
 app.use(express.json());
 app.use(bodyParser.json());

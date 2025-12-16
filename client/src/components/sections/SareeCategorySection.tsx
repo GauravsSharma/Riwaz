@@ -46,10 +46,10 @@ export default function SareeCategorySection() {
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-16">
-          <h1 className="text-5xl fraunces font-medium text-gray-900 mb-4 tracking-tight">
+          <h1 className="text-3xl sm:text-5xl fraunces font-medium text-gray-900 mb-2 sm:mb-4 tracking-tight">
            Fashion Frenzy Arrivals
           </h1>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-600 text-md sm:text-lg max-w-2xl mx-auto leading-6">
             Discover the finest handcrafted sarees from across India, each telling a unique story of tradition and craftsmanship
           </p>
         </div>

@@ -55,7 +55,7 @@ const ProductDetailed = ({
         },
         onError:()=>{
             toast.error("Failed to add item to cart.")
-        }
+        }   
        })
     }
     return (
@@ -97,7 +97,7 @@ const ProductDetailed = ({
                             <img
                                 src={productImages[selectedImage].url}
                                 alt={product.title}
-                                className="w-full h-96 lg:h-full object-cover rounded-lg"
+                                className="w-full h-[35rem] sm:h-[60rem] lg:h-full object-cover rounded-lg"
                             />
                         </div>
                     )}
@@ -227,15 +227,12 @@ const ProductDetailed = ({
 
                     {/* Add to Cart Buttons */}
                     <div className="space-y-3"
-                    
-
                     >
-                        <button className={`w-full py-3 border-2 border-gray-900 text-gray-900 font-semibold rounded-lg hover:bg-red-50 bg-red-200 transition cursor-pointer flex justify-center items-center gap-2 ${isPending?"opacity-50 pointer-events-none":""}`}
+                        <button className={`w-full py-3 border-2 border-white text-white font-semibold rounded-lg hover:bg-yellow-400 bg-yellow-500 transition cursor-pointer flex justify-center items-center gap-2 ${isPending?"opacity-50 pointer-events-none":""}`}
                         onClick={handleAddToCart}
                         disabled={isPending}
                         >
                             ADD TO CART
-
                             {isPending && <FormSubmissionLoader/>}
                         </button>
                         <button className="w-full py-3 bg-purple-700 text-white font-semibold rounded-lg hover:bg-purple-800 transition">

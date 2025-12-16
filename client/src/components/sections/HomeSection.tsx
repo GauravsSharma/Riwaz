@@ -11,20 +11,20 @@ export default function HomeSections({ products,title,discription }: Props) {
     <div>
 
       {/* ⭐ Beautiful New Arrivals Section */}
-      <div className="px-10 py-16 ">
+      <div className="md:px-10 py-16 ">
 
         {/* Heading */}
-        <div className="text-center mb-12">
-          <h1 className="text-5xl fraunces font-bold tracking-tight text-gray-900">
+        <div className="text-center mb-6 sm:mb-12">
+          <h1 className="text-3xl sm:text-5xl fraunces font-bold tracking-tight text-gray-900">
             {title}
           </h1>
-          <p className="text-md text-gray-600 mt-2">
+          <p className="text-md text-gray-600 mt-1 sm:mt-2">
            {discription}
           </p>        
         </div>
 
         {/* Product Grid */}
-        <div className="flex justify-center gap-2">
+        <div className="flex justify-center flex-wrap gap-y-2 sm:gap-2">
           {products?.map((product, index) => (
             <ProductCard
               key={index}

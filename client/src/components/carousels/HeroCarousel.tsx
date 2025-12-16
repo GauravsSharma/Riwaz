@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useMediaQuery } from 'react-responsive';
 
 interface Slide {
   url: string;
   theme: 'light' | 'dark';
 }
 
-const slides: Slide[] = [
+const desktopSlides: Slide[] = [
  
   {
     url: '/home/s2.webp',
@@ -19,13 +20,45 @@ const slides: Slide[] = [
     theme: 'light'
   },
 ];
+const portraitSlides: Slide[] = [
+ 
+  {
+    url: '/home/mc1.jpg',
+    theme: 'dark'
+  },
+  {
+    url: '/home/mc2.jpg',
+    theme: 'light'
+  }, {
+    url: '/home/mc3.jpg',
+    theme: 'light'
+  },
+];
 
 const PeachCarousel: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
   const [direction, setDirection] = useState<'next' | 'prev'>('next');
   const [isPaused, setIsPaused] = useState<boolean>(false);
-
+   const [slides, setSlides] = useState<Slide[]>(desktopSlides);
+  
+  useEffect(() => {
+    // Update slides based on screen size after mount
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    
+    const handleResize = () => {
+      setSlides(mediaQuery.matches ? portraitSlides : desktopSlides);
+    };
+    
+    // Set initial value
+    handleResize();
+    
+    // Listen for changes
+    mediaQuery.addEventListener('change', handleResize);
+    
+    return () => mediaQuery.removeEventListener('change', handleResize);
+  }, []);
+  
   const goToNext = useCallback(() => {
     if (isTransitioning) return;
     setDirection('next');
@@ -63,7 +96,7 @@ const PeachCarousel: React.FC = () => {
 
   return (
     <div 
-      className="relative mt-30 w-full h-[81vh] bg-white overflow-hidden"
+      className="relative mt-20 sm:mt-32 w-full h-[81vh] bg-white overflow-hidden"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -90,7 +123,7 @@ const PeachCarousel: React.FC = () => {
               <img
                 src={slide.url}
               
-                className="w-full h-fit object-cover"
+                className="w-full h-full sm:h-fit object-cover "
               />
               {/* Subtle gradient overlay */}
               <div className={`absolute inset-0 ${

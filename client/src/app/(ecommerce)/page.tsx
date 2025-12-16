@@ -1,5 +1,6 @@
 "use client"
 import HeroCarousel from '@/components/carousels/HeroCarousel'
+import ProductCardSkeleton from '@/components/loaders/ProductCardLoader'
 import EmbroideredSareeSection from '@/components/sections/EmbroideredSareeSection'
 import HomeSections from '@/components/sections/HomeSection'
 import ProductDetailed from '@/components/sections/ProductDetailed'
@@ -31,19 +32,23 @@ const page = () => {
     }
   }, [user, isLoading]);
 
-  if (isBaluchariSareesLoading) {
-    return <div>Loading.....</div>
-  }
 
   return (
     <div>
       <HeroCarousel />
 
       <SareeStoreSection />
+      {isNormalSareesLoading&& <div className="flex justify-center flex-wrap gap-2 gap-y-2 mt-20 md:mt-34">
+        {
+          [1,2,3,4].map((_,i)=>(
+            <ProductCardSkeleton key={i}/>
+          ))
+        }
+       </div>}
       {!isNormalSareesLoading && normalSarees && <HomeSections products={normalSarees} title={"Georgette Sarees"} discription={"Best georgette sarees stock only at riwaz."} />}
 
       <SareeCategorySection />
-      <div className='text-center my-15  fraunces font-semibold text-5xl'>
+      <div className='text-center my-15 fraunces font-semibold text-3xl sm:text-5xl'>
         Featured Product
       </div>
       {!singleProductLoading && data && <ProductDetailed
@@ -58,9 +63,22 @@ const page = () => {
 
       {/* Correct props */}
       {!isBaluchariSareesLoading && baluchariSarees && <HomeSections products={baluchariSarees} title={"Baluchari Sarees"} discription={"Best baluchari sarees stock only at riwaz."} />}
-
+        {isBaluchariSareesLoading&& <div className="flex justify-center flex-wrap gap-2 gap-y-2 mt-20 md:mt-34">
+        {
+          [1,2,3,4].map((_,i)=>(
+            <ProductCardSkeleton key={i}/>
+          ))
+        }
+       </div>}
       {/* Correct props */}
       {!isSilkSareesLoading && silkSarees && <HomeSections products={silkSarees} title={"Silk Woven Sarees"} discription={"Best silk woven sarees stock only at riwaz."} />}
+       {isSilkSareesLoading&& <div className="flex justify-center flex-wrap gap-2 gap-y-2 mt-20 md:mt-34">
+        {
+          [1,2,3,4].map((_,i)=>(
+            <ProductCardSkeleton key={i}/>
+          ))
+        }
+       </div>}
     </div>
   )
 }
