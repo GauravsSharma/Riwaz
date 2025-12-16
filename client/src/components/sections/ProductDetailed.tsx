@@ -5,6 +5,9 @@ import React, { useState } from 'react'
 import { toast } from 'react-toastify';
 import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
 import { useQueryClient } from '@tanstack/react-query';
+import MobileImageCarousel from '../carousels/ProductViewCarousel';
+// import MobileImageCarousel from './MobileImageCarousel';
+
 type Section = 'details' | 'return' | 'shipping' | 'seller' | 'help';
 interface Props {
     product:MainProduct,
@@ -62,10 +65,20 @@ const ProductDetailed = ({
         <div className={`flex flex-col lg:flex-row px-4 md:px-6 ${isFromHome?"lg:px-20":"lg:px-8"} pb-6 gap-8`}>
             {/* LEFT SECTION - Product Images */}
             <div className="w-full lg:w-1/2 lg:sticky lg:top-0 lg:h-screen lg:overflow-hidden">
-                <div className="flex flex-col-reverse md:flex-row gap-4 h-full">
+                {/* Mobile Carousel - Show only on mobile */}
+                <div className="block md:hidden">
+                    <MobileImageCarousel 
+                        images={productImages}
+                        productTitle={product.title}
+                        discountPercentage={product.discountPercentage}
+                    />
+                </div>
+
+                {/* Desktop Gallery - Show only on tablet and desktop */}
+                <div className="hidden md:flex flex-row gap-4 h-full">
                     {/* Thumbnail Images */}
                     {productImages.length > 0 && (
-                        <div className="flex md:flex-col gap-3 w-full md:w-20 overflow-x-auto md:overflow-x-visible">
+                        <div className="flex flex-col gap-3 w-20 overflow-x-visible">
                             {productImages.map((image, index) => (
                                 <div
                                     key={image.public_id}
@@ -76,7 +89,7 @@ const ProductDetailed = ({
                                     <img
                                         src={image.url}
                                         alt={`Product ${index + 1}`}
-                                        className="w-16 h-20 md:w-full md:h-20 object-cover hover:opacity-80 transition"
+                                        className="w-full h-20 object-cover hover:opacity-80 transition"
                                     />
                                 </div>
                             ))}
@@ -97,7 +110,7 @@ const ProductDetailed = ({
                             <img
                                 src={productImages[selectedImage].url}
                                 alt={product.title}
-                                className="w-full h-[35rem] sm:h-[60rem] lg:h-full object-cover rounded-lg"
+                                className="w-full h-[60rem] lg:h-full object-cover rounded-lg"
                             />
                         </div>
                     )}
@@ -226,9 +239,9 @@ const ProductDetailed = ({
                     </div>}
 
                     {/* Add to Cart Buttons */}
-                    <div className="space-y-3"
+                    <div className="space-y-2"
                     >
-                        <button className={`w-full py-3 border-2 border-white text-white font-semibold rounded-lg hover:bg-yellow-400 bg-yellow-500 transition cursor-pointer flex justify-center items-center gap-2 ${isPending?"opacity-50 pointer-events-none":""}`}
+                        <button className={`w-full mt-4 py-3 border-2 border-white text-white font-semibold rounded-lg hover:bg-zinc-800 bg-zinc-700 transition cursor-pointer flex justify-center items-center gap-2 ${isPending?"opacity-50 pointer-events-none":""}`}
                         onClick={handleAddToCart}
                         disabled={isPending}
                         >
@@ -262,8 +275,8 @@ const ProductDetailed = ({
                     {/* Colors Section - Only show if variants exist */}
                     {variants && variants.length > 0 && (
                         <div>
-                            <h3 className="font-semibold text-gray-900 mb-4">Colors:</h3>
-                            <div className="grid grid-cols-3 gap-4">
+                            <h3 className="font-semibold text-gray-900 my-4 sm:mb-4">Colors:</h3>
+                            <div className="flex flwx-wrap gap-3">
                                 {variants.map((variant) => (
                                     <div
                                         key={variant._id}
@@ -273,7 +286,7 @@ const ProductDetailed = ({
                                         <img
                                             src={variant.thumbnail.url}
                                             alt={variant.color}
-                                            className="w-full h-60 object-cover"
+                                            className="w-36 h-44 sm:w-full sm:h-60 object-cover"
                                         />
                                         <p className="text-center py-2 font-semibold text-sm capitalize">{variant.color}</p>
                                     </div>
