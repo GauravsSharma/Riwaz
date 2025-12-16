@@ -1,11 +1,11 @@
 "use client";
-import { useState } from 'react';
-import { Search, User, ShoppingCart, Menu, X } from 'lucide-react';
-import Link from 'next/link';
 import LoginModal from '@/components/models/LoginModel';
-import { useUserStore } from '@/stores/user.store';
-import { useUserCart } from '@/stores/buyer/cart.user';
 import { useGetCartSummary } from '@/hooks/buyer/useUserCart';
+import { useUserCart } from '@/stores/buyer/cart.user';
+import { useUserStore } from '@/stores/user.store';
+import { Menu, Search, ShoppingCart, User, X } from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 
 
 export default function Header() {
@@ -31,8 +31,83 @@ export default function Header() {
     'Become a Seller',
   ];
 
+  // Search overlay state
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  
+  const recommendedProducts = [
+    {
+      id: '1',
+      name: 'Traditional Banarasi Silk Saree',
+      price: 4999,
+      originalPrice: 7999,
+      image: '/images/banarsi.webp',
+    },
+    {
+      id: '2',
+      name: 'Pure Kanjivaram Silk Saree',
+      price: 8999,
+      originalPrice: 12999,
+      image: '/images/kanjeevaram.jpg',
+    },
+    {
+      id: '3',
+      name: 'Elegant Chiffon Saree',
+      price: 2499,
+      originalPrice: 3999,
+      image: '/images/chiffon.webp',
+    },
+    // Add more products...
+  ];
+
+  // Focus input when overlay opens
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isOpen]);
+
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e:KeyboardEvent) => {
+      // Open with Ctrl/Cmd + K
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsOpen(true);
+      }
+      // Close with Escape
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const handleClose = () => {
+    setIsOpen(false);
+    setSearchQuery('');
+  };
+
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // Add your search logic here
+    console.log('Searching for:', searchQuery);
+  };
+
+  
+  const handleProductClick = (productId: string) => {
+    console.log('Product clicked:', productId);
+    handleClose(); // Close search overlay
+    // Navigate to product page
+    // router.push(`/products/${productId}`);
+  };
+
   return (
-    <div className='fixed z-50 top-0 left-0 w-full z-10'>
+    <div className='fixed z-50 top-0 left-0 w-full'>
       {/* Top Bar */}
       <div className="bg-gradient-to-r from-pink-400 to-purple-400 hidden md:block">
         <div className="max-w-7xl mx-auto px-4 sm:px-2">
@@ -84,7 +159,7 @@ export default function Header() {
       </div>
 
       {/* Desktop Header */}
-      <header className="hidden  md:block bg-white border-b border-gray-200">
+      <header className="hidden md:block bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-2">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
@@ -117,7 +192,10 @@ export default function Header() {
 
             {/* Right Icons */}
             <div className="flex items-center space-x-6">
-              <button className="text-gray-700 hover:text-pink-500 transition-colors">
+              <button 
+                onClick={() => setIsOpen(true)}
+                className="text-gray-700 hover:text-pink-500 transition-colors"
+              >
                 <Search className="w-5 h-5" />
               </button>
               {user ? <User className='w-5 h-5 cursor-pointer' /> : <div
@@ -125,14 +203,16 @@ export default function Header() {
                 className="text-gray-700 cursor-pointer hover:text-pink-500 text-[15px] font-medium transition-colors">
                 Login
               </div>}
-              <Link href={"/cart"}><button
-
-                className="relative cursor-pointer mt-2 text-gray-700 hover:text-pink-500 transition-colors">
-                <ShoppingCart className="w-5 h-5" />
-                <span className="absolute -top-2 -right-2 bg-gray-800 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {count}
-                </span>
-              </button></Link>
+              <Link href={"/cart"}>
+                <button
+                  className="relative cursor-pointer mt-2 text-gray-700 hover:text-pink-500 transition-colors"
+                >
+                  <ShoppingCart className="w-5 h-5" />
+                  <span className="absolute -top-2 -right-2 bg-gray-800 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {count}
+                  </span>
+                </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -164,16 +244,16 @@ export default function Header() {
 
             {/* Right Icons */}
             <div className="flex items-center space-x-4">
-              <button className="text-gray-700">
+              <button 
+                onClick={() => setIsOpen(true)}
+                className="text-gray-700"
+              >
                 <Search className="w-5 h-5" />
               </button>
-              {/* <button className="text-gray-700">
-                <User className="w-5 h-5" />
-              </button> */}
               <Link href={"/cart"}>
                 <button
-
-                  className="relative cursor-pointer text-gray-700">
+                  className="relative cursor-pointer text-gray-700"
+                >
                   <ShoppingCart className="w-5 h-5" />
                   <span className="absolute -top-1.5 -right-1.5 bg-gray-800 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
                     {count}
@@ -213,6 +293,166 @@ export default function Header() {
           </div>
         )}
       </header>
+
+      {/* Search Overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-slate-950/95 z-[100] animate-in fade-in duration-200 flex items-start justify-center pt-20"
+          onClick={handleClose}
+        >
+          {/* Search Container */}
+          <div
+            className="w-full max-w-2xl mx-4 animate-in slide-in-from-top-2 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Search Box */}
+            <div className="bg-slate-800/90 backdrop-blur-md rounded-lg shadow-2xl overflow-hidden border border-slate-700">
+              {/* Search Input Area */}
+              <div className="flex items-center gap-3 px-5 py-4">
+                <Search className="w-5 h-5 text-slate-400 flex-shrink-0" />
+                <form onSubmit={handleSearch} className="flex-1">
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search sarees..."
+                    className="w-full text-base outline-none bg-transparent text-slate-200 placeholder:text-slate-500"
+                  />
+                </form>
+                <kbd className="px-2 py-1 text-xs font-medium text-slate-400 bg-slate-700/50 rounded border border-slate-600">
+                  esc
+                </kbd>
+              </div>
+
+                {/* Content Area */}
+              <div className="px-5 py-8 min-h-[200px]">
+                {searchQuery ? (
+                  <div className="w-full space-y-4">
+                    {/* Search Results */}
+                    <div className="space-y-2">
+                      {navItems.filter(item => item.toLowerCase().includes(searchQuery.toLowerCase())).map((item, index) => (
+                        <div
+                          key={index}
+                          className="px-4 py-3 hover:bg-slate-700/50 rounded cursor-pointer transition-colors duration-150"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-slate-700 rounded flex items-center justify-center">
+                              <Search className="w-4 h-4 text-slate-400" />
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="text-sm font-medium text-slate-200">{item}</h3>
+                              <p className="text-xs text-slate-500">Category</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      {navItems.filter(item => item.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
+                        <div className="text-center py-4">
+                          <p className="text-slate-500 text-sm">No results found for "{searchQuery}"</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Product Recommendations - Show when searching */}
+                    <div className="mt-6 pt-6 border-t border-slate-700">
+                      <h3 className="text-slate-300 text-sm font-medium mb-4">You might also like</h3>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {recommendedProducts.slice(0, 6).map((product) => (
+                          <div
+                            key={product.id}
+                            onClick={() => handleProductClick(product.id)}
+                            className="group cursor-pointer bg-slate-700/30 rounded-lg overflow-hidden hover:bg-slate-700/50 transition-all duration-300"
+                          >
+                            <div className="relative aspect-[3/4] overflow-hidden bg-slate-700">
+                              <img
+                                src={product.image}
+                                alt={product.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                            </div>
+                            <div className="p-3">
+                              <h4 className="text-xs font-medium text-slate-200 line-clamp-2 mb-2">
+                                {product.name}
+                              </h4>
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-sm font-bold text-slate-100">
+                                  ₹{product.price.toLocaleString()}
+                                </span>
+                                {product.originalPrice && (
+                                  <span className="text-xs text-slate-500 line-through">
+                                    ₹{product.originalPrice.toLocaleString()}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <p className="text-slate-500 text-sm mb-6">No recent searches</p>
+                    
+                    {/* Product Recommendations - Show when no search query */}
+                    <div className="mt-6">
+                      <h3 className="text-slate-300 text-sm font-medium mb-4 text-left">Trending Now</h3>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {recommendedProducts.slice(0, 6).map((product) => (
+                          <div
+                            key={product.id}
+                            onClick={() => handleProductClick(product.id)}
+                            className="group cursor-pointer bg-slate-700/30 rounded-lg overflow-hidden hover:bg-slate-700/50 transition-all duration-300"
+                          >
+                            <div className="relative aspect-[3/4] overflow-hidden bg-slate-700">
+                              <img
+                                src={product.image}
+                                alt={product.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                            </div>
+                            <div className="p-3">
+                              <h4 className="text-xs font-medium text-slate-200 line-clamp-2 mb-2">
+                                {product.name}
+                              </h4>
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-sm font-bold text-slate-100">
+                                  ₹{product.price.toLocaleString()}
+                                </span>
+                                {product.originalPrice && (
+                                  <span className="text-xs text-slate-500 line-through">
+                                    ₹{product.originalPrice.toLocaleString()}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className="px-5 py-3 border-t border-slate-700 bg-slate-800/50">
+                <div className="flex items-center justify-between text-xs text-slate-500">
+                  <div className="flex items-center gap-2">
+                    <kbd className="px-2 py-1 bg-slate-700/50 rounded border border-slate-600">↵</kbd>
+                    <span>to select</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <kbd className="px-2 py-1 bg-slate-700/50 rounded border border-slate-600">ESC</kbd>
+                    <span>to close</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <LoginModal isOpen={isLoginOpen} setIsOpen={setIsLoginOpen} becomeASeller={becomeASeller} />
     </div>
   );
