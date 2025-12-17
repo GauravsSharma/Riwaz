@@ -78,7 +78,7 @@ export default function FilterSidebar({ isOpen, setIsOpen, search }: { isOpen: b
    }
   }, [search, price, colors, types, fabrics, work, router]);
   return (
-    <div className={`lg:block ${isOpen ? "left-0" : "-left-[100%]"} fixed  duration-500 w-full z-20 lg:w-[20%] h-screen lg:sticky top-0 overflow-auto bg-white p  border-r border-gray-200`}>
+    <div className={`lg:block  mt-10 ${isOpen ? "left-0" : "-left-[100%]"} fixed  duration-500 w-full z-20 lg:w-[20%] h-screen lg:sticky top-0 overflow-auto bg-white p  border-r border-gray-200`}>
       <div className='p-6'>
         {/* Header */}
         <div className='text-xl font-semibold px-4 text-slate-700'>Filters</div>

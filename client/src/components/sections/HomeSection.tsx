@@ -11,7 +11,7 @@ export default function HomeSections({ products,title,discription }: Props) {
     <div>
 
       {/* ⭐ Beautiful New Arrivals Section */}
-      <div className="md:px-10 py-16 ">
+      <div className="md:px-10 py-10 sm:py-16 ">
 
         {/* Heading */}
         <div className="text-center mb-6 sm:mb-12">

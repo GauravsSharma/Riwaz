@@ -1,6 +1,5 @@
 import api from "@/lib/axios";
 import { useUserCart } from "@/stores/buyer/cart.user";
-import { useProductStore } from "@/stores/buyer/products.store";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 interface CartPayLoad {
@@ -39,7 +38,16 @@ export const useGetCartSummary = () => {
     },
   });
 };
-
+export const useMergeCart = () => {
+  const setCartItems = useUserCart((s) => s.setCartItems);
+  return useMutation({
+    mutationFn: async (cartItems: CartPayLoad[]) => {
+      const res = await api.post(`/usercart/merge`, { cartItems });
+      setCartItems(res.data.items);
+      return res.data.items;
+    }
+  });
+}
 
 export const useAdditem = () => {
   const setSingleItem = useUserCart((s) => s.setSingleItem);

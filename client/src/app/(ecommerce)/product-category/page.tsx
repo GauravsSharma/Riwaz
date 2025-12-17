@@ -27,7 +27,7 @@ const page = () => {
   console.log(searchParams.toString());
 
   return (
-    <div className='flex relative mt-20 md::mt-32'>
+    <div className='flex relative mt-28 md:mt-32'>
       <FilterSidebar setIsOpen={setIsOpen} isOpen={isOpen} search={search} />
       <div className='md:p-5 w-full lg:w-[80%]'>
         <div className='flex items-center justify-between mb-5 lg:p-0 p-3'>

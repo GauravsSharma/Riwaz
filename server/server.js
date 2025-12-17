@@ -17,7 +17,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 app.use(cors({
-  origin: true, // allow all origins dynamically
+  origin: "http://192.168.31.254:3000", // allow all origins dynamically
   credentials: true,
 }));
 

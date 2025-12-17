@@ -45,7 +45,7 @@ export default function SareeCategorySection() {
     <div className="bg-gradient-to-b from-white via-amber-50/30 to-white py-16 px-6">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-8 sm:mb-16">
           <h1 className="text-3xl sm:text-5xl fraunces font-medium text-gray-900 mb-2 sm:mb-4 tracking-tight">
            Fashion Frenzy Arrivals
           </h1>
