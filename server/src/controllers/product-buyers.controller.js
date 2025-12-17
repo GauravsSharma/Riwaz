@@ -168,9 +168,86 @@ export const searchProducts = async (req, res) => {
     });
   }
 };
-export const getProductsByQuery = async (req, res) => {
-  
+
+export const getProductRecommendationByQuery = async (req, res) => {
+  try {
+    const { q } = req.query;
+
+    if (!q || q.trim().length === 0) {
+      return res.status(200).json([]);
+    }
+
+    const keyword = q.trim();
+
+    const products = await Product.find({
+      isActive: true,
+      $or: [
+        // 🔹 Prefix match (ban → banarasi)
+        { title: { $regex: `^${keyword}`, $options: "i" } },
+        { type: { $regex: `^${keyword}`, $options: "i" } },
+
+        // 🔹 Contains match
+        { title: { $regex: keyword, $options: "i" } },
+        { description: { $regex: keyword, $options: "i" } },
+      ],
+    })
+      .select("title slug price thumbnail type")
+      .limit(5);
+
+    res.status(200).json({success:true,products});
+  } catch (error) {
+    console.error("Search error:", error);
+    res.status(500).json({ success:false,message: "Server error" });
+  }
 };
+export const getSearchSuggestions = async (req, res) => {
+  try {
+    const { q } = req.query;
+
+    if (!q || q.trim().length < 1) {
+      return res.status(200).json([]);
+    }
+
+    const keyword = q.trim();
+
+    const products = await Product.find({
+      isActive: true,
+      $or: [
+        { title: { $regex: keyword, $options: "i" } },
+        { type: { $regex: keyword, $options: "i" } },
+        { fabric: { $regex: keyword, $options: "i" } },
+        { work: { $regex: keyword, $options: "i" } },
+      ],
+    })
+      .select("title type fabric work")
+      .limit(10);
+
+    // 🔹 Extract meaningful suggestions
+    const suggestionsSet = new Set();
+
+    products.forEach((p) => {
+      if (p.title?.toLowerCase().includes(keyword.toLowerCase())) {
+        suggestionsSet.add(p.title);
+      }
+      if (p.type?.toLowerCase().includes(keyword.toLowerCase())) {
+        suggestionsSet.add(`${p.type} saree`);
+      }
+      if (p.fabric?.toLowerCase().includes(keyword.toLowerCase())) {
+        suggestionsSet.add(`${p.fabric} saree`);
+      }
+      if (p.work?.toLowerCase().includes(keyword.toLowerCase())) {
+        suggestionsSet.add(`${p.work} saree`);
+      }
+    });
+
+    res.status(200).json({success:true,suggestions:[...suggestionsSet].slice(0, 8)});
+  } catch (err) {
+    console.error("Suggestion error:", err);
+    res.status(500).json({ success:false,message: "Server error" });
+  }
+};
+
+
 export const getProductsByType = async (req, res) => {
   try {
     const { type } = req.params;
