@@ -1,12 +1,9 @@
 import jwt from 'jsonwebtoken';
 
 export const sellerMiddleware = (req, res, next) => {
-
-
     try {
         // console.log("hello from sleer");
         const token = req.cookies.token;
-   console.log(token);
         if (!token) {
             return res.status(401).json({ message: "Token missing. Please login." });
         }

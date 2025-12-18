@@ -78,7 +78,7 @@ export const verifyOtp = async (req, res) => {
 
         // Generate JWT token
         const token = jwt.sign({ userId: user.id, phone: user.phone, userType: user.userType }, process.env.JWT_SECRET, { expiresIn: '30d' });
-
+         await createUserCart(user._id);
         res.cookie("token", token, {
             httpOnly: true,
             secure: false,
@@ -93,7 +93,7 @@ export const verifyOtp = async (req, res) => {
             path: "/",
             maxAge: 30 * 24 * 60 * 60 * 1000,
         });
-        await createUserCart(user._id);
+       
         // Send response to frontend
         return res.status(200).json({
             message: "OTP verified successfully.",

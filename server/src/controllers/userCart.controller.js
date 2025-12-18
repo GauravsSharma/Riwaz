@@ -255,7 +255,7 @@ export const updateItemQuantity = async (req, res) => {
 // mergeCart - Merge guest cart with user cart after login
 export const mergeCart = async (req, res) => {
   try {
-    const cartItems = req.body;
+    const {cartItems} = req.body;
     const userId = req.user.userId;
 
     if (!Array.isArray(cartItems)) {
@@ -264,8 +264,12 @@ export const mergeCart = async (req, res) => {
 
     let userCart = await UserCart.findOne({ userId });
 
+    if (!userCart) {
+      userCart = await UserCart.create({ userId, products: [] });
+    }
+
     for (let item of cartItems) {
-      const product = await Product.findById(item.productId)
+      const product = await Product.findById(item.productId);
 
       if (!product) {
         return res.status(404).json({
@@ -280,21 +284,34 @@ export const mergeCart = async (req, res) => {
           message: `Invalid quantity for product id: ${product._id}`,
         });
       }
-      userCart.products.push({
-        productId: product._id,
-        unitPrice: product.price,
-        quantity: item.quantity,
-        color: product.color,
-        thumbnail: product.thumbnail
-      });
+
+      //CHECK IF PRODUCT ALREADY EXISTS
+      const existingItem = userCart.products.find(
+        (p) => p.productId.toString() === product._id.toString()
+      );
+
+      if (existingItem) {
+        existingItem.quantity += item.quantity;
+      } else {
+        userCart.products.push({
+          discountPercentage:product.discountPercentage,
+          originalPrice:product.originalPrice,
+          title: product.title,
+          productId: product._id,
+          unitPrice: product.price,
+          quantity: item.quantity,
+          color: product.color,
+          thumbnail: product.thumbnail.url,
+        });
+      }
     }
 
     await userCart.save();
 
     return res.status(200).json({
       success: true,
-      message: `All products added to cart.`,
-      cart: userCart,
+      message: "Cart merged successfully",
+      items: userCart.products,
     });
   } catch (error) {
     return res.status(500).json({
@@ -303,6 +320,7 @@ export const mergeCart = async (req, res) => {
     });
   }
 };
+
 
 // validateCart - Check if items are still in stock/valid before checkout
 export const validateCart = async (req, res) => {
@@ -321,15 +339,6 @@ export const validateCart = async (req, res) => {
         });
         continue;
       }
-      // const variant = product.variants.find(v => v.color.toLowerCase() === item.color.toLowerCase());
-      // if (!variant) {
-      //   validationResults.push({
-      //     productId: item.productId,
-      //     valid: false,
-      //     message: "Variant not found"
-      //   });
-      //   continue;
-      // }
       if (product.stock < item.quantity) {
         validationResults.push({
           productId: item.productId,

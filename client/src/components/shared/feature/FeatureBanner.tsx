@@ -20,8 +20,8 @@ export default function FeaturesBanner() {
   ];
 
   return (
-    <div className="border-t border-slate-200 py-12 px-20">
-      <div className="max-w-7xl mx-auto px-4">
+    <div className="border-t border-slate-200 py-12 px-5 md:px-20">
+      <div className=" mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {features.map((feature, index) => {
             const IconComponent = feature.icon;

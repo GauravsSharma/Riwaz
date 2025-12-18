@@ -11,6 +11,7 @@ import AddReviewDialog from '@/components/models/AddReviewModel';
 import { useReviewStore } from '@/stores/buyer/review.store';
 import ProductDetailed from '@/components/sections/ProductDetailed';
 import { log } from 'console';
+import ProductPageSkeleton from '@/components/loaders/ProductPageLoader';
 
 
 
@@ -22,11 +23,7 @@ const ProductPage = () => {
 
   const params = useParams();
   const productId = params.id as string;
-  console.log(productId);
-
   const { data: product, isPending } = useGetMainProduct(productId);
-  console.log(product);
-
   const { isPending: isReviewsLoading } = useGetReviews(productId)
   const reviews = useReviewStore(s => s.reviews)
   const totalReviews = useReviewStore(s => s.totalReviews)
@@ -40,24 +37,19 @@ const ProductPage = () => {
   const reviewsLen = reviews?.length || 0;
   const recentPurchases = 15;
 
-
-
-
-  console.log(product, rating, reviewsLen, variants);
-
   // Loading state
-  if (isPending) {
-    return <div className="p-10 text-center">Loading product...</div>;
+   if(isPending){
+    return<ProductPageSkeleton/>
   }
-
   if (!product) {
     return <div className="p-10 text-center">Product not found</div>;
   }
 
   const productImages = product.images || [];
-
+ 
   return (
-    <div className='mt-34'>
+    
+    <div className='mt-24 md:mt-34'>
       {/* Breadcrumb */}
       <div className="px-4 md:px-6 lg:px-8 py-3 text-sm text-gray-500">
         <span className="hover:text-gray-700 cursor-pointer">Home</span>
@@ -98,7 +90,7 @@ const ProductPage = () => {
         <div className="mb-6 flex justify-center items-center py-20">
           <button
             onClick={() => setIsDialogBoxOpen(true)}
-            className="w-1/5 mx-auto bg-purple-500 cursor-pointer hover:bg-purple-600 text-white font-medium px-6 py-3 rounded-md text-md  transition-colors duration-200"
+            className="w-[80%] md:w-1/5 mx-auto bg-purple-500 cursor-pointer hover:bg-purple-600 text-white font-medium px-6 py-3 rounded-md text-md  transition-colors duration-200"
           >
             WRITE A PRODUCT REVIEW
           </button>

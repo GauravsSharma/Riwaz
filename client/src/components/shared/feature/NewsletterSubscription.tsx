@@ -11,7 +11,7 @@ const NewsletterSubscription = () => {
   };
 
   return (
-    <div className="bg-gray-100 px-10 border-y border-gray-200">
+    <div className="bg-gray-100  sm:px-10 border-y border-gray-200">
       <div className=" px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           {/* Left Side - Title and Description */}
@@ -38,7 +38,7 @@ const NewsletterSubscription = () => {
               />
               <button
                 type="submit"
-                className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-r-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                className="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-6 py-3 rounded-r-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
               >
                 SUBSCRIBE
               </button>

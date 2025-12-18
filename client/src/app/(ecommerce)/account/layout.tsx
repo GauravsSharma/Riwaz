@@ -7,7 +7,7 @@ const layout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <div className='p-20 w-full flex gap-5 '>
+    <div className='p-20 w-full flex gap-5 mt-20 '>
     <ProfileSidebar/>
     {children}
     </div>

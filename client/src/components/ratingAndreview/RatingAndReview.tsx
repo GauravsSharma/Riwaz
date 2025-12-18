@@ -115,7 +115,7 @@ const ProductReview: React.FC<ProductReviewProps> = ({
                     <div className="flex-1">
                         <div className='flex justify-between items-center mb-4'>
                             <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">
-                                What Power Customer Say
+                                What Riwaz Customers Say
                             </h3>
                             {/* Desktop: Write Review Button */}
                             <div className="hidden lg:block lg:ml-6">

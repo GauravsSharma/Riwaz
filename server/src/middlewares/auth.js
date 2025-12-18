@@ -1,11 +1,8 @@
 import jwt from 'jsonwebtoken';
 
 export const authMiddleware = (req, res, next) => {
-
-
     try {
         // console.log("hello from auth");
-        
         const token = req.cookies.token;   // ⬅️ Read token from cookie
         
         if (!token) {
