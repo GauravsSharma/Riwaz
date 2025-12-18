@@ -1,9 +1,11 @@
 "use client";
 import ProductCard from "@/components/cards/ProductCard";
 import SortDrawer from "@/components/drawers/SortDrawer";
+import ProductCardSkeleton from "@/components/loaders/ProductCardLoader";
 import FilterSidebar from "@/components/shared/sidebars/FilterSidebar";
 import { useGetProducts } from "@/hooks/buyer/useProducts";
 import { useProductStore } from "@/stores/buyer/products.store";
+import { Filter } from "lucide-react";
 import { useParams, useSearchParams } from "next/navigation";
 import { use, useState } from "react";
 
@@ -21,22 +23,31 @@ const page = () => {
     // Here you would implement your actual sorting logic
     console.log('Sorting by:', sortOption);
   };
-  if (isPending) {
-    return <div className="mt-20 md::mt-32">Loading...</div>
-  }
-  console.log(searchParams.toString());
-
+ 
   return (
     <div className='flex relative mt-28 md:mt-32'>
       <FilterSidebar setIsOpen={setIsOpen} isOpen={isOpen} search={search} />
+
       <div className='md:p-5 w-full lg:w-[80%]'>
-        <div className='flex items-center justify-between mb-5 lg:p-0 p-3'>
-          <h1 className='text-xl text-slate-700 font-semibold pl-2 md:pl-10'>
-            Top results for "{decodeURIComponent(search || '').toLowerCase()}"
+        <button
+          className='bg-purple-700 md:hidden cursor-pointer mx-auto text-white font-semibold text-sm px-10 py-2  hover:bg-purple-800 transition-colors flex items-center gap-2'
+          onClick={() => {
+            setIsOpen(true);
+          }}
+        >
+          <Filter className="w-5 h-5" />
+          APPLY FILTERS
+        </button>
+        <div className='flex items-center mt-2 justify-between mb-2 md:mb-5 lg:p-0 p-3'>
+          <h1 className='text-md text-zinc-500 font-medium pl-2 md:pl-10'>
+            {products && products.length} results found for "{decodeURIComponent(search || '').toLowerCase()}"
           </h1>
         </div>
 
-        <div className='flex items-center gap-y-2 lg:gap-5 flex-wrap w-full justify-start pb-20 md:px-10'>
+        <div className='flex items-center gap-y-2 lg:gap-5 gap-x-2 flex-wrap w-full md:justify-start justify-center pb-20 md:px-10 px-1'>
+          {isPending && [1,2,3,4].map((_, i) => (
+            <ProductCardSkeleton key={i} />
+          ))}
           {!isPending && products && products.length > 0 && products.map((item, idx) => (
             <ProductCard key={idx}
               title={item.title}
@@ -48,25 +59,13 @@ const page = () => {
               isFromHome={false} />
           ))}
         </div>
-      {products && products.length === 0 && (
-        <div className='flex justify-center items-center h-[50vh] w-full'>
-          <h2 className='text-2xl text-gray-500'>No products found.</h2>
-        </div>
-      )}
+        {products && products.length === 0 && (
+          <div className='flex justify-center items-center h-[50vh] w-full'>
+            <h2 className='text-2xl text-gray-500'>No products found.</h2>
+          </div>
+        )}
         {/* Bottom Navigation Bar */}
-        <div className='flex lg:hidden justify-between items-center fixed shadow-2xl border-t border-gray-300 bg-white w-full bottom-0 px-20 py-3 tracking-wider'>
-          <button
-            onClick={() => setSortDrawerOpen(true)}
-            className='text-red-500 font-semibold text-md hover:text-red-600 transition-colors'
-          >
-            Sort
-          </button>
-          <button className='text-red-500 font-semibold text-md hover:text-red-600 transition-colors'
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            Filter
-          </button>
-        </div>
+
       </div>
 
       {/* Sort Drawer */}

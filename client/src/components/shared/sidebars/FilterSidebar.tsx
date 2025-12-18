@@ -17,7 +17,7 @@ export default function FilterSidebar({ isOpen, setIsOpen, search }: { isOpen: b
   const [work, setWork] = useState<string[]>([]);
   const searchParams = useSearchParams();
   const isTabletOrMobile = useMediaQuery({ maxWidth: 778 })
-  console.log(isTabletOrMobile);
+  
   useEffect(() => {
     // price
     const priceMin = searchParams.get("priceMin");
@@ -54,8 +54,9 @@ export default function FilterSidebar({ isOpen, setIsOpen, search }: { isOpen: b
       setWork(workParam.split(","));
     }
   }, [searchParams]);
-  const handleApply=()=>{
-     const newParams = new URLSearchParams();
+  
+  const handleApply = () => {
+    const newParams = new URLSearchParams();
 
     if (search) newParams.set("search", search);
 
@@ -68,40 +69,49 @@ export default function FilterSidebar({ isOpen, setIsOpen, search }: { isOpen: b
     if (types.length) newParams.set("type", types.join(","));
     if (fabrics.length) newParams.set("fabric", fabrics.join(","));
     if (work.length) newParams.set("work", work.join(","));
-    //useGetProducts(`?${newParams.toString()}`);
+    
     router.push(`?${newParams.toString()}`);
-    // console.log(`?${newParams.toString()}`);
   }
+  
   useEffect(() => {
-   if(!isTabletOrMobile){
-    handleApply();
-   }
+    if (!isTabletOrMobile) {
+      handleApply();
+    }
   }, [search, price, colors, types, fabrics, work, router]);
+  
   return (
-    <div className={`lg:block  mt-10 ${isOpen ? "left-0" : "-left-[100%]"} fixed  duration-500 w-full z-20 lg:w-[20%] h-screen lg:sticky top-0 overflow-auto bg-white p  border-r border-gray-200`}>
-      <div className='p-6'>
+    <div className={`lg:block mt-10 ${isOpen ? "left-0" : "-left-[100%]"} fixed duration-500 w-full z-20 lg:w-[20%] h-screen lg:sticky top-0 bg-white border-r border-gray-200`}>
+      {/* Scrollable content area */}
+      <div className='h-[calc(100vh-80px)] lg:h-screen overflow-y-auto p-6'>
         {/* Header */}
-        <div className='text-xl font-semibold px-4 text-slate-700'>Filters</div>
-        {/* Color Filter */}
+        <div className='text-xl font-semibold px-4 text-slate-700 mb-4'>Filters</div>
+        
+        {/* Filter Components */}
         <PriceFilter setPrice={setPrice} price={price} />
         <ColorFilter setSelectedColors={setColors} selectedColors={colors} />
         <TypeFilter setSelectedTypes={setTypes} selectedTypes={types} />
         <WorkFilter setSelectedWork={setWork} selectedWork={work} />
         <FabricFilter setSelectedFabrics={setFabrics} selectedFabrics={fabrics} />
       </div>
-      <div className='flex  lg:hidden justify-between items-center sticky shadow-2xl border-t border-gray-300 bg-white w-full bottom-0 px-20 py-3 left-0 tracking-wider'>
+      
+      {/* Fixed bottom buttons for mobile */}
+     {isOpen && <div className='flex lg:hidden justify-between items-center shadow-2xl border-t border-gray-300 bg-white w-full px-20 py-5 tracking-wider fixed bottom-0 left-0'>
         <button
           onClick={() => setIsOpen(false)}
           className='text-slate-800 font-semibold text-md hover:text-slate-900 transition-colors'
         >
           Cancel
         </button>
-        <button className='text-red-500 font-semibold text-md hover:text-red-600 transition-colors'
-          onClick={() => {setIsOpen(!isOpen);handleApply()}}
+        <button 
+          className='text-red-500 font-semibold text-md hover:text-red-600 transition-colors'
+          onClick={() => {
+            setIsOpen(false);
+            handleApply();
+          }}
         >
           Apply
         </button>
-      </div>
+      </div>}
     </div>
   );
 }

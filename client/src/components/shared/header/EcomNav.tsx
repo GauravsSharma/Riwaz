@@ -135,7 +135,7 @@ export default function Header() {
               <button className="text-gray-700 hover:text-pink-500 transition-colors">
                 <Search className="w-5 h-5" />
               </button>
-              {user ? <User className='w-5 h-5 cursor-pointer' /> : <div
+              {user ? <User className='w-5 h-5 cursor-pointer' onClick={()=>router.push("/account")}/> : <div
                 onClick={() => { setBecomeASeller(false); setIsLoginOpen(true) }}
                 className="text-gray-700 cursor-pointer hover:text-pink-500 text-[15px] font-medium transition-colors">
                 Login
@@ -206,7 +206,22 @@ export default function Header() {
                   </li>
                 ))}
                 <li className="pt-2 border-t border-gray-200">
-                  {user ? <User className='w-5 h-5 cursor-pointer' /> : <div
+                  {user ?<div>
+                     
+                    <Link
+                      href={`/account`}
+                      className="block text-gray-700 hover:text-pink-500 text-sm font-medium py-2"
+                    >
+                      Account
+                    </Link>
+                    <Link
+                      href={`/`}
+                      className="block text-gray-700 hover:text-pink-500 text-sm font-medium py-2"
+                    >
+                      Orders
+                    </Link>
+                  
+                  </div> : <div
                     className="block cursor-pointer text-gray-700 hover:text-pink-500 text-sm font-medium py-2"
                     onClick={() => { setBecomeASeller(false); setIsLoginOpen(true); setMobileMenuOpen(false) }}
                   >

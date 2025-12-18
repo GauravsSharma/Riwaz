@@ -7,6 +7,7 @@ import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
 import { useQueryClient } from '@tanstack/react-query';
 import MobileImageCarousel from '../carousels/ProductViewCarousel';
 import { useUserStore } from '@/stores/user.store';
+import ImageModal from '../models/ImageModel';
 // import MobileImageCarousel from './MobileImageCarousel';
 
 type Section = 'details' | 'return' | 'shipping' | 'seller' | 'help';
@@ -30,6 +31,7 @@ const ProductDetailed = ({
     isFromHome = false
 }: Props) => {
     const [selectedImage, setSelectedImage] = useState(0);
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
     const user = useUserStore((s) => s.user);
     const [expandedSections, setExpandedSections] = useState<Record<Section, boolean>>({
         details: true,
@@ -92,8 +94,14 @@ const ProductDetailed = ({
     }
 
     return (
+        
         <div className={`flex flex-col lg:flex-row px-4 md:px-6 ${isFromHome ? "lg:px-20" : "lg:px-8"} pb-6 gap-8`}>
             {/* LEFT SECTION - Product Images */}
+           {isImageModalOpen && <ImageModal
+            isOpen={isImageModalOpen}
+            setIsOpen={setIsImageModalOpen}
+            images={productImages.map(img => img.url)}
+            />}
             <div className="w-full lg:w-1/2 lg:sticky lg:top-0 lg:h-screen lg:overflow-hidden">
                 {/* Mobile Carousel - Show only on mobile */}
                 <div className="block md:hidden">
@@ -101,6 +109,7 @@ const ProductDetailed = ({
                         images={productImages}
                         productTitle={product.title}
                         discountPercentage={product.discountPercentage}
+                        setIsImageModalOpen={setIsImageModalOpen}
                     />
                 </div>
 
@@ -128,7 +137,7 @@ const ProductDetailed = ({
 
                     {/* Main Image */}
                     {productImages[selectedImage] && (
-                        <div className="flex-1 relative">
+                        <div className="flex-1 relative" onClick={()=>setIsImageModalOpen(true)}>
                             <div className="absolute top-4 left-4 bg-black text-white px-3 py-1 text-xs font-bold z-10 rounded">
                                 NEW ARRIVAL
                             </div>

@@ -2,6 +2,7 @@ import { useSendOtp, useVerifyOtp } from '@/hooks/useUser';
 import { X } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
+import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
 
 export default function LoginModal({ isOpen, setIsOpen,becomeASeller }: { isOpen: boolean, setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,becomeASeller:boolean }) {
   //   const [isOpen, setIsOpen] = useState(true);
@@ -9,8 +10,8 @@ export default function LoginModal({ isOpen, setIsOpen,becomeASeller }: { isOpen
   const [receiveOffers, setReceiveOffers] = useState(true);
   const [showOptInput, setShowOtpInput] = useState(false);
   const [otp, setOtp] = useState('');
-  const sendOtpMutation = useSendOtp();
-  const verifyOtpMutation = useVerifyOtp();
+  const {mutate:sendOtpMutation,isPending} = useSendOtp();
+  const {mutate:verifyOtpMutation,isPending:isVerifyOptPending} = useVerifyOtp();
 
   const handleClose = () => {
     setIsOpen(false);
@@ -25,7 +26,7 @@ export default function LoginModal({ isOpen, setIsOpen,becomeASeller }: { isOpen
      
     console.log(mobileNumber+""+mobileNumber);
 
-    sendOtpMutation.mutate(
+    sendOtpMutation(
       { phone: "+91" + mobileNumber },
       {
         onSuccess: () => {
@@ -38,7 +39,7 @@ export default function LoginModal({ isOpen, setIsOpen,becomeASeller }: { isOpen
   };
 
   const handleSubmit = () => {
-    verifyOtpMutation.mutate(
+    verifyOtpMutation(
       {
         phone: "+91" + mobileNumber,
         otp,
@@ -135,19 +136,25 @@ export default function LoginModal({ isOpen, setIsOpen,becomeASeller }: { isOpen
 
               {/* Continue button */}
               {!showOptInput && <button
-                onClick={handleContinue}
-                className="w-full bg-red-400 hover:bg-red-500 text-white font-medium py-3 px-4 rounded-sm transition-colors duration-200 text-sm tracking-wide"
-                disabled={!mobileNumber}
-              >
-                CONTINUE
-              </button>}
+                        disabled={isPending && mobileNumber.length!==10}
+                        onClick={handleContinue}
+                        className={`flex-1 flex justify-center w-full items-center gap-2 bg-purple-600 text-white px-4 py-3 cursor-pointer rounded-lg hover:bg-purple-700 transition-colors font-medium ${
+                            isPending ? "bg-purple-500 cursor-not-allowed" : ""
+                        }`}
+                    >
+                        Continue
+                        {isPending && <FormSubmissionLoader />}
+                    </button>}
               {showOptInput && <button
-                onClick={handleSubmit}
-                className="w-full bg-red-400 hover:bg-red-500 text-white font-medium py-3 px-4 rounded-sm transition-colors duration-200 text-sm tracking-wide"
-                disabled={!otp}
-              >
-                Submit
-              </button>}
+                        disabled={isVerifyOptPending}
+                        onClick={handleSubmit}
+                        className={`flex-1 flex w-full justify-center items-center gap-2 bg-purple-600 text-white px-4 py-3 cursor-pointer rounded-lg hover:bg-purple-700 transition-colors font-medium ${
+                            isVerifyOptPending ? "bg-purple-500 cursor-not-allowed" : ""
+                        }`}
+                    >
+                        Submit
+                        {isVerifyOptPending && <FormSubmissionLoader />}
+                    </button>}
             </div>
           </div>
         </div>

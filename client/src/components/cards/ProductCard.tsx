@@ -24,7 +24,7 @@ const ProductCard = ({
   };
 
   return (
-   <div className={`group cursor-pointer ${isFromHome? "sm:w-80 w-1/2 ":"sm:w-60 w-1/2"}`}>
+   <div className={`group cursor-pointer  ${isFromHome? "sm:w-80 w-[48%]":"sm:w-60 w-[48%]"}`}>
       <div className="relative overflow-hidden">
         <div className="absolute top-4 left-4 z-10">
           <span className="bg-purple-500 text-white px-3 py-1 text-sm font-semibold">
@@ -35,7 +35,7 @@ const ProductCard = ({
         onClick={handleViewDetails}
           src={image}
           alt={title}
-          className={`w-full ${isFromHome?"h-92":"h-80"} object-cover transition-transform duration-500 group-hover:scale-105`}
+          className={`w-full ${isFromHome?"h-80 sm:h-92":"h-80"} object-cover transition-transform duration-500 group-hover:scale-105 rounded md:rounded-none`}
         />
       </div>
       <div className="mt-4">

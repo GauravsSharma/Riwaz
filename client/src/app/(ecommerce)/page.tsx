@@ -66,7 +66,6 @@ const page = () => {
       <SareeCategorySection />
       <div className='text-center my-8  sm:my-15  '>
         <h3 className='font-semibold fraunces text-3xl sm:text-5xl'>Featured Product</h3>
-        
         <p className='text-md text-gray-600 mt-1 sm:mt-2'>A perfect blend of tradition, luxury, and grace.</p>
       </div>
       
@@ -80,7 +79,6 @@ const page = () => {
 
       />}
 
-      {/* Correct props */}
       {!isBaluchariSareesLoading && baluchariSarees && <HomeSections products={baluchariSarees} title={"Baluchari Sarees"} discription={"Best baluchari sarees stock only at riwaz."} />}
       {isBaluchariSareesLoading && <div className="flex justify-center flex-wrap gap-2 gap-y-2 mt-20 md:mt-34">
         {
@@ -89,7 +87,6 @@ const page = () => {
           ))
         }
       </div>}
-      {/* Correct props */}
       {!isSilkSareesLoading && silkSarees && <HomeSections products={silkSarees} title={"Silk Woven Sarees"} discription={"Best silk woven sarees stock only at riwaz."} />}
       {isSilkSareesLoading && <div className="flex justify-center flex-wrap gap-2 gap-y-2 mt-20 md:mt-34">
         {

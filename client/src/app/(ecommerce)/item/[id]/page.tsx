@@ -11,6 +11,7 @@ import AddReviewDialog from '@/components/models/AddReviewModel';
 import { useReviewStore } from '@/stores/buyer/review.store';
 import ProductDetailed from '@/components/sections/ProductDetailed';
 import { log } from 'console';
+import ProductPageSkeleton from '@/components/loaders/ProductPageLoader';
 
 
 
@@ -37,17 +38,17 @@ const ProductPage = () => {
   const recentPurchases = 15;
 
   // Loading state
-  if (isPending) {
-    return <div className="p-10 text-center">Loading product...</div>;
+   if(isPending){
+    return<ProductPageSkeleton/>
   }
-
   if (!product) {
     return <div className="p-10 text-center">Product not found</div>;
   }
 
   const productImages = product.images || [];
-
+ 
   return (
+    
     <div className='mt-24 md:mt-34'>
       {/* Breadcrumb */}
       <div className="px-4 md:px-6 lg:px-8 py-3 text-sm text-gray-500">

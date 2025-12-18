@@ -2,7 +2,7 @@ import React from 'react';
 
 const ProductCardSkeleton = ({ isFromHome = true }) => {
   return (
-    <div className={`group cursor-pointer ${isFromHome ? "sm:w-80 w-1/2" : "sm:w-60 w-1/2"}`}>
+    <div className={`group cursor-pointer ${isFromHome ? "sm:w-80 w-[48%]" : "sm:w-60 w-[48%]"}`}>
       <div className="relative overflow-hidden bg-gray-200 animate-pulse">
         <div className="absolute top-4 left-4 z-10">
           <div className="bg-gray-300 h-7 w-20 rounded"></div>

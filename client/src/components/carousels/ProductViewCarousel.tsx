@@ -7,12 +7,14 @@ interface MobileImageCarouselProps {
   }[];
   productTitle: string;
   discountPercentage?: number;
+  setIsImageModalOpen: (open: boolean) => void;
 }
 
 const MobileImageCarousel: React.FC<MobileImageCarouselProps> = ({
   images,
   productTitle,
-  discountPercentage = 0
+  discountPercentage = 0,
+  setIsImageModalOpen,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
@@ -60,6 +62,7 @@ const MobileImageCarousel: React.FC<MobileImageCarouselProps> = ({
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
+        onClick={()=>setIsImageModalOpen(true)}
       >
         {/* Badges */}
         <div className="absolute top-4 left-4 bg-black text-white px-3 py-1 text-xs font-bold z-10 rounded">

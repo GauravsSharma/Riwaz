@@ -24,7 +24,7 @@ export default function HomeSections({ products,title,discription }: Props) {
         </div>
 
         {/* Product Grid */}
-        <div className="flex justify-center flex-wrap gap-y-2 sm:gap-2">
+        <div className="flex justify-center flex-wrap gap-y-2 gap-x-2 sm:gap-2">
           {products?.map((product, index) => (
             <ProductCard
               key={index}

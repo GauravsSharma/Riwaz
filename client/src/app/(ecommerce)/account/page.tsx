@@ -6,20 +6,11 @@ import { useCurrentUser } from "@/hooks/useUser";
 import Link from "next/link";
 
 export default function page() {
-  
-  
-   // in this basically we have to show logged-user details...
-  
-  
-     
-     const{data:user,isLoading,error}=useCurrentUser();
-     
 
-      // if user loads
+     const{data:user,isLoading,error}=useCurrentUser();
      if(isLoading)
       return <p>Loading.....</p>
-  
-     // if user is null.......
+ 
      if(error)
       return <p>Something went wrong.....</p>
   
