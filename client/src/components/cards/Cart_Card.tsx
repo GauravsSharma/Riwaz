@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { useUpdateItem } from '@/hooks/buyer/useUserCart';
 import { toast } from 'react-toastify';
 import { useQueryClient } from '@tanstack/react-query';
+import { useUserStore } from '@/stores/user.store';
+import { useUserCart } from '@/stores/buyer/cart.user';
 
 interface CartCardProps {
   title: string;
@@ -29,11 +31,12 @@ const Cart_Card = ({
   productId
 }: CartCardProps) => {
   const [quantity, setQuantity] = useState(quan);
+  const setCartItems = useUserCart(s => s.setCartItems)
   const { mutate: updateQuantity } = useUpdateItem();
   const queryClient = useQueryClient();
   // Debounce timer ref
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
-
+  const user = useUserStore(s => s.user)
   // Sync with prop changes (when cart data refetches)
   useEffect(() => {
     setQuantity(quan);
@@ -75,10 +78,20 @@ const Cart_Card = ({
   }, [quantity, productId]);
 
   const handleQuantityChange = (type: 'increase' | 'decrease') => {
-    if (type === 'increase') {
-      setQuantity(prev => prev + 1);
-    } else if (type === 'decrease' && quantity > 1) {
-      setQuantity(prev => prev - 1);
+    if (user) {
+      if (type === 'increase') {
+        setQuantity(prev => prev + 1);
+      } else if (type === 'decrease' && quantity > 1) {
+        setQuantity(prev => prev - 1);
+      }
+    } else {
+      const cartItems = localStorage.getItem('guest-cart') || '[]';
+      const items = JSON.parse(cartItems)
+      const index = items.findIndex((pro: CartItem) => pro.productId === productId)
+      if (index === -1) return;
+      items[index].quantity = type === 'decrease' ? items[index].quantity - 1 : items[index].quantity + 1
+      localStorage.setItem('guest-cart', JSON.stringify(items));
+      setCartItems(items)
     }
   };
 

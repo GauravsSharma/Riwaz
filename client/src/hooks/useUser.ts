@@ -202,7 +202,7 @@ export const useEditAddress = () => {
 
 
 // Verify OTP → return token + user
-export const useLogout = () => {
+export const useLogout = (setIsOpen: (open: boolean) => void) => {
   const setUser = useUserStore((s) => s.setUser);
 
   return useMutation({
@@ -210,9 +210,13 @@ export const useLogout = () => {
       const res = await api.post("/user/logout");
       return res.data;
     },
-    onSuccess: () => {  
+    onSuccess: () => {
       setUser(null);
+      setIsOpen(false);
       toast.success("Logout successful!");
+    },
+    onError: () => {
+      toast.error("Logout failed!");
     },
   });
 };

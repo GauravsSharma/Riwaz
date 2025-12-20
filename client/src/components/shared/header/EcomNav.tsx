@@ -7,7 +7,7 @@ import { useUserStore } from '@/stores/user.store';
 import { useUserCart } from '@/stores/buyer/cart.user';
 import { useGetCartSummary } from '@/hooks/buyer/useUserCart';
 import { useRouter } from 'next/navigation';
-
+// import {setCount from "../../../stores/buyer/cart.user"
 
 export default function Header() {
   const user = useUserStore((s) => s.user);
@@ -15,18 +15,18 @@ export default function Header() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const { data: cartSummary } = useGetCartSummary();
   const [becomeASeller, setBecomeASeller] = useState(false);
-
-  const cartCount = useUserCart((s) => s.count);
-  const [guestCount, setGuestCount] = useState(0);
+  const setCount = useUserCart(s=>s.setCount)
+  const count = useUserCart((s) => s.count);
+  // const [guestCount, setGuestCount] = useState(0);
 
   useEffect(() => {
     if (!user) {
       const cart = JSON.parse(localStorage.getItem("guest-cart") || "[]");
-      setGuestCount(cart.length);
+      setCount(cart.length);
     }
   }, [user]);
 
-  const count = user ? cartCount : guestCount;
+  // const count = user ? cartCount : guestCount;
 
 
   const router = useRouter()

@@ -1,44 +1,17 @@
 import React from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
-import { useDeleteItem } from '@/hooks/buyer/useUserCart';
-import { useQueryClient } from '@tanstack/react-query';
-import { useUserStore } from '@/stores/user.store';
-import { useUserCart } from '@/stores/buyer/cart.user';
-import { toast } from 'react-toastify';
+import { useLogout } from '@/hooks/useUser';
 
-interface DeleteCartItemProps {
-    productId: string;
+interface LogoutModelProps {
     isOpen: boolean;
     setIsOpen: (isOpen: boolean) => void;
 }
-const DeleteCartItem: React.FC<DeleteCartItemProps> = ({ productId, isOpen, setIsOpen }) => {
-      const queryClient = useQueryClient();
-      const user = useUserStore(s=>s.user)
-      const count = useUserCart(s=>s.count)
-      const setCount = useUserCart(s=>s.setCount)
-      const setCartItems = useUserCart(s=>s.setCartItems)
-    const { mutate: deleteItem,isPending } = useDeleteItem(productId,()=>{
-        setIsOpen(false);
-         queryClient.invalidateQueries({ queryKey: ['cart-summary-store'] });
-    });
-    const handleDelete = () => {
-        if(!user){
-            const cartItem = localStorage.getItem('guest-cart')||'[]';
-            const items = JSON.parse(cartItem);
-            const index = items.findIndex((pro:CartItem)=>pro.productId===productId)
-            if(index=== -1) return;
-            items.splice(index,1);
-            localStorage.setItem('guest-cart',JSON.stringify(items));
-            setCartItems(items)
-            toast.success("Item removed");
-            setCount(count===0?0:count-1);
-            setIsOpen(false);
-        }
-        else{
-            deleteItem()
-        }
-    };
+const LogoutModel: React.FC<LogoutModelProps> = ({ isOpen, setIsOpen }) => {
+   const {mutate,isPending} = useLogout(setIsOpen)
+   const handleLogout = ()=>{
+    mutate()
+   }
 
     return (
        <>
@@ -59,11 +32,11 @@ const DeleteCartItem: React.FC<DeleteCartItemProps> = ({ productId, isOpen, setI
                             <div className="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
                                 <AlertTriangle className="text-red-600" size={24} />
                             </div>
-                            <h2 className="text-xl font-semibold text-gray-900">Delete Item</h2>
+                            <h2 className="text-xl font-semibold text-gray-900">Are you sure ?</h2>
                         </div>
 
                         <p className="text-sm text-gray-500 mb-6">
-                            This action cannot be undone.
+                            Confirm that you want to logout.
                         </p>
 
                         <div className="flex gap-3 justify-end">
@@ -75,10 +48,10 @@ const DeleteCartItem: React.FC<DeleteCartItemProps> = ({ productId, isOpen, setI
                             </button>
                             <button
                                 disabled={isPending}
-                                onClick={handleDelete}
+                                onClick={handleLogout}
                                 className={`px-4 py-2 cursor-pointer flex justify-center items-center gap-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium ${isPending ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
-                                Delete
+                                Log out
                                 {isPending && <FormSubmissionLoader/>}
                             </button>
                         </div>
@@ -107,6 +80,6 @@ const DeleteCartItem: React.FC<DeleteCartItemProps> = ({ productId, isOpen, setI
     );
 };
 
-export default DeleteCartItem;
+export default LogoutModel;
 
 

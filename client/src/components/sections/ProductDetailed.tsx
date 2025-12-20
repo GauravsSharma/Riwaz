@@ -8,6 +8,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import MobileImageCarousel from '../carousels/ProductViewCarousel';
 import { useUserStore } from '@/stores/user.store';
 import ImageModal from '../models/ImageModel';
+import { useUserCart } from '@/stores/buyer/cart.user';
 // import MobileImageCarousel from './MobileImageCarousel';
 
 type Section = 'details' | 'return' | 'shipping' | 'seller' | 'help';
@@ -31,6 +32,8 @@ const ProductDetailed = ({
     isFromHome = false
 }: Props) => {
     const [selectedImage, setSelectedImage] = useState(0);
+    const count = useUserCart(s=>s.count)
+    const setCount = useUserCart(s=>s.setCount)
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
     const user = useUserStore((s) => s.user);
     const [expandedSections, setExpandedSections] = useState<Record<Section, boolean>>({
@@ -68,9 +71,16 @@ const ProductDetailed = ({
             parsedCart.push({
                 productId: product._id,
                 quantity,
+                title:product.title,
+                unitPrice:product.price,
+                thumbnail:product.images[0].url,
+                color:product.color,
+                discountPercentage:product.discountPercentage,
+                originalPrice:product.originalPrice
             });
+            setCount(count+1);
         }
-
+        
         localStorage.setItem("guest-cart", JSON.stringify(parsedCart));
         toast.success("Item added to cart successfully!");
 

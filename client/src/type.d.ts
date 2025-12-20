@@ -1,10 +1,3 @@
-// interface User {
-//   id: string;
-//   name: string;
-//   phone: string;
-//   type: "buyer" | "seller"| null;
-// }
-
 interface User {
   _id: string;
   fullName: string | null;
@@ -80,6 +73,8 @@ interface MainProduct{
       public_id:string
     }
   ]
+  color:string,
+  
 }
 interface Variant{
   thumbnail:{

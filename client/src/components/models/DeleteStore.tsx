@@ -3,41 +3,27 @@ import { AlertTriangle, X } from 'lucide-react';
 import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
 import { useDeleteItem } from '@/hooks/buyer/useUserCart';
 import { useQueryClient } from '@tanstack/react-query';
-import { useUserStore } from '@/stores/user.store';
-import { useUserCart } from '@/stores/buyer/cart.user';
+import { useDeleteStore } from '@/hooks/seller/useStore';
 import { toast } from 'react-toastify';
 
-interface DeleteCartItemProps {
-    productId: string;
+interface DeleteStoreProps {
+    storeId: string;
     isOpen: boolean;
     setIsOpen: (isOpen: boolean) => void;
 }
-const DeleteCartItem: React.FC<DeleteCartItemProps> = ({ productId, isOpen, setIsOpen }) => {
+const DeleteStoreModel: React.FC<DeleteStoreProps> = ({ storeId, isOpen, setIsOpen }) => {
       const queryClient = useQueryClient();
-      const user = useUserStore(s=>s.user)
-      const count = useUserCart(s=>s.count)
-      const setCount = useUserCart(s=>s.setCount)
-      const setCartItems = useUserCart(s=>s.setCartItems)
-    const { mutate: deleteItem,isPending } = useDeleteItem(productId,()=>{
-        setIsOpen(false);
-         queryClient.invalidateQueries({ queryKey: ['cart-summary-store'] });
-    });
+    const { mutate: deleteItem,isPending } = useDeleteStore();
     const handleDelete = () => {
-        if(!user){
-            const cartItem = localStorage.getItem('guest-cart')||'[]';
-            const items = JSON.parse(cartItem);
-            const index = items.findIndex((pro:CartItem)=>pro.productId===productId)
-            if(index=== -1) return;
-            items.splice(index,1);
-            localStorage.setItem('guest-cart',JSON.stringify(items));
-            setCartItems(items)
-            toast.success("Item removed");
-            setCount(count===0?0:count-1);
-            setIsOpen(false);
-        }
-        else{
-            deleteItem()
-        }
+        deleteItem(storeId,{
+            onSuccess:()=>{
+                setIsOpen(false)
+                toast.success("Store deleted Successfully.")
+            },
+            onError:()=>{
+                toast.error("Something went wrong.")
+            }
+        })
     };
 
     return (
@@ -107,6 +93,6 @@ const DeleteCartItem: React.FC<DeleteCartItemProps> = ({ productId, isOpen, setI
     );
 };
 
-export default DeleteCartItem;
+export default DeleteStoreModel;
 
 

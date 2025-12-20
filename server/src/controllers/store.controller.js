@@ -15,7 +15,7 @@ export const createStore = async (req, res) => {
             name,
             description,
             address,
-        }).select("name description address _id")
+        })
 
         return res
             .status(201)
@@ -69,13 +69,12 @@ export const updateStore = async (req, res) => {
         const { id } = req.params;
         const { name, description, address } = req.body;
 
-        const store = await Store.findById(id).populate('ownerId');
-
+        const store = await Store.findById(id).populate("ownerId").select("_id name description address")
+        
         if (!store) {
             return res.status(404).json({ message: "Store not found." });
         }
-
-        // only the owner can update
+        
         if (store.ownerId._id.toString() !== req.user.userId.toString()) {
             return res
                 .status(403)
@@ -118,7 +117,7 @@ export const deleteStore = async (req, res) => {
 
         await store.deleteOne();
 
-        return res.status(200).json({ message: "Store deleted successfully." });
+        return res.status(200).json({ success:true,id });
     } catch (error) {
         return res
             .status(500)
