@@ -15,6 +15,37 @@ interface SendOtpPayload {
   phone: string;
 }
 
+// product recommendation.... thumbnail type
+export interface ProductThumbnail {
+  url: string;
+  public_id: string;
+}
+
+export interface Products {
+  _id: string;
+  title: string;
+  slug: string;
+  type: string;
+  price: number;
+  thumbnail: ProductThumbnail;
+}
+
+// Product recommendation API response
+export interface ProductRecommendationResponse {
+  success: boolean;
+  products: Products[];
+}
+
+
+export interface ProductSuggestionResponse{
+
+  success:boolean;
+  suggestions:string[]
+    
+}
+
+
+
 interface VerifyOtpPayload {
   phone: string;
   otp: string;
@@ -151,8 +182,6 @@ export const getAddress = () => {
 
 };
 
-
-
 //delete the address
 
 
@@ -188,18 +217,64 @@ export const useEditAddress = () => {
 };
 
 
+// get ProductRecommendationByQuery
+
+export const getProductRecommendation = (searchQuery: string) => {
+  return useQuery<ProductSuggestionResponse>({
+    queryKey: ["searchSuggestions", searchQuery],
+    queryFn: async ({ queryKey }) => {
+      const [, query] = queryKey;
+
+      if (!query) {
+        return { success: true, products: [] };
+      }
+
+      const response = await api.get(
+        `/product/search/suggestions?q=${query}`,
+       {
+       headers: {
+        "Cache-Control": "no-cache",
+         Pragma: "no-cache",
+       }
+      }
+
+      );
+
+      console.log("Data------------>", response.data);
+      return response.data;
+    },
+    enabled: !!searchQuery, // prevents empty calls
+  });
+};
 
 
+export const getSearchRecommendation = (searchQuery: string) => {
+  return useQuery<ProductRecommendationResponse>({
+    queryKey: ["ProductSuggestions", searchQuery],
+    queryFn: async ({ queryKey }) => {
+      const [, query] = queryKey;
 
+      if (!query) {
+        return { success: true, products: [] };
+      }
 
+      const response = await api.get(
+        `/product/query?q=${query}`,
+       {
+       headers: {
+        "Cache-Control": "no-cache",
+         Pragma: "no-cache",
+       }
+      }
 
+      );
 
-
-
-
-
-
-
+      console.log("Data------------>", response.data);
+      return response.data;
+    },
+    enabled: !!searchQuery, // prevents empty calls
+  });
+};
 
 // Verify OTP → return token + user
 export const useLogout = () => {
@@ -216,3 +291,5 @@ export const useLogout = () => {
     },
   });
 };
+
+

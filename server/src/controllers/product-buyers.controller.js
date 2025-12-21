@@ -173,6 +173,8 @@ export const getProductRecommendationByQuery = async (req, res) => {
   try {
     const { q } = req.query;
 
+    console.log("q query: ",q);
+
     if (!q || q.trim().length === 0) {
       return res.status(200).json([]);
     }
