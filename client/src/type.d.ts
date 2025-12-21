@@ -1,3 +1,4 @@
+declare module "*.css";
 interface User {
   _id: string;
   fullName: string | null;

@@ -1,10 +1,8 @@
 
-import React, { useState } from 'react';
-import { Heart } from 'lucide-react';
-import Image from 'next/image';
-import { useUserStore } from '@/stores/user.store';
+import React from 'react';
 import { trimTitle } from '@/utils/trimeTitle';
-import { useRouter } from 'next/navigation';
+
+import Link from 'next/link';
 
 
 const ProductCard = ({ 
@@ -17,12 +15,6 @@ const ProductCard = ({
   isFromHome = true
 }) => {
  
-    const router = useRouter();
- 
-  const handleViewDetails = () => {
-    router.push(`/item/${id}`);
-  };
-
   return (
    <div className={`group cursor-pointer  ${isFromHome? "sm:w-80 w-[48%]":"sm:w-60 w-[48%]"}`}>
       <div className="relative overflow-hidden">
@@ -31,12 +23,14 @@ const ProductCard = ({
             SAVE {discount}%
           </span>
         </div>
+        <Link href={`/item/${id}`}>
+        
         <img
-        onClick={handleViewDetails}
-          src={image}
-          alt={title}
-          className={`w-full ${isFromHome?"h-80 sm:h-92":"h-80"} object-cover transition-transform duration-500 group-hover:scale-105 rounded md:rounded-none`}
+        src={image}
+        alt={title}
+        className={`w-full ${isFromHome?"h-80 sm:h-92":"h-80"} object-cover transition-transform duration-500 group-hover:scale-105 rounded md:rounded-none`}
         />
+        </Link>
       </div>
       <div className="mt-4">
         <h3 className="text-lg text-gray-800 line-clamp-2 mb-2">{trimTitle(title)}</h3>

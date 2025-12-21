@@ -135,7 +135,7 @@ export default function Header() {
               <button className="text-gray-700 hover:text-pink-500 transition-colors">
                 <Search className="w-5 h-5" />
               </button>
-              {user ? <User className='w-5 h-5 cursor-pointer' onClick={()=>router.push("/account")}/> : <div
+              {user ? <Link href={"/account"}><User className='w-5 h-5 cursor-pointer' /> </Link>: <div
                 onClick={() => { setBecomeASeller(false); setIsLoginOpen(true) }}
                 className="text-gray-700 cursor-pointer hover:text-pink-500 text-[15px] font-medium transition-colors">
                 Login
