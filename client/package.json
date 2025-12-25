@@ -2,9 +2,6 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
-  "overrides": {
-  "next": "15.3.5"
-},
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
@@ -19,7 +16,7 @@
     "axios": "^1.13.2",
     "lucide": "^0.525.0",
     "lucide-react": "^0.525.0",
-    "next": "15.3.5",
+    "next": "^15.5.9",
     "nextjs-toploader": "^3.9.17",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
