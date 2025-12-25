@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { Minus, Plus, Trash2, Heart, Tag, Truck } from 'lucide-react';
+import { Tag, Truck } from 'lucide-react';
 import Cart_Card from '@/components/cards/Cart_Card';
 import { useGetCartItems } from '@/hooks/buyer/useUserCart';
 import { useUserCart } from '@/stores/buyer/cart.user';
@@ -14,9 +14,7 @@ const ShoppingCartPage = () => {
   const [showCouponInput, setShowCouponInput] = useState(false);
   const [couponCode, setCouponCode] = useState('');
   const { isLoading } = useGetCartItems(!!user)
-  console.log(isLoading);
-    // this api fetches the cart item..
-  // const isLoading = false;
+
   const totalAmount = useUserCart((s) => s.totalDiscountedAmount);
   const totalActualAmount = useUserCart((s) => s.totalActualAmount);
   const setTotalActualAmount = useUserCart((s) => s.setTotalActualAmount);
@@ -44,7 +42,7 @@ const ShoppingCartPage = () => {
       setTotalActualAmount(totalActualAmount)
       setTotalDiscountedAmount(totalDiscountedAmount)
     }
-  }, [user, cartItems]);
+  }, [user, cartItems,setTotalActualAmount,setTotalDiscountedAmount]);
 
   if (isLoading) {
     return <div className='h-screen bg-amber-200 flex justify-center items-center'>Loading...</div>

@@ -13,7 +13,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 
-const page = () => {
+const Page = () => {
   const { isLoading } = useCurrentUser();
   const { isPending: isNormalSareesLoading, data: normalSarees } = useGetProducts(`?search=georgette%2Csarees&limit=4`);
   const { isPending: isBaluchariSareesLoading, data: baluchariSarees } = useGetProducts("?search=baluchari%2Csarees&limit=4");
@@ -41,14 +41,14 @@ const page = () => {
         localStorage.removeItem("guest-cart");
       },
     });
-  }, [user]);
+  }, [user,mergeCart,queryClient]);
 
   useEffect(() => {
     if (!isLoading && user?.userType === "seller") {
       router.push("/admin/dashboard");
     }
 
-  }, [user, isLoading]);
+  }, [user, isLoading,router]);
 
 
   return (
@@ -99,4 +99,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page

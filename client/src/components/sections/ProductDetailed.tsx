@@ -1,4 +1,4 @@
-import { useAdditem, useGetCartSummary } from '@/hooks/buyer/useUserCart';
+import { useAdditem } from '@/hooks/buyer/useUserCart';
 import { Banknote, ChevronDown, Minus, Plus, RotateCcw, Share2, Truck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
@@ -9,6 +9,7 @@ import MobileImageCarousel from '../carousels/ProductViewCarousel';
 import { useUserStore } from '@/stores/user.store';
 import ImageModal from '../models/ImageModel';
 import { useUserCart } from '@/stores/buyer/cart.user';
+import Image from 'next/image';
 // import MobileImageCarousel from './MobileImageCarousel';
 
 type Section = 'details' | 'return' | 'shipping' | 'seller' | 'help';
@@ -23,6 +24,7 @@ interface Props {
     variants: Variant[],
     isFromHome?: boolean
 }
+
 const ProductDetailed = ({
     product,
     productImages,
@@ -58,11 +60,9 @@ const ProductDetailed = ({
     };
     const addItemToLocal = () => {
         const storedCart = localStorage.getItem("guest-cart");
-
         const parsedCart = storedCart ? JSON.parse(storedCart) : [];
-
         const existingItemIndex = parsedCart.findIndex(
-            (item: any) => item.productId === product._id
+            (item: CartItem) => item.productId === product._id
         );
 
         if (existingItemIndex !== -1) {
@@ -83,7 +83,6 @@ const ProductDetailed = ({
         
         localStorage.setItem("guest-cart", JSON.stringify(parsedCart));
         toast.success("Item added to cart successfully!");
-
     }
     const handleAddToCart = () => {
         if (user) {
@@ -110,7 +109,7 @@ const ProductDetailed = ({
            {isImageModalOpen && <ImageModal
             isOpen={isImageModalOpen}
             setIsOpen={setIsImageModalOpen}
-            images={productImages.map(img => img.url)}
+            images={productImages.map(Image => Image.url)}
             />}
             <div className="w-full lg:w-1/2 lg:sticky lg:top-0 lg:h-screen lg:overflow-hidden">
                 {/* Mobile Carousel - Show only on mobile */}
@@ -135,8 +134,10 @@ const ProductDetailed = ({
                                         }`}
                                     onClick={() => setSelectedImage(index)}
                                 >
-                                    <img
+                                    <Image
                                         src={image.url}
+                                        height={80}
+                                        width={300}
                                         alt={`Product ${index + 1}`}
                                         className="w-full h-20 object-cover hover:opacity-80 transition"
                                     />
@@ -156,7 +157,9 @@ const ProductDetailed = ({
                                     {product.discountPercentage}% OFF
                                 </div>
                             )}
-                            <img
+                            <Image
+                             height={1000}
+                                width={300}
                                 src={productImages[selectedImage].url}
                                 alt={product.title}
                                 className="w-full h-[60rem] lg:h-full object-cover rounded-lg"
@@ -332,7 +335,9 @@ const ProductDetailed = ({
                                         onClick={() => { router.push(`/item/${variant._id}`) }}
                                         className={`cursor-pointer border-2 rounded-lg overflow-hidden transition border-gray-200`}
                                     >
-                                        <img
+                                        <Image
+                                         height={180}
+                                        width={150}
                                             src={variant.thumbnail.url}
                                             alt={variant.color}
                                             className="w-36 h-44 sm:w-full sm:h-60 object-cover"

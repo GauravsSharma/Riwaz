@@ -2,15 +2,9 @@
 
 import React, { useState } from 'react';
 import { 
-  ChevronLeft, 
   BarChart3, 
   ShoppingCart, 
   Package, 
-  Users, 
-  Megaphone, 
-  TrendingUp, 
-  Settings, 
-  HomeIcon,
   Building2,
   LogOut
 } from 'lucide-react';

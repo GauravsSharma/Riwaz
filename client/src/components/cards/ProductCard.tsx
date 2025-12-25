@@ -3,6 +3,7 @@ import React from 'react';
 import { trimTitle } from '@/utils/trimeTitle';
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 
 const ProductCard = ({ 
@@ -25,9 +26,11 @@ const ProductCard = ({
         </div>
         <Link href={`/item/${id}`}>
         
-        <img
+        <Image
         src={image}
         alt={title}
+        width={400}
+        height={400}
         className={`w-full ${isFromHome?"h-80 sm:h-92":"h-80"} object-cover transition-transform duration-500 group-hover:scale-105 rounded md:rounded-none`}
         />
         </Link>

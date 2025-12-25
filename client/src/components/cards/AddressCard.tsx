@@ -23,7 +23,6 @@ export default function AddressCard({
   address1,
   pincode,
   isHome = true,
-  onEdit,
   onRemove
 }: AddressCardProps) {
 

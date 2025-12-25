@@ -7,13 +7,14 @@ import { useUserStore } from '@/stores/user.store';
 import { useUserCart } from '@/stores/buyer/cart.user';
 import { useGetCartSummary } from '@/hooks/buyer/useUserCart';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 // import {setCount from "../../../stores/buyer/cart.user"
 
 export default function Header() {
   const user = useUserStore((s) => s.user);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const { data: cartSummary } = useGetCartSummary();
+  useGetCartSummary();
   const [becomeASeller, setBecomeASeller] = useState(false);
   const setCount = useUserCart(s=>s.setCount)
   const count = useUserCart((s) => s.count);
@@ -24,7 +25,7 @@ export default function Header() {
       const cart = JSON.parse(localStorage.getItem("guest-cart") || "[]");
       setCount(cart.length);
     }
-  }, [user]);
+  }, [user,setCount]);
 
   // const count = user ? cartCount : guestCount;
 
@@ -111,7 +112,7 @@ export default function Header() {
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <Link href="/" className="flex-shrink-0">
-              <img src="/logo.png" alt="" className='h-12' />
+              <Image src="/logo.png" alt=""  width={150} height={150}/>
             </Link>
 
             {/* Navigation */}
@@ -167,7 +168,7 @@ export default function Header() {
 
             {/* Logo */}
             <Link href={"/"} className="flex-shrink-0">
-              <img src="/logo.png" alt="riwaz logo" className='h-12' />
+              <Image src="/logo.png" alt="riwaz logo" width={150} height={150}/>
             </Link>
 
             {/* Right Icons */}

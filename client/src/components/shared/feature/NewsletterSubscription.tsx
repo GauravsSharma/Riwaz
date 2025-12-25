@@ -11,23 +11,22 @@ const NewsletterSubscription = () => {
   };
 
   return (
-    <div className="bg-gray-100  sm:px-10 border-y border-gray-200">
-      <div className=" px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-          {/* Left Side - Title and Description */}
-          <div className="flex-1 max-w-md">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-3">
-              Get Coupons & Offers
-            </h2>
-            <p className="text-gray-600 text-sm leading-relaxed">
-              You may unsubscribe at any moment. For that purpose, please find our contact 
-              info in the legal notice.
-            </p>
-          </div>
+    <div className="bg-white py-12 px-6">
+      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-center">
+        {/* Left Side - Title and Description */}
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Get Coupons & Offers
+          </h2>
+          <p className="text-gray-600">
+            You may unsubscribe at any moment. For that purpose, please find our contact info in the legal notice.
+          </p>
+        </div>
 
-          {/* Right Side - Email Form */}
-          <div className="flex-1 max-w-md w-full">
-            <form onSubmit={handleSubmit} className="flex gap-0">
+        {/* Right Side - Email Form */}
+        <div>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+            <div className="flex">
               <input
                 type="email"
                 value={email}
@@ -38,16 +37,15 @@ const NewsletterSubscription = () => {
               />
               <button
                 type="submit"
-                className="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-6 py-3 rounded-r-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                className="px-6 py-3 bg-red-600 text-white font-semibold rounded-r-md hover:bg-red-700 transition-colors"
               >
                 SUBSCRIBE
               </button>
-            </form>
-            <p className="text-xs text-gray-500 mt-2 flex items-center">
-              <span className="text-red-400 mr-1">*</span>
-              Don't worry we don't spam.
+            </div>
+            <p className="text-sm text-gray-500">
+              * Don&apos;t worry we don&apos;t spam.
             </p>
-          </div>
+          </form>
         </div>
       </div>
     </div>

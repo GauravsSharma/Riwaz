@@ -1,8 +1,6 @@
 import React from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
-import { useDeleteItem } from '@/hooks/buyer/useUserCart';
-import { useQueryClient } from '@tanstack/react-query';
 import { useDeleteStore } from '@/hooks/seller/useStore';
 import { toast } from 'react-toastify';
 
@@ -12,7 +10,6 @@ interface DeleteStoreProps {
     setIsOpen: (isOpen: boolean) => void;
 }
 const DeleteStoreModel: React.FC<DeleteStoreProps> = ({ storeId, isOpen, setIsOpen }) => {
-      const queryClient = useQueryClient();
     const { mutate: deleteItem,isPending } = useDeleteStore();
     const handleDelete = () => {
         deleteItem(storeId,{

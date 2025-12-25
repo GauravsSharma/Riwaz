@@ -14,7 +14,6 @@ import parentProduct from "../src/routes/parentProduct.route.js";
 import connectDB from "../src/db/db.js";
 
 const app = express();
-
 app.use(
   cors({
     origin: process.env.CLIENT_URL,

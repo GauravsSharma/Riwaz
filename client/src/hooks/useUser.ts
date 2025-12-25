@@ -112,27 +112,17 @@ export const useUpdateOrEditProfile = () =>{
 }
 
 // use to add address
-export const addAddress = () =>{
-
-     
+export const useAddAddress = () =>{
     return useMutation({
- 
       mutationFn:async(data:Address) =>{
-
        const res=await api.post("/user/address",data);
        return res.data;
-
-
       }
-   
 });}
 
 
 //used to get all address
-export const getAddress = () => {
-
-    
- 
+export const useGetAddresses = () => {
  return useQuery<AddressResponse>({
     queryKey: ["Address"],
     queryFn: async () => {
@@ -141,39 +131,23 @@ export const getAddress = () => {
       console.log("Data------------>",res.data);
        return res.data ?? { addresses: [] };
       
-    
     },
   });
-
-
-
-
-
-};
+}
 
 
 
 //delete the address
 
 
-export const deleteAddress = () =>{
+export const useDeleteAddress = () =>{
 
-const setUser = useUserStore((s: UserState) => s.setUser);
-
-
-     return useMutation({
- 
+     return useMutation({ 
       mutationFn:async(id:string) =>{
-
        const res=await api.delete(`/user/address/${id}`);
        return res.data;
-
-
       }
-   
 });
-
-
 }
 
 //edit the address

@@ -8,7 +8,7 @@ import { useUserStore } from "@/stores/user.store";
 import Link from "next/link";
 import { useState } from "react";
 
-export default function page() {
+export default function Page() {
      const [isLogoutModelOpen,setIsLogoutModelOpen] = useState(false)
      const user = useUserStore(s=>s.user)
      const{isLoading,error}=useCurrentUser();

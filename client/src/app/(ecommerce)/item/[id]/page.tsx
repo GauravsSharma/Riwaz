@@ -1,26 +1,19 @@
 "use client";
 import { useGetMainProduct } from '@/hooks/buyer/useProducts';
-import { Minus, Plus, Share2, ChevronDown, Truck, RotateCcw, Banknote } from 'lucide-react';
 import { useParams } from "next/navigation";
 import { useState } from 'react';
-import { useRouter } from 'next/navigation'
 import RatingAndReview from "../../../../components/ratingAndreview/RatingAndReview"
 import { useProductStore } from '@/stores/buyer/products.store';
 import { useGetReviews } from '@/hooks/buyer/useReview';
 import AddReviewDialog from '@/components/models/AddReviewModel';
 import { useReviewStore } from '@/stores/buyer/review.store';
 import ProductDetailed from '@/components/sections/ProductDetailed';
-import { log } from 'console';
 import ProductPageSkeleton from '@/components/loaders/ProductPageLoader';
 
 
 
 const ProductPage = () => {
   const [isReviewDialogBoxOpen, setIsDialogBoxOpen] = useState(false);
-
-  const router = useRouter()
-
-
   const params = useParams();
   const productId = params.id as string;
   const { data: product, isPending } = useGetMainProduct(productId);
@@ -35,8 +28,6 @@ const ProductPage = () => {
   const variants = useProductStore(s => s.variants);
   const rating = averageRating;
   const reviewsLen = reviews?.length || 0;
-  const recentPurchases = 15;
-
   // Loading state
    if(isPending){
     return<ProductPageSkeleton/>

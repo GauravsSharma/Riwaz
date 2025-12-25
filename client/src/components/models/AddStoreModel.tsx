@@ -3,6 +3,13 @@ import { X } from 'lucide-react';
 import React, { useEffect } from 'react'
 import { toast } from 'react-toastify';
 import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
+interface ApiError extends Error {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}
 interface FormData {
   name: string;
   description: string;
@@ -42,21 +49,21 @@ const AddStoreModel = ({
     }
     if (storeData) {
       updateStore({ data: formData, id: storeData._id }, {
-        onSuccess: (data) => {
+        onSuccess: () => {
           toast.success("Store updated successfully");
           setIsDialogOpen(false);
         },
-        onError: (error: any) => {
+        onError: (error: ApiError) => {
           toast.error(error.response?.data?.message || "Something went wrong");
         }
       })
     } else {
       createStoreMutation(formData, {
-        onSuccess: (data) => {
+        onSuccess: () => {
           toast.success("Store created successfully");
           setIsDialogOpen(false);
         },
-        onError: (error: any) => {
+        onError: (error: ApiError) => {
           toast.error(error.response?.data?.message || "Something went wrong");
         }
       });

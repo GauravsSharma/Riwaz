@@ -1,8 +1,7 @@
 "use client"
 import React, { useState } from 'react';
-import { Plus, X, MapPin, Store, MoreVertical, Edit2, Trash2 } from 'lucide-react';
+import { Plus, MapPin, Store, MoreVertical, Edit2, Trash2 } from 'lucide-react';
 import AddStoreModel from '@/components/models/AddStoreModel';
-import { useGetAllStores } from '@/hooks/seller/useStore';
 import { useSellerStore } from '@/stores/seller/store.store';
 import DeleteStoreModel from '@/components/models/DeleteStore';
 

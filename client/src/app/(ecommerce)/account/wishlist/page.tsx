@@ -2,7 +2,7 @@
 import WishlistCart from '@/components/cards/WishlistCart'
 import React from 'react'
 
-const page = () => {
+const Page = () => {
   return (
     <div>
        <h2 className="text-2xl font-semibold text-gray-900 mb-6">My Whishlist</h2>
@@ -13,4 +13,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page
