@@ -1,6 +1,7 @@
 "use client"
 import HeroCarousel from '@/components/carousels/HeroCarousel'
 import ProductCardSkeleton from '@/components/loaders/ProductCardLoader'
+import CustomerReviews from '@/components/sections/CustomerReviews'
 import HomeSections from '@/components/sections/HomeSection'
 import ProductDetailed from '@/components/sections/ProductDetailed'
 import SareeCategorySection from '@/components/sections/SareeCategorySection'
@@ -95,6 +96,7 @@ const Page = () => {
           ))
         }
       </div>}
+      <CustomerReviews/>
     </div>
   )
 }
