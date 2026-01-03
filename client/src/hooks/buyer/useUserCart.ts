@@ -11,6 +11,9 @@ interface CartSummary {
   totalActualPrice: number
   itemCount: number,
 }
+interface CheckoutSessionPayload{
+    coupon:string
+}
 export const useGetCartItems = (enabled: boolean) => {
   const setCartItems = useUserCart((s) => s.setCartItems);
   return useQuery<CartItem[]>({
@@ -87,5 +90,15 @@ export const useDeleteItem = (id: string, onSuccessCallback: () => void) => {
     onError: () => {
       toast.error("Failed to delete item. Please try again.");
     }
+  });
+};
+
+
+export const useCreateCheckoutSession = () => {
+  return useMutation({
+    mutationFn: async (data:CheckoutSessionPayload) => {
+      const res = await api.post("/order/create-checkout-session",data);
+      return res.data.sessionUrl;
+    },
   });
 };

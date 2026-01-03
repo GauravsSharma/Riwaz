@@ -2,23 +2,29 @@
 import React, { useEffect, useState } from 'react';
 import { Tag, Truck } from 'lucide-react';
 import Cart_Card from '@/components/cards/Cart_Card';
-import { useGetCartItems } from '@/hooks/buyer/useUserCart';
+import { useCreateCheckoutSession, useGetCartItems, useGetCartSummary } from '@/hooks/buyer/useUserCart';
 import { useUserCart } from '@/stores/buyer/cart.user';
 import DeleteCartItem from '@/components/models/DeleteCartItem';
 import { useUserStore } from '@/stores/user.store';
+import { toast } from 'react-toastify';
+import CheckoutSessionLoader from '@/components/loaders/CheckoutSessionLoader';
+import { useRouter } from 'next/navigation';
 
 const ShoppingCartPage = () => {
   const [item, setItem] = useState<string>();
+  useGetCartSummary()
   const user = useUserStore(s => s.user)
   const [isOpen, setIsOpen] = useState(false);
   const [showCouponInput, setShowCouponInput] = useState(false);
   const [couponCode, setCouponCode] = useState('');
   const { isLoading } = useGetCartItems(!!user)
-
+  const [isCheckOutLoaderOpen, setIsCheckOutLoaderOpen] = useState(false);
   const totalAmount = useUserCart((s) => s.totalDiscountedAmount);
   const totalActualAmount = useUserCart((s) => s.totalActualAmount);
   const setTotalActualAmount = useUserCart((s) => s.setTotalActualAmount);
   const setTotalDiscountedAmount = useUserCart((s) => s.setTotalDiscountedAmount);
+  const { mutate } = useCreateCheckoutSession();
+  const router = useRouter()
   const [items, setItems] = useState<CartItem[]>([]);
   const cartItems = useUserCart((s) => s.items);
 
@@ -42,11 +48,30 @@ const ShoppingCartPage = () => {
       setTotalActualAmount(totalActualAmount)
       setTotalDiscountedAmount(totalDiscountedAmount)
     }
-  }, [user, cartItems,setTotalActualAmount,setTotalDiscountedAmount]);
+  }, [user, cartItems, setTotalActualAmount, setTotalDiscountedAmount]);
+  const handleCheckout = () => {
+    if (!user) {
+      toast.info("Please login first.");
+      return;
+    }
+    setIsCheckOutLoaderOpen(true);
+    mutate({ coupon: "NONE" }, {
+      onSuccess: (url: string) => {
+        setIsCheckOutLoaderOpen(false);
+        // router.push(url)
+      },
+      onError: () => {
+        setIsCheckOutLoaderOpen(false)
+        toast.error("Something went wrong")
+      }
+    })
+
+  }
 
   if (isLoading) {
     return <div className='h-screen bg-amber-200 flex justify-center items-center'>Loading...</div>
   }
+
   return (
     <div className="min-h-screen bg-gray-50 relative mt-34">
       <div className="max-w-7xl mx-auto px-4 py-6">
@@ -108,7 +133,7 @@ const ShoppingCartPage = () => {
 
               {/* Free Delivery Badge */}
               <div className="flex items-center gap-2 mb-4 md:mb-6 p-3 bg-green-50 rounded-lg">
-                <Truck className="text-green-600 flex-shrink-0" size={16} />
+                <Truck className="text-green-600 shrink-0" size={16} />
                 <span className="text-sm font-medium text-green-700">Free delivery order over ₹499</span>
               </div>
 
@@ -146,7 +171,9 @@ const ShoppingCartPage = () => {
                   <span className="text-xl md:text-2xl font-bold text-gray-900">₹{totalAmount.toFixed(2)}</span>
                 </div>
 
-                <button className="w-full bg-slate-700 text-white py-3 rounded-lg font-semibold hover:bg-slate-800 transition-colors">
+                <button
+                  onClick={handleCheckout}
+                  className="w-full bg-slate-700 text-white py-3 rounded-lg font-semibold hover:bg-slate-800 transition-colors cursor-pointer">
                   CHECKOUT
                 </button>
               </div>
@@ -161,7 +188,9 @@ const ShoppingCartPage = () => {
           productId={item}
         />
       }
+      {isCheckOutLoaderOpen && <CheckoutSessionLoader />}
     </div>
+
   );
 };
 

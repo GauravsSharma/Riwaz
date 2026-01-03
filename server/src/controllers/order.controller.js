@@ -1,58 +1,27 @@
-import Stripe from "stripe";
 import Order from '../models/Order.js';
 import UserCart from '../models/userCart.js';
 import Product from '../models/product.js';
 import { stripe } from "../../api/index.js";
+import { rozarPayInstance } from '../config/rozarpay.js';
 // import { stripe } from "../../server.js";
 
 // you have to change the variant to productId
 export const createCheckoutSession = async (req, res) => {
     try {
         const userId = req.user.userId;
-        
-       
-        const usercart = await UserCart.findOne({ userId }).populate("products.productId");
-        if (!usercart) {
-            return res.status(400).json({
-                success: false,
-                message: "User cart not found.",
-            });
+        const cartItems = await UserCart
+            .findOne({ userId })
+        const totalAmont = cartItems.products.reduce((acc,item)=>item.unitPrice*item.quantity+acc,0)
+        const options = {
+            amount:totalAmont * 100,
+            currency:"INR"
         }
-
-        if (usercart.products.length === 0) {
-            return res.status(400).json({
-                success: false,
-                message: "User cart is empty.",
-            });
-        }
-        const line_items = usercart.products.map((item) => ({
-            price_data: {
-                currency: "usd",
-                product_data: {
-                    name: item.productId?.title || "Unknown Product",
-                    description: item.productId?.description || "",
-                    images: item.thumbnail.url ? [item.thumbnail.url] : [],
-                },
-                unit_amount: Math.round(item.unitPrice * 100), // Stripe uses cents
-            },
-            quantity: item.quantity,
-        }));
-
-        const session = await stripe.checkout.sessions.create({
-            payment_method_types: ["card"], // ✅ should be "card", not "cards"
-            mode: "payment",
-            line_items,
-            success_url: `${process.env.CLIENT_URL}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.CLIENT_URL}/checkout-cancel`,
-            metadata: {
-                userId,
-            },
-        });
-
+        const order = await rozarPayInstance.orders.create(options);
+        console.log(order)
         return res.status(200).json({
             success: true,
             message: "Checkout session created successfully.",
-            sessionUrl: session.url,
+            order
         });
 
     } catch (error) {
@@ -165,7 +134,7 @@ export const placeOrder = async (req, res) => {
                 });
             }
 
-          
+
             // Validate stock availability
             if (item.quantity > product.stock) {
                 return res.status(400).json({

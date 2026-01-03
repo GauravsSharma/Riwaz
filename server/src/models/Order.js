@@ -1,6 +1,4 @@
 import mongoose from "mongoose";
-import Address from "./Address.js";
-
 
 // how user will place a order ?
 // create address schema

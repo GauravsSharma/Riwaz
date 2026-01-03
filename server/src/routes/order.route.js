@@ -7,8 +7,8 @@ import { createCheckoutSession, placeOrder } from '../controllers/order.controll
 
 const router = express.Router();
 
-router.post("/place-order",authMiddleware,placeOrder)
 router.post("/create-checkout-session",authMiddleware,createCheckoutSession)
+router.post("/place-order",authMiddleware,placeOrder)
 
 export default router;
 
