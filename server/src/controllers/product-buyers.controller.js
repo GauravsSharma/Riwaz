@@ -31,7 +31,7 @@ export const getSingleProduct = async (req, res) => {
         path: "images",
         select: "url public_id"
       });
-
+    console.log("product",product);
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }

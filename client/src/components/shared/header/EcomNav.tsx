@@ -50,6 +50,7 @@ export default function Header() {
   const { data: suggestionData } = getProductRecommendation(debounceQuery);
   const { data: productData } = getSearchRecommendation(debounceQuery);
 
+
   // Focus input when search overlay opens
   useEffect(() => {
     if (isOpen && inputRef.current) inputRef.current.focus();
@@ -58,9 +59,10 @@ export default function Header() {
   // Keyboard shortcuts for search overlay
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k" || e.key === "Enter") {
         e.preventDefault();
         setIsOpen(true);
+        //call the product description...
       }
       if (e.key === "Escape") setIsOpen(false);
     };
@@ -77,14 +79,24 @@ export default function Header() {
     setSearchQuery(e.target.value);
   };
 
-  const handleProductClick = (slug: string) => {
-    router.push(`/product/${slug}`);
+  const handleProductClick = (id: string) => {
+    //router.push(`/product/${slug}`);
+
+   // console.log(productData?.products,"product data");
+    //console.log(id)
+    //setSelectedItem(id)
+    //console.log("hi i am product handle");
+    router.push(`/item/${id}`)
     handleClose();
   };
 
   const handleSuggestionClick = (text: string) => {
     setSearchQuery(text);
-    inputRef.current?.focus();
+    console.log("hi i am suggestion");
+    router.push(`/product-category?search/${text}`)
+    handleClose();
+   // router.push(`/item/${id}`)
+   
   };
 
   return (
@@ -205,11 +217,11 @@ export default function Header() {
       {/* ================= SEARCH OVERLAY ================= */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-slate-950/95 z-[100] flex justify-center pt-20 px-4"
+          className="fixed inset-0 backdrop-blur-xs z-[100] flex justify-center pt-20 px-4"
           onClick={handleClose}
         >
           <div
-            className="w-full max-w-2xl bg-slate-800 rounded-lg"
+            className="w-full max-w-2xl shadow-md shadow-white rounded-lg"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-3 px-4 py-4 border-b border-slate-700">
@@ -219,7 +231,7 @@ export default function Header() {
                 value={searchQuery}
                 onChange={handleSearch}
                 placeholder="Search sarees..."
-                className="flex-1 bg-transparent outline-none text-white"
+                className="flex-1 bg-transparent outline-none text-black"
               />
               <X className="cursor-pointer" onClick={handleClose} />
             </div>
@@ -227,6 +239,7 @@ export default function Header() {
             <div className="p-4 max-h-[70vh] overflow-y-auto">
               {searchQuery ? (
                 <>
+                  <h3 className="text-sm text-slate-400 mb-2">Suggested searches</h3>
                   {/* Suggestions fallback */}
                   {suggestionData?.suggestions?.length ? (
                     suggestionData.suggestions.map((text, i) => (
@@ -242,12 +255,13 @@ export default function Header() {
                     <p className="text-slate-400">No suggestions found</p>
                   )}
 
+                  <h3 className="text-sm text-slate-400 mt-4 mb-2">Products</h3>
                   {/* Products fallback */}
                   {productData?.products?.length ? (
                     productData.products.map((p) => (
                       <div
                         key={p._id}
-                        onClick={() => handleProductClick(p.slug)}
+                        onClick={() => handleProductClick(p._id)}
                         className="flex gap-3 p-3 hover:bg-slate-700 rounded cursor-pointer"
                       >
                         <img
