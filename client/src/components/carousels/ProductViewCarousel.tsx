@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
+import React, { useState, useRef } from 'react';
 
 interface MobileImageCarouselProps {
   images: {
@@ -81,8 +82,10 @@ const MobileImageCarousel: React.FC<MobileImageCarouselProps> = ({
         >
           {images.map((image, index) => (
             <div key={image.public_id} className="w-full flex-shrink-0">
-              <img
+              <Image
                 src={image.url}
+                width={400}
+                height={500}
                 alt={`${productTitle} ${index + 1}`}
                 className="w-full h-[35rem] object-cover"
               />

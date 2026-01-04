@@ -1,18 +1,26 @@
 import React from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
-import { useDeleteReview } from '@/hooks/buyer/useReview';
+import { useDeleteStore } from '@/hooks/seller/useStore';
+import { toast } from 'react-toastify';
 
-interface DeleteReviewDialogProps {
-    reviewId: string;
+interface DeleteStoreProps {
+    storeId: string;
     isOpen: boolean;
     setIsOpen: (isOpen: boolean) => void;
 }
-const DeleteReviewDialog: React.FC<DeleteReviewDialogProps> = ({ reviewId, isOpen, setIsOpen }) => {
-    const { mutate: deleteReview,isPending } = useDeleteReview(reviewId);
+const DeleteStoreModel: React.FC<DeleteStoreProps> = ({ storeId, isOpen, setIsOpen }) => {
+    const { mutate: deleteItem,isPending } = useDeleteStore();
     const handleDelete = () => {
-        deleteReview()
-        setIsOpen(false);
+        deleteItem(storeId,{
+            onSuccess:()=>{
+                setIsOpen(false)
+                toast.success("Store deleted Successfully.")
+            },
+            onError:()=>{
+                toast.error("Something went wrong.")
+            }
+        })
     };
 
     return (
@@ -34,7 +42,7 @@ const DeleteReviewDialog: React.FC<DeleteReviewDialogProps> = ({ reviewId, isOpe
                             <div className="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
                                 <AlertTriangle className="text-red-600" size={24} />
                             </div>
-                            <h2 className="text-xl font-semibold text-gray-900">Delete Review</h2>
+                            <h2 className="text-xl font-semibold text-gray-900">Delete Item</h2>
                         </div>
 
                         <p className="text-sm text-gray-500 mb-6">
@@ -82,4 +90,6 @@ const DeleteReviewDialog: React.FC<DeleteReviewDialogProps> = ({ reviewId, isOpe
     );
 };
 
-export default DeleteReviewDialog;
+export default DeleteStoreModel;
+
+

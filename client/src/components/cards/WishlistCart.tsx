@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Heart, X } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import Image from 'next/image';
 
 const WishlistCart = () => {

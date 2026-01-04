@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X } from 'lucide-react';
+import Image from 'next/image';
 
 interface ImageModalProps {
   images: string[];
@@ -23,7 +23,7 @@ export default function ImageModal({ images, isOpen, setIsOpen }: ImageModalProp
 
       <div className="flex flex-col items-center gap-2">
         {images.map((url, i) => (
-          <img
+          <Image
             key={i}
             src={url}
             alt=""

@@ -1,6 +1,7 @@
 "use client"
 import HeroCarousel from '@/components/carousels/HeroCarousel'
 import ProductCardSkeleton from '@/components/loaders/ProductCardLoader'
+import CustomerReviews from '@/components/sections/CustomerReviews'
 import HomeSections from '@/components/sections/HomeSection'
 import ProductDetailed from '@/components/sections/ProductDetailed'
 import SareeCategorySection from '@/components/sections/SareeCategorySection'
@@ -13,7 +14,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 
-const page = () => {
+const Page = () => {
   const { isLoading } = useCurrentUser();
   const { isPending: isNormalSareesLoading, data: normalSarees } = useGetProducts(`?search=georgette%2Csarees&limit=4`);
   const { isPending: isBaluchariSareesLoading, data: baluchariSarees } = useGetProducts("?search=baluchari%2Csarees&limit=4");
@@ -41,14 +42,14 @@ const page = () => {
         localStorage.removeItem("guest-cart");
       },
     });
-  }, [user]);
+  }, [user,mergeCart,queryClient]);
 
   useEffect(() => {
     if (!isLoading && user?.userType === "seller") {
       router.push("/admin/dashboard");
     }
 
-  }, [user, isLoading]);
+  }, [user, isLoading,router]);
 
 
   return (
@@ -95,8 +96,9 @@ const page = () => {
           ))
         }
       </div>}
+      <CustomerReviews/>
     </div>
   )
 }
 
-export default page
+export default Page

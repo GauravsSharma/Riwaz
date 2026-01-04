@@ -1,6 +1,6 @@
 import api from "@/lib/axios";
 import { useProductStore } from "@/stores/buyer/products.store";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 interface SingleProduct{
   product: MainProduct;
   variants: Variant[];

@@ -8,7 +8,7 @@ const router = express.Router();
 router.post('/', sellerMiddleware, createStore);
 router.get('/', sellerMiddleware,getStores);
 router.delete('/:id', sellerMiddleware, deleteStore);
-router.put('/', sellerMiddleware, updateStore);
+router.put('/:id', sellerMiddleware, updateStore);
 router.get('/:id', sellerMiddleware, getStoreById);
 // router.post('/:id', authMiddleware,);
 

@@ -1,9 +1,7 @@
 import api from "@/lib/axios";
 import { useSellerStore } from "@/stores/seller/store.store";
-import { useUserStore } from "@/stores/user.store";
-import { Store } from "@/type";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { toast } from "react-toastify";
+
 
 interface StoreDataPayload {
     name: string;
@@ -32,5 +30,30 @@ export const useCreateStore = () => {
       const res = await api.post("/store", data);
       return res.data;
     },
+  });
+};
+// Send OTP
+export const useUpdateStore = () => {
+  const updateStore = useSellerStore(s=>s.updateStore)
+  return useMutation({
+    mutationFn: async ({data,id}:{data:StoreDataPayload,id:string}) => {
+      const res = await api.put(`/store/${id}`, data);
+      return res.data.store;
+    },
+    onSuccess:(data)=>{
+      updateStore(data)
+    }
+  });
+};
+export const useDeleteStore = () => {
+  const deleteStore = useSellerStore(s=>s.deleteStore)
+  return useMutation({
+    mutationFn: async (id:string) => {
+      const res = await api.delete(`/store/${id}`);
+      return res.data.id;
+    },
+    onSuccess:(data)=>{
+      deleteStore(data)
+    }
   });
 };

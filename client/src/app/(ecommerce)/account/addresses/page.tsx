@@ -4,48 +4,39 @@ import AddressCard from "@/components/cards/AddressCard";
 import Error from "@/components/error/Error";
 import FormSubmissionLoader from "@/components/loaders/FormSubmissionLoader";
 import AddNewAddressForm from "@/components/models/AddAddresseModel";
-import { deleteAddress, getAddress } from "@/hooks/useUser";
+import { useDeleteAddress, useGetAddresses } from "@/hooks/useUser";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-export default function page() {
-
-  const { data: address, isLoading, error } = getAddress();
-
-  const deleteAdd = deleteAddress();
-  
-  
-
+export default function Page() {
+  const { data: address, isLoading, error } = useGetAddresses();
+  const deleteAdd = useDeleteAddress();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleAddNewAddress = () => setIsOpen(true);
 
-  
-
-const handleRemove = (id: string) => {
-  const confirmed = window.confirm("Do you want to delete this address?");
-  
+  const handleRemove = (id: string) => {
+    const confirmed = window.confirm("Do you want to delete this address?");
     if (confirmed) {
-    deleteAdd.mutate(id);
-    // toast is handled in the mutation's onSuccess to avoid duplicate toasts
-
+      deleteAdd.mutate(id);
+      // toast handled in mutation onSuccess
     } else {
-    toast("Delete canceled");
+      toast("Delete canceled");
     }
-};
-
+  };
 
   if (isLoading) return <FormSubmissionLoader />;
   if (error) return <Error />;
-    
+
   return (
     <div className="w-[75%] p-6">
-
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-semibold text-gray-900">My Addresses</h1>
-        <button 
+        <h1 className="text-2xl font-semibold text-gray-900">
+          My Addresses
+        </h1>
+        <button
           onClick={handleAddNewAddress}
           className="flex items-center space-x-2 text-red-500 hover:text-red-600 font-medium transition-colors"
         >
@@ -53,9 +44,12 @@ const handleRemove = (id: string) => {
           <span className="text-sm font-bold">ADD NEW ADDRESS</span>
         </button>
       </div>
+
       {/* Address List */}
       <div className="space-y-4">
-        {!isLoading && !error && address && Array.isArray(address.addresses) && address.addresses.length > 0 ? (
+        {address &&
+        Array.isArray(address.addresses) &&
+        address.addresses.length > 0 ? (
           address.addresses.map((add: any) => (
             <AddressCard
               key={add._id}
@@ -71,19 +65,18 @@ const handleRemove = (id: string) => {
           ))
         ) : (
           <div className="p-6 border rounded-md text-center">
-            <h2 className="text-xl font-semibold">No addresses yet</h2>
-            <p className="text-gray-500 mt-2">Add a new address to get started.</p>
-            
-        
-          
+            <h2 className="text-xl font-semibold">
+              No addresses yet
+            </h2>
+            <p className="text-gray-500 mt-2">
+              Add a new address to get started.
+            </p>
           </div>
         )}
       </div>
 
       {/* Add New Address Form */}
       <AddNewAddressForm setIsOpen={setIsOpen} isOpen={isOpen} />
-
-      
     </div>
   );
 }

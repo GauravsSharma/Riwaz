@@ -1,13 +1,13 @@
-import { useState } from 'react';
-const ProductCard = () => (
-  <div className="w-48 h-64 bg-gray-200 m-2 rounded-lg"></div>
-);
 
-const FilterSidebar = () => (
-  <div className="w-80 bg-gray-100 h-screen p-4">
-    <h2>Filter Sidebar</h2>
-  </div>
-);
+// const ProductCard = () => (
+//   <div className="w-48 h-64 bg-gray-200 m-2 rounded-lg"></div>
+// );
+
+// const FilterSidebar = () => (
+//   <div className="w-80 bg-gray-100 h-screen p-4">
+//     <h2>Filter Sidebar</h2>
+//   </div>
+// );
 
 // Sort Drawer Component
 interface SortDrawerProps {

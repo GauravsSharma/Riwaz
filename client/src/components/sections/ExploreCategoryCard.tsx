@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { JSX, useState } from 'react';
 
 interface CategoryParam {
@@ -22,7 +23,9 @@ export default function ExploreCategoryCard({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-90`}></div>
-      <img 
+      <Image 
+        height={500}
+        width={500}
         src={url} 
         alt={title}
         className={` max-w-full h-auto transition-transform duration-700 ${isHovered ? 'scale-110' : 'scale-100'}`}

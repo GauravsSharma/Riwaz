@@ -42,7 +42,7 @@ export default function SareeCategorySection() {
   ];
 
   return (
-    <div className="bg-gradient-to-b from-white via-amber-50/30 to-white py-16 px-6">
+    <div className="bg-linear-to-b from-white via-amber-50/30 to-white py-16 px-6">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-8 sm:mb-16">

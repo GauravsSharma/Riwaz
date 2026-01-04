@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 
 interface UserState {
   user: User | null;
-  setUser: (user: User) => void;
+  setUser: (user: User | null) => void;
 }
 
 // ------------------------
@@ -15,7 +15,6 @@ interface SendOtpPayload {
   phone: string;
 }
 
-// product recommendation.... thumbnail type
 export interface ProductThumbnail {
   url: string;
   public_id: string;
@@ -30,21 +29,15 @@ export interface Products {
   thumbnail: ProductThumbnail;
 }
 
-// Product recommendation API response
 export interface ProductRecommendationResponse {
   success: boolean;
   products: Products[];
 }
 
-
-export interface ProductSuggestionResponse{
-
-  success:boolean;
-  suggestions:string[]
-    
+export interface ProductSuggestionResponse {
+  success: boolean;
+  suggestions: string[];
 }
-
-
 
 interface VerifyOtpPayload {
   phone: string;
@@ -52,43 +45,35 @@ interface VerifyOtpPayload {
   userType: "seller" | "customer";
 }
 
-interface UserDetails{
-   name:string;
-   email:string
+interface UserDetails {
+  name: string;
+  email: string;
 }
 
-//AddressResponse-picture of address 
 export interface AddressResponse {
   addresses: Address[];
 }
 
-//edit address type
-export interface AddressEdit{
-  
-  id:string,
-  address1: string
+export interface AddressEdit {
+  id: string;
+  address1: string;
   landmark?: string;
   city: string;
   state: string;
   pincode: string;
-  
 }
-
 
 // ------------------------
 // GET current user
 // ------------------------
 export const useCurrentUser = () => {
-  // Explicitly type 's' to UserState
   const setUser = useUserStore((s: UserState) => s.setUser);
- 
+
   return useQuery<User>({
     queryKey: ["current-user"],
     queryFn: async () => {
-      const res = await api.get("/user")
+      const res = await api.get("/user");
       setUser(res.data.user);
-      console.log("Data------------>",res.data);
-      
       return res.data.user;
     },
   });
@@ -107,10 +92,10 @@ export const useSendOtp = () => {
 };
 
 // ------------------------
-// Verify OTP → return token + user
+// Verify OTP
 // ------------------------
 export const useVerifyOtp = () => {
-  const setUser = useUserStore((s) => s.setUser);
+  const setUser = useUserStore((s: UserState) => s.setUser);
 
   return useMutation({
     mutationFn: async (data: VerifyOtpPayload) => {
@@ -126,97 +111,75 @@ export const useVerifyOtp = () => {
   });
 };
 
-//used to edit profile 
-export const useUpdateOrEditProfile = () =>{
-   
-    return useMutation({
-
-       mutationFn:async(data:UserDetails) =>{
-
-          const res=await api.put("/user/profile",data);
-          return res.data;
-       
-        }
-      
-    });
-
-}
-
-// use to add address
-export const addAddress = () =>{
-    const queryClient = useQueryClient();
-
-    return useMutation({
- 
-      mutationFn:async(data:Address) =>{
-
-       const res=await api.post("/user/address",data);
-       return res.data;
-
-      },
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["Address"] });
-        toast.success("Address added");
-      }
-   
-});}
-
-
-//used to get all address
-export const getAddress = () => {
-
-    
- 
- return useQuery<AddressResponse>({
-    queryKey: ["Address"],
-    queryFn: async () => {
-      const res = await api.get("/user/address")
-      
-      console.log("Data------------>",res.data);
-       return res.data ?? { addresses: [] };
-      
-    
+// ------------------------
+// Edit profile
+// ------------------------
+export const useUpdateOrEditProfile = () => {
+  return useMutation({
+    mutationFn: async (data: UserDetails) => {
+      const res = await api.put("/user/profile", data);
+      return res.data;
     },
   });
-
-
-
-
-
 };
 
-//delete the address
-
-
-export const deleteAddress = () =>{
+// ------------------------
+// Add address
+// ------------------------
+export const useAddAddress = () => {
   const queryClient = useQueryClient();
 
-     return useMutation({
- 
-      mutationFn:async(id:string) =>{
- 
-       const res=await api.delete(`/user/address/${id}`);
-       return res.data;
+  return useMutation({
+    mutationFn: async (data: Address) => {
+      const res = await api.post("/user/address", data);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["Address"] });
+      toast.success("Address added");
+    },
+  });
+};
 
-      },
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["Address"] });
-        toast.success("Address deleted");
-      }
-   
-});
+// ------------------------
+// Get addresses
+// ------------------------
+export const useGetAddresses = () => {
+  return useQuery<AddressResponse>({
+    queryKey: ["Address"],
+    queryFn: async () => {
+      const res = await api.get("/user/address");
+      return res.data ?? { addresses: [] };
+    },
+  });
+};
 
+// ------------------------
+// Delete address
+// ------------------------
+export const useDeleteAddress = () => {
+  const queryClient = useQueryClient();
 
-}
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await api.delete(`/user/address/${id}`);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["Address"] });
+      toast.success("Address deleted");
+    },
+  });
+};
 
-//edit the address
-
+// ------------------------
+// Edit address
+// ------------------------
 export const useEditAddress = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (data: AddressEdit) => {
-      console.log("id is: ",data.id);
       const res = await api.put(`/user/address/${data.id}`, data);
       return res.data;
     },
@@ -227,80 +190,70 @@ export const useEditAddress = () => {
   });
 };
 
-
-// get ProductRecommendationByQuery
-
+// ------------------------
+// Search suggestions
+// ------------------------
 export const getProductRecommendation = (searchQuery: string) => {
   return useQuery<ProductSuggestionResponse>({
     queryKey: ["searchSuggestions", searchQuery],
     queryFn: async ({ queryKey }) => {
       const [, query] = queryKey;
-
-      if (!query) {
-        return { success: true, products: [] };
-      }
+      if (!query) return { success: true, suggestions: [] };
 
       const response = await api.get(
         `/product/search/suggestions?q=${query}`,
-       {
-       headers: {
-        "Cache-Control": "no-cache",
-         Pragma: "no-cache",
-       }
-      }
-
+        {
+          headers: {
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
+          },
+        }
       );
 
-      console.log("Data------------>", response.data);
       return response.data;
     },
-    enabled: !!searchQuery, // prevents empty calls
+    enabled: !!searchQuery,
   });
 };
-
 
 export const getSearchRecommendation = (searchQuery: string) => {
   return useQuery<ProductRecommendationResponse>({
     queryKey: ["ProductSuggestions", searchQuery],
     queryFn: async ({ queryKey }) => {
       const [, query] = queryKey;
+      if (!query) return { success: true, products: [] };
 
-      if (!query) {
-        return { success: true, products: [] };
-      }
+      const response = await api.get(`/product/query?q=${query}`, {
+        headers: {
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+      });
 
-      const response = await api.get(
-        `/product/query?q=${query}`,
-       {
-       headers: {
-        "Cache-Control": "no-cache",
-         Pragma: "no-cache",
-       }
-      }
-
-      );
-
-      console.log("Data------------>", response.data);
       return response.data;
     },
-    enabled: !!searchQuery, // prevents empty calls
+    enabled: !!searchQuery,
   });
 };
 
-// Verify OTP → return token + user
-export const useLogout = () => {
-  const setUser = useUserStore((s) => s.setUser);
+// ------------------------
+// Logout
+// ------------------------
+export const useLogout = (setIsOpen: (open: boolean) => void) => {
+  const setUser = useUserStore((s: UserState) => s.setUser);
 
   return useMutation({
     mutationFn: async () => {
       const res = await api.post("/user/logout");
       return res.data;
     },
-    onSuccess: () => {  
+    onSuccess: () => {
       setUser(null);
+      setIsOpen(false);
       toast.success("Logout successful!");
+    },
+    onError: () => {
+      toast.error("Logout failed!");
     },
   });
 };
-
-
