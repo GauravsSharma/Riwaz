@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { MoreVertical } from "lucide-react";
+import ProductImageDialog from "../models/AddImages";
+import { set } from "zod";
 
 const ActionMenu = ({ product, setIsUploadDialogOpen,setProductId,setIsDeleteDialogOpen}: {
    product: SellerProduct,
@@ -11,7 +13,7 @@ const ActionMenu = ({ product, setIsUploadDialogOpen,setProductId,setIsDeleteDia
   const [open, setOpen] = useState(false);
   // const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   // const [productId, setProductId] = useState<string>("");
-  const [position] = useState({ top: 0, left: 0 });
+  const [position, setPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 

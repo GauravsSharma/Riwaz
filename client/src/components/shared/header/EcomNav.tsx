@@ -1,5 +1,4 @@
 "use client";
-<<<<<<< HEAD
 
 import React from "react";
 
@@ -15,18 +14,6 @@ import { Menu, Search, ShoppingCart, User, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-=======
-import { useEffect, useState } from 'react';
-import { Search, User, ShoppingCart, Menu, X } from 'lucide-react';
-import Link from 'next/link';
-import LoginModal from '@/components/models/LoginModel';
-import { useUserStore } from '@/stores/user.store';
-import { useUserCart } from '@/stores/buyer/cart.user';
-import { useGetCartSummary } from '@/hooks/buyer/useUserCart';
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-// import {setCount from "../../../stores/buyer/cart.user"
->>>>>>> dadce33c71534ea5a0ea233a8e5e3337e34bc4c7
 
 export default function Header() {
   const router = useRouter();
@@ -38,7 +25,6 @@ export default function Header() {
 
   // Login modal state
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-<<<<<<< HEAD
 
   // Become seller state
   const [becomeASeller, setBecomeASeller] = useState(false);
@@ -48,25 +34,6 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-=======
-  useGetCartSummary();
-  const [becomeASeller, setBecomeASeller] = useState(false);
-  const setCount = useUserCart(s=>s.setCount)
-  const count = useUserCart((s) => s.count);
-  // const [guestCount, setGuestCount] = useState(0);
-
-  useEffect(() => {
-    if (!user) {
-      const cart = JSON.parse(localStorage.getItem("guest-cart") || "[]");
-      setCount(cart.length);
-    }
-  }, [user,setCount]);
-
-  // const count = user ? cartCount : guestCount;
-
-
-  const router = useRouter()
->>>>>>> dadce33c71534ea5a0ea233a8e5e3337e34bc4c7
   const navItems = [
     "Banarasi Sarees",
     "Kanjivaram Sarees",
@@ -152,7 +119,6 @@ export default function Header() {
         </div>
       </div>
 
-<<<<<<< HEAD
       {/* ================= MOBILE HEADER ================= */}
       <header className="md:hidden bg-white border-b">
         <div className="flex justify-between items-center h-16 px-4">
@@ -171,84 +137,6 @@ export default function Header() {
                 <ShoppingCart />
                 {count > 0 && (
                   <span className="absolute -top-2 -right-2 text-xs bg-black text-white rounded-full px-1">
-=======
-      {/* Desktop Header */}
-      <header className="hidden  lg:block bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-2">
-          <div className="flex items-center justify-between h-20">
-            {/* Logo */}
-            <Link href="/" className="flex-shrink-0">
-              <Image src="/logo.png" alt=""  width={150} height={150}/>
-            </Link>
-
-            {/* Navigation */}
-            <nav className="flex-1 flex justify-center">
-              <ul className="flex items-center space-x-6">
-                {navItems.map((item) => (
-                  <li key={item}>
-                    <Link
-                      href={`/product-category?search=${item.toLowerCase()}`}
-                      className="text-gray-700 hover:text-pink-500 text-[15px] font-medium transition-colors"
-                    >
-                      {item}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-
-            {/* Right Icons */}
-            <div className="flex items-center justify-center space-x-6">
-              <button className="text-gray-700 hover:text-pink-500 transition-colors">
-                <Search className="w-5 h-5" />
-              </button>
-              {user ? <Link href={"/account"}><User className='w-5 h-5 cursor-pointer' /> </Link>: <div
-                onClick={() => { setBecomeASeller(false); setIsLoginOpen(true) }}
-                className="text-gray-700 cursor-pointer hover:text-pink-500 text-[15px] font-medium transition-colors">
-                Login
-              </div>}
-              <Link href={"/cart"}><button
-
-                className="relative cursor-pointer mt-2 text-gray-700 hover:text-pink-500 transition-colors">
-                <ShoppingCart className="w-5 h-5" />
-                <span className="absolute -top-2 -right-2 bg-gray-800 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {count}
-                </span>
-              </button></Link>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Mobile Header */}
-      <header className="lg:hidden bg-white border-b border-gray-200">
-        <div className="px-4">
-          <div className="flex items-center justify-between h-14">
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="text-gray-700"
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-
-            {/* Logo */}
-            <Link href={"/"} className="flex-shrink-0">
-              <Image src="/logo.png" alt="riwaz logo" width={150} height={150}/>
-            </Link>
-
-            {/* Right Icons */}
-            <div className="flex items-center justify-center space-x-4">
-              <button className="text-gray-700">
-                <Search className="w-5 h-5" />
-              </button>
-              <Link href={"/cart"}>
-                <button
-
-                  className="relative cursor-pointer mt-2 text-gray-700">
-                  <ShoppingCart className="w-5 h-5" />
-                  <span className="absolute -top-1.5 -right-1.5 bg-gray-800 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
->>>>>>> dadce33c71534ea5a0ea233a8e5e3337e34bc4c7
                     {count}
                   </span>
                 )}

@@ -69,10 +69,11 @@ export const getProductById = async (req, res) => {
 
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
+
     }
     const variants = await Product.find({
       parentId: product.parentId,
-      _id: { $ne: product._id }
+      _id: { $ne: product._id }   // exclude current product
     }).select("thumbnail color _id");
     res.status(200).json({ success: true, product, variants });
   } catch (error) {

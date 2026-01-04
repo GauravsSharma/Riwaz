@@ -1,5 +1,5 @@
-import Image from 'next/image';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useMediaQuery } from 'react-responsive';
 
 interface Slide {
   url: string;
@@ -64,14 +64,14 @@ const PeachCarousel: React.FC = () => {
     setDirection('next');
     setIsTransitioning(true);
     setCurrentIndex((prev) => (prev + 1) % slides.length);
-  }, [isTransitioning,slides.length]);
+  }, [isTransitioning]);
 
-  // const goToPrev = useCallback(() => {
-  //   if (isTransitioning) return;
-  //   setDirection('prev');
-  //   setIsTransitioning(true);
-  //   setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
-  // }, [isTransitioning]);
+  const goToPrev = useCallback(() => {
+    if (isTransitioning) return;
+    setDirection('prev');
+    setIsTransitioning(true);
+    setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
+  }, [isTransitioning]);
 
   const goToSlide = (index: number): void => {
     if (isTransitioning || index === currentIndex) return;
@@ -90,6 +90,9 @@ const PeachCarousel: React.FC = () => {
     const interval = setInterval(goToNext, 5000);
     return () => clearInterval(interval);
   }, [goToNext, isPaused]);
+
+  const currentSlide = slides[currentIndex];
+  const textColor = currentSlide.theme === 'dark' ? 'text-white' : 'text-gray-900';
 
   return (
     <div 
@@ -117,10 +120,9 @@ const PeachCarousel: React.FC = () => {
                   : 'opacity-0 scale-95'
               }`}
             >
-              <Image
+              <img
                 src={slide.url}
-                fill
-                 alt='saree image'
+              
                 className="w-full h-full sm:h-fit object-cover "
               />
               {/* Subtle gradient overlay */}

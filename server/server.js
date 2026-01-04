@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import bodyParser from 'body-parser';
 import cookieParser from "cookie-parser";
 import cors from 'cors';
@@ -43,9 +42,3 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-=======
-import dotenv from "dotenv";
-import app from "./api/index.js";
-dotenv.config();
-app.listen(5000, () => console.log("Local server running"));
->>>>>>> dadce33c71534ea5a0ea233a8e5e3337e34bc4c7

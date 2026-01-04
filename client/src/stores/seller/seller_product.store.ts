@@ -18,7 +18,7 @@ export const useSellerProducts = create<SellerProductState>((set) => ({
     updateProduct: (()=>{
 
     }),
-    deleteProduct: (() => {
+    deleteProduct: ((storeId) => {
 
     }),
 }));

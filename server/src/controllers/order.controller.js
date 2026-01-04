@@ -2,8 +2,7 @@ import Stripe from "stripe";
 import Order from '../models/Order.js';
 import UserCart from '../models/userCart.js';
 import Product from '../models/product.js';
-import { stripe } from "../../api/index.js";
-// import { stripe } from "../../server.js";
+import { stripe } from "../../server.js";
 
 // you have to change the variant to productId
 export const createCheckoutSession = async (req, res) => {

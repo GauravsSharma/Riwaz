@@ -1,7 +1,7 @@
 "use client";
 import { useAddReview } from '@/hooks/buyer/useReview';
 import { useProductStore } from '@/stores/buyer/products.store';
-import { X, Image as ImageIcon, ArrowLeft } from 'lucide-react';
+import { X, Image, Video, ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
@@ -9,14 +9,6 @@ import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
 interface AddReviewDialogProps {
     isOpen: boolean;
     onClose: () => void;
-}
-
-interface ApiError extends Error {
-    response?: {
-        data?: {
-            message?: string;
-        };
-    };
 }
 
 const AddReviewDialog = ({ isOpen, onClose }: AddReviewDialogProps) => {
@@ -27,7 +19,6 @@ const AddReviewDialog = ({ isOpen, onClose }: AddReviewDialogProps) => {
     const [photos, setPhotos] = useState<File[]>([]);
     const { mutate, isPending } = useAddReview()
     const mainProduct = useProductStore(s => s.mainProduct)
-    
     const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             setPhotos(Array.from(e.target.files));
@@ -61,10 +52,12 @@ const AddReviewDialog = ({ isOpen, onClose }: AddReviewDialogProps) => {
                 toast.success("Review posted.")
                 handleClose();
             },
-            onError: (error: ApiError) => {
+            onError: (error) => {
                 toast.error(error.message)
             }
         })
+
+
     };
 
     const handleClose = () => {
@@ -139,7 +132,7 @@ const AddReviewDialog = ({ isOpen, onClose }: AddReviewDialogProps) => {
                         <div className="text-center space-y-6">
                             <div>
                                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Show it off</h2>
-                                <p className="text-gray-600">We&apos;d love to see it in action!</p>
+                                <p className="text-gray-600">We'd love to see it in action!</p>
                             </div>
                             <div className="space-y-3 max-w-md mx-auto">
                                 <label className="block">
@@ -151,7 +144,7 @@ const AddReviewDialog = ({ isOpen, onClose }: AddReviewDialogProps) => {
                                         className="hidden"
                                     />
                                     <div className="bg-black text-white py-3 px-6 rounded-lg cursor-pointer hover:bg-gray-800 transition flex items-center justify-center gap-2 font-semibold">
-                                        <ImageIcon size={20} />
+                                        <Image size={20} />
                                         Add photos
                                     </div>
                                 </label>

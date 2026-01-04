@@ -5,6 +5,7 @@ import { useGetAllStores } from "@/hooks/seller/useStore";
 import { useUserStore } from "@/stores/user.store";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { da } from "zod/locales";
 
 const Layout = ({
     children,
@@ -19,12 +20,16 @@ useEffect(() => {
     if (!user || user.userType !== "seller") {
         router.push("/");
     }
-}, [user,router]);
+}, [user]);
 
 // extract storeId safely
 const storeId = !isLoading && data?.length ? data[0]._id : "";
 
-   useGetAllSellerProducts(storeId);
+// call hook unconditionally
+const {
+    data: sellerProducts,
+    isLoading: productsLoading,
+} = useGetAllSellerProducts(storeId);
 
     return (
         <div className="flex w-full">

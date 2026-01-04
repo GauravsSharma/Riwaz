@@ -1,29 +1,33 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { 
+  ChevronLeft, 
   BarChart3, 
   ShoppingCart, 
   Package, 
-  Building2,
-  LogOut
+  Users, 
+  Megaphone, 
+  TrendingUp, 
+  Settings, 
+  HomeIcon,
+  Building2
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useSellerStore } from '@/stores/seller/store.store';
-import LogoutModel from '@/components/models/LogoutModel';
 
 const AdminSidebar = () => {
   const pathname = usePathname();
-  const [isLogoutModelOpen,setIsLogoutModelOpen] = useState(false);
+
   const menuItems = [
     { icon: BarChart3, label: 'Overview', count: '24+', url: "/admin/dashboard" },
     { icon: Building2, label: 'Stores', url: "/admin/stores" },
     { icon: ShoppingCart, label: 'Orders', url: "/admin/orders" },
     { icon: Package, label: 'Products', url: "/admin/products" },
+    { icon: Users, label: 'Customers', url: "/admin/customers" },
+    // { icon: Megaphone, label: 'Marketing', url: "/admin/marketing" },
   ];
-  const stores = useSellerStore(s=>s.stores)
-  const currentStore:Store|null = stores && stores[0];
+
   return (
     <div className="w-64 h-screen sticky left-0 top-0 bg-gray-50 border-r border-gray-200 flex flex-col">
       {/* Header */}
@@ -32,8 +36,11 @@ const AdminSidebar = () => {
           <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center">
             <div className="w-4 h-4 bg-white rounded-full"></div>
           </div>
-          <span className="text-sm font-semibold text-gray-900">{currentStore?.name}</span>
+          <span className="text-lg font-semibold text-gray-900">Denca</span>
         </div>
+        <button className="p-1 hover:bg-gray-200 rounded-md transition-colors">
+          <ChevronLeft className="w-5 h-5 text-gray-600" />
+        </button>
       </div>
 
       {/* Menu Section */}
@@ -78,17 +85,14 @@ const AdminSidebar = () => {
 
       {/* Settings at bottom */}
       <div className="px-3 pb-6">
-        <div
-          className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-100 cursor-pointer hover:text-red-600 transition-all duration-200 group"
-          onClick={()=>setIsLogoutModelOpen(true)}
+        <a
+          href="#"
+          className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-all duration-200 group"
         >
-          <LogOut className="w-5 h-5 text-red-500 group-hover:text-red-600" />
-          <span>Logout</span>
-        </div>
+          <Settings className="w-5 h-5 text-gray-500 group-hover:text-gray-700" />
+          <span>Settings</span>
+        </a>
       </div>
-{
-  isLogoutModelOpen && <LogoutModel isOpen={isLogoutModelOpen} setIsOpen={setIsLogoutModelOpen}/>
-}
     </div>
   );
 };

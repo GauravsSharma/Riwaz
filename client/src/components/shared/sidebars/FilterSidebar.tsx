@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useCallback } from "react";
 import PriceFilter from './filterSIdebarComponents/PriceFIlter';
 import ColorFilter from './filterSIdebarComponents/ColorFilter';
 import TypeFilter from './filterSIdebarComponents/TypesFilter';
@@ -56,29 +55,29 @@ export default function FilterSidebar({ isOpen, setIsOpen, search }: { isOpen: b
     }
   }, [searchParams]);
   
- const handleApply = useCallback(() => {
-  const newParams = new URLSearchParams();
+  const handleApply = () => {
+    const newParams = new URLSearchParams();
 
-  if (search) newParams.set("search", search);
+    if (search) newParams.set("search", search);
 
-  if (price.min !== 0 || price.max !== 2999) {
-    newParams.set("priceMin", price.min.toString());
-    newParams.set("priceMax", price.max.toString());
+    if (price.min !== 0 || price.max !== 2999) {
+      newParams.set("priceMin", price.min.toString());
+      newParams.set("priceMax", price.max.toString());
+    }
+
+    if (colors.length) newParams.set("color", colors.join(","));
+    if (types.length) newParams.set("type", types.join(","));
+    if (fabrics.length) newParams.set("fabric", fabrics.join(","));
+    if (work.length) newParams.set("work", work.join(","));
+    
+    router.push(`?${newParams.toString()}`);
   }
-
-  if (colors.length) newParams.set("color", colors.join(","));
-  if (types.length) newParams.set("type", types.join(","));
-  if (fabrics.length) newParams.set("fabric", fabrics.join(","));
-  if (work.length) newParams.set("work", work.join(","));
-
-  router.push(`?${newParams.toString()}`);
-}, [search, price, colors, types, fabrics, work, router]);
   
   useEffect(() => {
     if (!isTabletOrMobile) {
       handleApply();
     }
-  }, [search, price, colors, types, fabrics, work, router,isTabletOrMobile,handleApply]);
+  }, [search, price, colors, types, fabrics, work, router]);
   
   return (
     <div className={`lg:block mt-10 ${isOpen ? "left-0" : "-left-[100%]"} fixed duration-500 w-full z-20 lg:w-[20%] h-screen lg:sticky top-0 bg-white border-r border-gray-200`}>
