@@ -2,17 +2,20 @@
 "use client"
 
 
+import Error from "@/components/error/Error";
+import UsersFall from "@/components/fallback/UsersFall";
 import { useCurrentUser } from "@/hooks/useUser";
 import Link from "next/link";
 
 export default function page() {
 
      const{data:user,isLoading,error}=useCurrentUser();
+    
      if(isLoading)
-      return <p>Loading.....</p>
+      return <UsersFall/>
  
      if(error)
-      return <p>Something went wrong.....</p>
+      return <Error/>
   
    return (
     <div className=" p-6 bg-white">
