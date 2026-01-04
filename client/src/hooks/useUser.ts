@@ -1,6 +1,6 @@
 import api from "@/lib/axios";
 import { useUserStore } from "@/stores/user.store";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
 interface UserState {
@@ -144,8 +144,8 @@ export const useUpdateOrEditProfile = () =>{
 
 // use to add address
 export const addAddress = () =>{
+    const queryClient = useQueryClient();
 
-     
     return useMutation({
  
       mutationFn:async(data:Address) =>{
@@ -153,7 +153,10 @@ export const addAddress = () =>{
        const res=await api.post("/user/address",data);
        return res.data;
 
-
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["Address"] });
+        toast.success("Address added");
       }
    
 });}
@@ -186,18 +189,19 @@ export const getAddress = () => {
 
 
 export const deleteAddress = () =>{
-
-const setUser = useUserStore((s: UserState) => s.setUser);
-
+  const queryClient = useQueryClient();
 
      return useMutation({
  
       mutationFn:async(id:string) =>{
-
+ 
        const res=await api.delete(`/user/address/${id}`);
        return res.data;
 
-
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["Address"] });
+        toast.success("Address deleted");
       }
    
 });
@@ -208,10 +212,17 @@ const setUser = useUserStore((s: UserState) => s.setUser);
 //edit the address
 
 export const useEditAddress = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (data: AddressEdit) => {
-      const res = await api.put(`/address/${data.id}`, data);
+      console.log("id is: ",data.id);
+      const res = await api.put(`/user/address/${data.id}`, data);
       return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["Address"] });
+      toast.success("Address updated");
     },
   });
 };

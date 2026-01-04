@@ -21,12 +21,20 @@ interface EditAddressFormProps {
   id: string;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
+  existingAddress?: {
+    postCode: string;
+    state: string;
+    cityTown: string;
+    address1: string;
+    landmark: string;
+  };
 }
 
 export default function EditAddressForm({
   id,
   isOpen,
   setIsOpen,
+  
 }: EditAddressFormProps) {
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -68,10 +76,9 @@ export default function EditAddressForm({
 
   const onSubmit = (data: AddressFormData) => {
     console.log('Form submitted:', data);
-
-    address.mutate(
+        address.mutate(
       {
-        id:id,
+        id: id,
         landmark: data.landmark,
         state: data.state,
         city: data.cityTown,
@@ -82,11 +89,16 @@ export default function EditAddressForm({
         onSuccess: (data) => {
           console.log('Address updated', data);
           setIsOpen(false);
+          setCurrentStep(1); // Reset step after successful update
         },
         onError: (error) =>
           console.error(`Failed to update address: ${error}`),
       }
     );
+
+
+
+
   };
 
   return (

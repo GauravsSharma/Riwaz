@@ -10,7 +10,7 @@ interface AddressCardProps {
   address1: string;
   pincode: string;
   isHome?: boolean;
-  onEdit: () => void;
+
   onRemove: (id: string) => void;
 }
 
@@ -23,7 +23,7 @@ export default function AddressCard({
   address1,
   pincode,
   isHome = true,
-  onEdit,
+  
   onRemove
 }: AddressCardProps) {
 
@@ -31,6 +31,18 @@ export default function AddressCard({
     const [isOpen, setIsOpen] = useState(false);
   
     const EditAddress = () => setIsOpen(true);
+
+    const hasAddress = Boolean(address1 || landmark || city || state || pincode);
+
+    if (!hasAddress) {
+      return (
+        <div className="bg-white border shadow-lg border-gray-200 rounded-lg p-6 mb-4">
+          <div className="flex justify-between items-center">
+            <div className="text-gray-500">Address not available.</div>
+          </div>
+        </div>
+      );
+    }
 
   return (
     <div className="bg-white border shadow-lg border-gray-200 rounded-lg p-6 mb-4">
@@ -46,7 +58,7 @@ export default function AddressCard({
         {/* Action Buttons */}
         <div className="flex items-center space-x-4">
           <button 
-            onClick={EditAddress}
+            onClick={() =>{EditAddress()}}
             className="text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors"
           >
             EDIT
@@ -67,7 +79,18 @@ export default function AddressCard({
         </p>
       </div>
       
-    <EditAddressForm isOpen={isOpen} setIsOpen={setIsOpen}  id={id}/>
+    <EditAddressForm
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        id={id}
+        existingAddress={{
+          postCode: pincode,
+          state: state,
+          cityTown: city,
+          address1: address1,
+          landmark: landmark
+        }}
+      />
     </div>
 
   );

@@ -1,6 +1,8 @@
 "use client";
 
 import AddressCard from "@/components/cards/AddressCard";
+import Error from "@/components/error/Error";
+import FormSubmissionLoader from "@/components/loaders/FormSubmissionLoader";
 import AddNewAddressForm from "@/components/models/AddAddresseModel";
 import { deleteAddress, getAddress } from "@/hooks/useUser";
 import { Plus } from "lucide-react";
@@ -21,25 +23,12 @@ export default function page() {
 
   
 
-  
-  const handleEdit = () => {
-    console.log("Edit address clicked");
-     
-    //edit logic.......
-
-
-   
-
-
-
-  };
-
 const handleRemove = (id: string) => {
   const confirmed = window.confirm("Do you want to delete this address?");
   
     if (confirmed) {
     deleteAdd.mutate(id);
-    toast.success("Address deleted");
+    // toast is handled in the mutation's onSuccess to avoid duplicate toasts
 
     } else {
     toast("Delete canceled");
@@ -47,16 +36,8 @@ const handleRemove = (id: string) => {
 };
 
 
-
-   if(isLoading)
-      return (
-        <img src="/loaders/form_loader.gif" alt="Loading spinner" style={{ width: '100px' }}/>
-      );
-
-      if(error)
-       return (
-        <img src="/loaders/form_loader.gif" alt="Loading spinner" style={{ width: '100px' }}/>
-      );
+  if (isLoading) return <FormSubmissionLoader />;
+  if (error) return <Error />;
     
   return (
     <div className="w-[75%] p-6">
@@ -74,19 +55,29 @@ const handleRemove = (id: string) => {
       </div>
       {/* Address List */}
       <div className="space-y-4">
-        { !isLoading && !error && address?.addresses?.map((add: any) => (
-          <AddressCard
-            id={add._id}
-            address1={add.address1}
-            landmark={add.landmark}
-            city={add.city}
-            state={add.state}
-            pincode={add.pincode}
-            isHome={add.type === "home"}
-            onEdit={handleEdit}
-            onRemove={handleRemove}
-          />
-        ))}
+        {!isLoading && !error && address && Array.isArray(address.addresses) && address.addresses.length > 0 ? (
+          address.addresses.map((add: any) => (
+            <AddressCard
+              key={add._id}
+              id={add._id}
+              address1={add.address1}
+              landmark={add.landmark}
+              city={add.city}
+              state={add.state}
+              pincode={add.pincode}
+              isHome={add.type === "home"}
+              onRemove={handleRemove}
+            />
+          ))
+        ) : (
+          <div className="p-6 border rounded-md text-center">
+            <h2 className="text-xl font-semibold">No addresses yet</h2>
+            <p className="text-gray-500 mt-2">Add a new address to get started.</p>
+            
+        
+          
+          </div>
+        )}
       </div>
 
       {/* Add New Address Form */}

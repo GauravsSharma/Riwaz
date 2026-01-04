@@ -1,5 +1,7 @@
 "use client";
 
+import React from "react";
+
 import LoginModal from "@/components/models/LoginModel";
 import useDebounce from "@/hooks/useDebounce";
 import {
@@ -221,7 +223,7 @@ export default function Header() {
           onClick={handleClose}
         >
           <div
-            className="w-full max-w-2xl shadow-md shadow-white rounded-lg"
+            className="w-full h-auto max-w-2xl shadow-md  bg-white rounded-lg"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-3 px-4 py-4 border-b border-slate-700">
@@ -246,7 +248,7 @@ export default function Header() {
                       <div
                         key={i}
                         onClick={() => handleSuggestionClick(text)}
-                        className="p-2 hover:bg-slate-700 rounded cursor-pointer"
+                        className="p-2 hover:bg-pink-50 rounded cursor-pointer"
                       >
                         {text}
                       </div>
@@ -262,7 +264,7 @@ export default function Header() {
                       <div
                         key={p._id}
                         onClick={() => handleProductClick(p._id)}
-                        className="flex gap-3 p-3 hover:bg-slate-700 rounded cursor-pointer"
+                        className="flex gap-3 p-3 hover:bg-pink-50 rounded cursor-pointer"
                       >
                         <img
                           src={p.thumbnail.url}
@@ -270,7 +272,7 @@ export default function Header() {
                           alt={p.title}
                         />
                         <div>
-                          <p className="text-white">{p.title}</p>
+                          <p className="text-black">{p.title}</p>
                           <p className="text-sm text-slate-400">
                             ₹{p.price.toLocaleString()}
                           </p>
@@ -289,9 +291,9 @@ export default function Header() {
                       <div
                         key={p._id}
                         onClick={() => handleProductClick(p.slug)}
-                        className="p-3 bg-slate-700/30 rounded cursor-pointer"
+                        className="p-3 bg-pink-50 hover:bg-pink-100 rounded cursor-pointer"
                       >
-                        <p className="text-sm text-white truncate">
+                        <p className="text-sm text-black truncate">
                           {p.title}
                         </p>
                       </div>
