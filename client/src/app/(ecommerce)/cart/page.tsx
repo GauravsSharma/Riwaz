@@ -9,6 +9,7 @@ import { useUserStore } from '@/stores/user.store';
 import { toast } from 'react-toastify';
 import CheckoutSessionLoader from '@/components/loaders/CheckoutSessionLoader';
 import { useRouter } from 'next/navigation';
+import Script from 'next/script';
 
 const ShoppingCartPage = () => {
   const [item, setItem] = useState<string>();
@@ -18,7 +19,7 @@ const ShoppingCartPage = () => {
   const [showCouponInput, setShowCouponInput] = useState(false);
   const [couponCode, setCouponCode] = useState('');
   const { isLoading } = useGetCartItems(!!user)
-  const [isCheckOutLoaderOpen, setIsCheckOutLoaderOpen] = useState(false);
+  const [isCheckOutLoaderOpen, setIsCheckOutLoaderOpen] = useState(true);
   const totalAmount = useUserCart((s) => s.totalDiscountedAmount);
   const totalActualAmount = useUserCart((s) => s.totalActualAmount);
   const setTotalActualAmount = useUserCart((s) => s.setTotalActualAmount);
@@ -56,16 +57,40 @@ const ShoppingCartPage = () => {
     }
     setIsCheckOutLoaderOpen(true);
     mutate({ coupon: "NONE" }, {
-      onSuccess: (url: string) => {
+      onSuccess: (order: RazorpayOrder) => {
         setIsCheckOutLoaderOpen(false);
-        // router.push(url)
+        loadPaymentPage(order)
       },
       onError: () => {
         setIsCheckOutLoaderOpen(false)
         toast.error("Something went wrong")
       }
     })
-
+  }
+  const loadPaymentPage = (order: RazorpayOrder) => {
+    let options = {
+      "key": process.env.NEXT_PUBLIC_RAZORPAY_KEY, // Enter the Key ID generated from the Dashboard
+      "amount": order.amount, // Amount is in currency subunits. 
+      "currency": "INR",
+      "name": "Riwaz",
+      "description": "",
+      "image": "/logo.png",
+      "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+      "callback_url": `${process.env.NEXT_PUBLIC_API_URL}/order/paymentVerification`,
+      "prefill": {
+        "name": "Gaurav Kumar",
+        "email": "gaurav.kumar@example.com",
+        "contact": "+919876543210"
+      },
+      "notes": {
+        "address": "Razorpay Corporate Office"
+      },
+      "theme": {
+        "color": "#3399cc"
+      }
+    };
+    const razorpay = new (window as any).Razorpay(options);
+    razorpay.open();
   }
 
   if (isLoading) {
@@ -189,6 +214,10 @@ const ShoppingCartPage = () => {
         />
       }
       {isCheckOutLoaderOpen && <CheckoutSessionLoader />}
+      <Script
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        strategy="afterInteractive"
+      />
     </div>
 
   );

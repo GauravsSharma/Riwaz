@@ -13,13 +13,13 @@ const orderItemSchema = new mongoose.Schema({
     ref: "Product",
     required: true,
   },
-  // variantId: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: "ProductVariant",
-  // },
   quantity: { type: Number, required: true, min: 1 },
   price: { type: Number, required: true }, // price per item
   color: {
+    type: String,
+    required: true
+  },
+  thumbnail: {
     type: String,
     required: true
   }
@@ -43,6 +43,10 @@ const orderSchema = new mongoose.Schema(
       type: String,
       enum: ["COD", "Razorpay", "Stripe"],
       default: "COD",
+    },
+    paymentMode: {
+      type: String,
+      enum: ["upi", "card", "netbanking", "wallet"],
     },
     paymentStatus: {
       type: String,
@@ -81,6 +85,11 @@ const orderSchema = new mongoose.Schema(
     deliveredAt: {
       type: Date,
     },
+    razorpayOrderId: {
+      type: String,
+      required: true,
+      unique: true,
+    }
   },
   {
     timestamps: true,

@@ -98,7 +98,7 @@ export const useCreateCheckoutSession = () => {
   return useMutation({
     mutationFn: async (data:CheckoutSessionPayload) => {
       const res = await api.post("/order/create-checkout-session",data);
-      return res.data.sessionUrl;
+      return res.data.order;
     },
   });
 };
