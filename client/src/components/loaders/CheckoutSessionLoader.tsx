@@ -11,9 +11,7 @@ const CheckoutSessionLoader = () => {
                     Creating checkout session...
                 </div>
             </div>
-
         </div>
     )
 }
-
 export default CheckoutSessionLoader
