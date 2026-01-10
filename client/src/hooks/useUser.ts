@@ -193,49 +193,6 @@ export const useEditAddress = () => {
 // ------------------------
 // Search suggestions
 // ------------------------
-export const getProductRecommendation = (searchQuery: string) => {
-  return useQuery<ProductSuggestionResponse>({
-    queryKey: ["searchSuggestions", searchQuery],
-    queryFn: async ({ queryKey }) => {
-      const [, query] = queryKey;
-      if (!query) return { success: true, suggestions: [] };
-
-      const response = await api.get(
-        `/product/search/suggestions?q=${query}`,
-        {
-          headers: {
-            "Cache-Control": "no-cache",
-            Pragma: "no-cache",
-          },
-        }
-      );
-
-      return response.data;
-    },
-    enabled: !!searchQuery,
-  });
-};
-
-export const getSearchRecommendation = (searchQuery: string) => {
-  return useQuery<ProductRecommendationResponse>({
-    queryKey: ["ProductSuggestions", searchQuery],
-    queryFn: async ({ queryKey }) => {
-      const [, query] = queryKey;
-      if (!query) return { success: true, products: [] };
-
-      const response = await api.get(`/product/query?q=${query}`, {
-        headers: {
-          "Cache-Control": "no-cache",
-          Pragma: "no-cache",
-        },
-      });
-
-      return response.data;
-    },
-    enabled: !!searchQuery,
-  });
-};
-
 // ------------------------
 // Logout
 // ------------------------

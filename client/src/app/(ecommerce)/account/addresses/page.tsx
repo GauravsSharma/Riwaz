@@ -50,16 +50,16 @@ export default function Page() {
         {address &&
         Array.isArray(address.addresses) &&
         address.addresses.length > 0 ? (
-          address.addresses.map((add: any) => (
+          address.addresses.map((add: Address) => (
             <AddressCard
               key={add._id}
               id={add._id}
-              address1={add.address1}
+              address1={add.address}
               landmark={add.landmark}
               city={add.city}
               state={add.state}
               pincode={add.pincode}
-              isHome={add.type === "home"}
+              isHome={add.type === "Home"}
               onRemove={handleRemove}
             />
           ))

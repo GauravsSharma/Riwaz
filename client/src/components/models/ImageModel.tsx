@@ -28,6 +28,9 @@ export default function ImageModal({ images, isOpen, setIsOpen }: ImageModalProp
             src={url}
             alt=""
             className="max-h-screen w-auto object-contain"
+            width={800}
+            height={600}
+            
           />
         ))}
       </div>

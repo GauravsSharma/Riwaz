@@ -1,6 +1,8 @@
+import Image from "next/image";
+
 const Error = () => {
   return (
-   <img src="/images/error.gif" alt="" className="h-6 w-6"/>
+   <Image src="/images/error.gif" alt="" className="h-6 w-6" width={50} height={50}/>
   )
 }
 

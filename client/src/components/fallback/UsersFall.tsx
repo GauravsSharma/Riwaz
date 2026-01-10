@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import LoginModal from '../models/LoginModel';
+import Image from 'next/image';
 
 
 const  UsersFall = () =>{
@@ -12,7 +13,7 @@ const  UsersFall = () =>{
 
     return(
         <div className="p-4 text-center">
-        <img src="/images/avatar.png" className="w-20 h-20 rounded-full mx-auto" />
+        <Image src="/images/avatar.png" alt='Error image' className="w-20 h-20 rounded-full mx-auto" width={100} height={100}/>
          <p className="text-gray-500 text-sm">
           Oops you not logged in !!
         </p>
