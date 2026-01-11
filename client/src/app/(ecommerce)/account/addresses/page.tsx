@@ -1,62 +1,40 @@
 "use client";
 
 import AddressCard from "@/components/cards/AddressCard";
-import Error from "@/components/error/Error";
-import FormSubmissionLoader from "@/components/loaders/FormSubmissionLoader";
 import AddNewAddressForm from "@/components/models/AddAddresseModel";
-import { deleteAddress, getAddress } from "@/hooks/useUser";
+import { useDeleteAddress, useGetAddresses } from "@/hooks/buyer/useAddress";
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import { toast } from "react-toastify";
 
-export default function page() {
-
-  const { data: address, isLoading, error } = getAddress();
-
-  const deleteAdd = deleteAddress();
-  
-  
-
+export default function Page() {
+  const { data: addresses, isLoading } = useGetAddresses();
+  const deleteAddress = useDeleteAddress();
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleAddNewAddress = () => setIsOpen(true);
-
-  
-
-const handleRemove = (id: string) => {
-  const confirmed = window.confirm("Do you want to delete this address?");
-  
-    if (confirmed) {
-    deleteAdd.mutate(id);
-    // toast is handled in the mutation's onSuccess to avoid duplicate toasts
-
-    } else {
-    toast("Delete canceled");
+  const handleRemove = (id: string) => {
+    if (window.confirm("Delete this address?")) {
+      deleteAddress.mutate(id);
     }
-};
+  };
 
+  if (isLoading)
+    return <p className="text-center mt-6 text-gray-600">Loading addresses...</p>;
 
-  if (isLoading) return <FormSubmissionLoader />;
-  if (error) return <Error />;
-    
   return (
-    <div className="w-[75%] p-6">
-
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-semibold text-gray-900">My Addresses</h1>
-        <button 
-          onClick={handleAddNewAddress}
-          className="flex items-center space-x-2 text-red-500 hover:text-red-600 font-medium transition-colors"
+    <div className="w-full sm:w-[75%] p-4 sm:p-6 mx-auto">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <h1 className="text-2xl font-semibold">My Addresses</h1>
+        <button
+          onClick={() => setIsOpen(true)}
+          className="flex items-center gap-2 text-red-500 font-medium hover:text-red-600"
         >
-          <Plus size={20} />
-          <span className="text-sm font-bold">ADD NEW ADDRESS</span>
+          <Plus size={18} /> Add New
         </button>
       </div>
-      {/* Address List */}
-      <div className="space-y-4">
-        {!isLoading && !error && address && Array.isArray(address.addresses) && address.addresses.length > 0 ? (
-          address.addresses.map((add: any) => (
+
+      {addresses && addresses.length > 0 ? (
+        <div className="flex flex-col gap-4">
+          {addresses.map((add) => (
             <AddressCard
               key={add._id}
               id={add._id}
@@ -65,25 +43,15 @@ const handleRemove = (id: string) => {
               city={add.city}
               state={add.state}
               pincode={add.pincode}
-              isHome={add.type === "home"}
               onRemove={handleRemove}
             />
-          ))
-        ) : (
-          <div className="p-6 border rounded-md text-center">
-            <h2 className="text-xl font-semibold">No addresses yet</h2>
-            <p className="text-gray-500 mt-2">Add a new address to get started.</p>
-            
-        
-          
-          </div>
-        )}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-gray-500 mt-4">No address found.</p>
+      )}
 
-      {/* Add New Address Form */}
-      <AddNewAddressForm setIsOpen={setIsOpen} isOpen={isOpen} />
-
-      
+      <AddNewAddressForm isOpen={isOpen} setIsOpen={setIsOpen} />
     </div>
   );
 }
