@@ -54,7 +54,6 @@ export default function Page() {
               city={add.city}
               state={add.state}
               pincode={add.pincode}
-              isHome={add.type === "home"}
               onRemove={handleRemove}
             />
           ))

@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { Figtree,Fraunces } from "next/font/google";
 import { ToastContainer } from "react-toastify";
 import QueryProvider from "./QueryProvider";
-import NextTopLoader from "nextjs-toploader";
 
 const figtree = Figtree({
   variable: "--font-figtree",
@@ -32,7 +31,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${figtree.variable} ${fraunces.variable} ${figtree.className}  antialiased`}>
         <QueryProvider>
-        <NextTopLoader color="white"/>
+
           {children}
           <ToastContainer />
         </QueryProvider>

@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 
 interface UserState {
   user: User | null;
-  setUser: (user: User | null) => void;
+  setUser: (user: User) => void;
 }
 
 // ------------------------
@@ -15,6 +15,7 @@ interface SendOtpPayload {
   phone: string;
 }
 
+// product recommendation.... thumbnail type
 export interface ProductThumbnail {
   url: string;
   public_id: string;
@@ -29,15 +30,21 @@ export interface Products {
   thumbnail: ProductThumbnail;
 }
 
+// Product recommendation API response
 export interface ProductRecommendationResponse {
   success: boolean;
   products: Products[];
 }
 
-export interface ProductSuggestionResponse {
-  success: boolean;
-  suggestions: string[];
+
+export interface ProductSuggestionResponse{
+
+  success:boolean;
+  suggestions:string[]
+    
 }
+
+
 
 interface VerifyOtpPayload {
   phone: string;
@@ -45,35 +52,31 @@ interface VerifyOtpPayload {
   userType: "seller" | "customer";
 }
 
-interface UserDetails {
-  name: string;
-  email: string;
+interface UserDetails{
+   name:string;
+   email:string
 }
 
+//AddressResponse-picture of address 
 export interface AddressResponse {
   addresses: Address[];
 }
 
-export interface AddressEdit {
-  id: string;
-  address1: string;
-  landmark?: string;
-  city: string;
-  state: string;
-  pincode: string;
-}
 
 // ------------------------
 // GET current user
 // ------------------------
 export const useCurrentUser = () => {
+  // Explicitly type 's' to UserState
   const setUser = useUserStore((s: UserState) => s.setUser);
-
+ 
   return useQuery<User>({
     queryKey: ["current-user"],
     queryFn: async () => {
-      const res = await api.get("/user");
+      const res = await api.get("/user")
       setUser(res.data.user);
+      console.log("Data------------>",res.data);
+      
       return res.data.user;
     },
   });
@@ -92,10 +95,10 @@ export const useSendOtp = () => {
 };
 
 // ------------------------
-// Verify OTP
+// Verify OTP → return token + user
 // ------------------------
 export const useVerifyOtp = () => {
-  const setUser = useUserStore((s: UserState) => s.setUser);
+  const setUser = useUserStore((s) => s.setUser);
 
   return useMutation({
     mutationFn: async (data: VerifyOtpPayload) => {
@@ -111,33 +114,13 @@ export const useVerifyOtp = () => {
   });
 };
 
-// ------------------------
-// Edit profile
-// ------------------------
-export const useUpdateOrEditProfile = () => {
-  return useMutation({
-    mutationFn: async (data: UserDetails) => {
-      const res = await api.put("/user/profile", data);
-      return res.data;
-    },
-  });
-};
+//used to edit profile 
+export const useUpdateOrEditProfile = () =>{
+    return useMutation({
+       mutationFn:async(data:UserDetails) =>{
+          const res=await api.put("/user/profile",data);
+          return res.data;
+        }
+    });
 
-export const useLogout = (setIsOpen: (open: boolean) => void) => {
-  const setUser = useUserStore((s: UserState) => s.setUser);
-
-  return useMutation({
-    mutationFn: async () => {
-      const res = await api.post("/user/logout");
-      return res.data;
-    },
-    onSuccess: () => {
-      setUser(null);
-      setIsOpen(false);
-      toast.success("Logout successful!");
-    },
-    onError: () => {
-      toast.error("Logout failed!");
-    },
-  });
-};
+}

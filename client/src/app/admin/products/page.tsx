@@ -3,8 +3,10 @@
 import React from "react";
 import { useSellerProducts } from "@/stores/seller/seller_product.store";
 import SellerProductsTable from "@/components/tables/SellerProductsTable";
+import ProductImageDialog from "@/components/models/AddImages";
+// import SellerProductsTable from "@/components/SellerProductsTable";
 
-const Page = () => {
+const page = () => {
   const products = useSellerProducts((s) => s.products);
 
   return (
@@ -15,4 +17,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default page;

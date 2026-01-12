@@ -1,4 +1,10 @@
-declare module "*.css";
+// interface User {
+//   id: string;
+//   name: string;
+//   phone: string;
+//   type: "buyer" | "seller"| null;
+// }
+
 interface User {
   _id: string;
   fullName: string | null;
@@ -18,67 +24,65 @@ interface Store {
   address: string;
 
 }
-interface Product {
+interface Product{
   _id: string;
   title: string;
   price: number;
-  originalPrice: number;
-  discountPercentage: number;
+  originalPrice:number;
+  discountPercentage:number;
   thumbnail: {
-    url: string,
-    public_id: string
+    url:string,
+    public_id:string
   };
 }
 
-interface SellerProduct {
+interface SellerProduct{
   _id: string;
   title: string;
   isActive: boolean;
   stock: number;
   price: number;
-  status: string
+  status:string
   thumbnail: {
     public_id: string;
     url: string;
   };
-  slug: string
+  slug:string
 }
-interface BaseProduct {
-  _id: string,
-  title: string,
-  isParent: boolean
-  storeId: string,
-  varients: SellerProduct[]
+interface BaseProduct{
+  _id:string,
+  title:string,
+  isParent:boolean
+  storeId:string,
+  varients:SellerProduct[]
 }
 
-interface MainProduct {
-  _id: string
-  title: string,
-  price: number,
-  originalPrice: number,
-  discountPercentage: number,
-  description: string,
-  images: [
+interface MainProduct{
+  _id:string
+  title:string,
+  price:number,
+  originalPrice:number,
+  discountPercentage:number,
+  description:string,
+  images:[
     {
-      url: string,
-      public_id: string
+      url:string,
+      public_id:string
     }
   ]
-  color: string,
-
 }
-interface Variant {
-  thumbnail: {
-    url: string,
-    public_id: string
+interface Variant{
+  thumbnail:{
+    url:string,
+    public_id:string
   },
-  color: string,
-  _id: string
+  color:string,
+  _id:string
 }
 
 interface ReviewUser {
   _id: string;
-  fullName: string
+  fullName:string
 }
 
 interface ProductReview {
@@ -88,7 +92,7 @@ interface ProductReview {
   userId: ReviewUser;
   createdAt: string;
 }
-interface RatingBreakdown {
+interface RatingBreakdown{
   1: number;
   2: number;
   3: number;

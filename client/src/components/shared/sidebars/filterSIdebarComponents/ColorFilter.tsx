@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronUp, MoreHorizontal } from 'lucide-react';
 
 interface ColorFilterProps {

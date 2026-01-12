@@ -24,7 +24,7 @@ export default function LoginModal({ isOpen, setIsOpen,becomeASeller }: { isOpen
       return;
     }
      
-    // console.log(mobileNumber+""+mobileNumber);
+    console.log(mobileNumber+""+mobileNumber);
 
     sendOtpMutation(
       { phone: "+91" + mobileNumber },
@@ -46,7 +46,7 @@ export default function LoginModal({ isOpen, setIsOpen,becomeASeller }: { isOpen
         userType: becomeASeller ? "seller" : "customer",
       },
       {
-        onSuccess: () => {
+        onSuccess: (res) => {
           toast.success("Login successful!");
           setIsOpen(false);
         },

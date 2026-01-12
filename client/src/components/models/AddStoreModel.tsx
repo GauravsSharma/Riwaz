@@ -1,92 +1,57 @@
-import { useCreateStore, useUpdateStore } from '@/hooks/seller/useStore';
+import { useCreateStore } from '@/hooks/seller/useStore';
 import { X } from 'lucide-react';
-import React, { useEffect } from 'react'
+import React from 'react'
 import { toast } from 'react-toastify';
-import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
-interface ApiError extends Error {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-}
 interface FormData {
-  name: string;
-  description: string;
-  address: string;
+    name: string;
+    description: string;
+    address: string;
 }
 const AddStoreModel = ({
-  storeData,
-  isDialogOpen,
-  setIsDialogOpen,
-
-}: {
-  storeData: Store|undefined,
-  isDialogOpen: boolean;
-  setIsDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    isDialogOpen ,
+    setIsDialogOpen,
+   
+}:{
+    isDialogOpen: boolean;
+    setIsDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
 
-  const [formData, setFormData] = React.useState<FormData>({
-    name: storeData ? storeData.name : "",
-    description: storeData ? storeData.description : "",
-    address: storeData ? storeData.address : ""
-  });
-  const {mutate:createStoreMutation,isPending:isAddPending} = useCreateStore()
-  const {mutate:updateStore,isPending:isUpdatPending} = useUpdateStore();
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
+    const [formData, setFormData] = React.useState<FormData>({
+        name: "",
+        description: "",
+        address: ""
     });
-  }
-  const isPending = storeData?isUpdatPending:isAddPending;
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.name || !formData.description || !formData.address) {
-      toast.error("Please fill all the fields");
-      return;
-    }
-    if (storeData) {
-      updateStore({ data: formData, id: storeData._id }, {
-        onSuccess: () => {
-          toast.success("Store updated successfully");
-          setIsDialogOpen(false);
-        },
-        onError: (error: ApiError) => {
-          toast.error(error.response?.data?.message || "Something went wrong");
-        }
-      })
-    } else {
-      createStoreMutation(formData, {
-        onSuccess: () => {
-          toast.success("Store created successfully");
-          setIsDialogOpen(false);
-        },
-        onError: (error: ApiError) => {
-          toast.error(error.response?.data?.message || "Something went wrong");
-        }
-      });
-    }
-  };
-  useEffect(()=>{
-    if(storeData){
-      const data = {
-        name:storeData.name,
-        address:storeData.address,
-        description:storeData.description
+    const createStoreMutation = useCreateStore()
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setFormData({
+          ...formData,
+          [e.target.name]: e.target.value
+        });
       }
-      setFormData(data)
-    }
-  },[storeData])
-  
+    const handleSubmit = (e: React.FormEvent) => {
+        if(!formData.name || !formData.description || !formData.address){
+            toast.error("Please fill all the fields");
+            return;
+        }
+
+        e.preventDefault();
+        createStoreMutation.mutate(formData, {
+            onSuccess: (data) => {
+                toast.success("Store created successfully");
+                setIsDialogOpen(false);
+            },
+            onError: (error:any) => {
+                toast.error(error.response?.data?.message || "Something went wrong");
+            }
+        });
+    };
   return (
     <div>
-      {isDialogOpen && (
+         {isDialogOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-in fade-in duration-200">
             <div className="flex justify-between items-center p-6 border-b border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-900">{storeData?"Update Store":"Add new store"}</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Add New Store</h2>
               <button
                 onClick={() => setIsDialogOpen(false)}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -107,7 +72,7 @@ const AddStoreModel = ({
                   onChange={handleInputChange}
                   required
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none"
-
+                  
                   placeholder="Enter store name"
                 />
               </div>
@@ -150,12 +115,11 @@ const AddStoreModel = ({
                   Cancel
                 </button>
                 <button
-                  disabled={isPending}
+                  type="submit"
                   onClick={handleSubmit}
-                  className={`px-4 py-2 cursor-pointer w-1/2 flex justify-center items-center gap-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-medium ${isPending ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className="flex-1 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-md hover:shadow-lg transition-all font-medium"
                 >
-                  {storeData?"Update":"Add Store"}
-                  {isPending && <FormSubmissionLoader />}
+                  Add Store
                 </button>
               </div>
             </div>

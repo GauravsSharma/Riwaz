@@ -11,7 +11,7 @@ interface CartSummary {
   totalActualPrice: number
   itemCount: number,
 }
-export const useGetCartItems = (enabled: boolean) => {
+export const useGetCartItems = () => {
   const setCartItems = useUserCart((s) => s.setCartItems);
   return useQuery<CartItem[]>({
     queryKey: ["cart-store"],
@@ -20,7 +20,6 @@ export const useGetCartItems = (enabled: boolean) => {
       setCartItems(res.data.cartItems);
       return res.data.cartItems;
     },
-    enabled
   });
 };
 

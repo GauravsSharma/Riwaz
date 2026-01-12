@@ -25,7 +25,6 @@ export const useGetAddresses = () => {
  */
 export const useCreateAddress = () => {
   const addAddress = useAddressStore((s) => s.addAddress);
-  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (data: Omit<Address, "_id" | "userId">) => {

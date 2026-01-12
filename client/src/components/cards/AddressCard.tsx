@@ -1,14 +1,15 @@
+"use client";
+import { Edit2, Home, MapPin, Trash2,MapPinned } from "lucide-react";
 import { useState } from "react";
-import { Home, MapPin, Edit2, Trash2, MapPinned } from "lucide-react";
 import EditAddressForm from "./EditAddressForm";
 
 interface AddressCardProps {
   id: string;
-  landmark: string;
-  state: string;
-  city: string;
-  address1: string;
-  pincode: string;
+  landmark?: string;
+  state?: string;
+  city?: string;
+  address1?: string;
+  pincode?: string;
   isHome?: boolean;
   onRemove: (id: string) => void;
 }
@@ -90,9 +91,9 @@ export default function AddressCard({
 
       {/* Your Form Component */}
       <EditAddressForm
+        id={id}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        id={id}
         existingAddress={{
           postCode: pincode,
           state: state,

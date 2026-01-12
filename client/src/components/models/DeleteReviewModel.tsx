@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AlertTriangle, X } from 'lucide-react';
+import { useDeleteProduct } from '@/hooks/seller/useSellerProduct';
 import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
 import { useDeleteReview } from '@/hooks/buyer/useReview';
 

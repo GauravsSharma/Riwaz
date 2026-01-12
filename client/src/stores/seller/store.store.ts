@@ -17,19 +17,10 @@ export const useSellerStore = create<StoreState>((set) => ({
             stores: state.stores ? [...state.stores, store] : [store],
         }));
     }),
-    updateStore: (updatedStore) =>
-    set((state) => ({
-      stores: state.stores
-        ? state.stores.map((store) =>
-            store._id === updatedStore._id ? updatedStore : store
-          )
-        : state.stores,
-    })),
-    deleteStore: (storeId) =>
-    set((state) => ({
-      stores: state.stores
-        ? state.stores.filter((store) => store._id !== storeId)
-        : state.stores,
-    })),
+    updateStore: (()=>{
 
+    }),
+    deleteStore: ((storeId) => {
+
+    }),
 }));
