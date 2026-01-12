@@ -1,10 +1,21 @@
 import api from "@/lib/axios";
 import { useProductStore } from "@/stores/buyer/products.store";
 import { useQuery } from "@tanstack/react-query";
+
 interface SingleProduct{
   product: MainProduct;
   variants: Variant[];
   success: boolean;
+}
+// Product recommendation API response
+export interface ProductRecommendationResponse {
+  success: boolean;
+  products: Product[];
+}
+
+export interface ProductSuggestionResponse{
+  success:boolean;
+  suggestions:string[]
 }
 export const useGetProducts = (query:string) => {
   const setProducts = useProductStore((s) => s.setProducts);
@@ -41,4 +52,61 @@ export const useGetMainProduct = (productId: string) => {
             return res.data.product;
         },
     });
+};
+
+export const getProductRecommendation = (searchQuery: string) => {
+  return useQuery<ProductSuggestionResponse>({
+    queryKey: ["searchSuggestions", searchQuery],
+    queryFn: async ({ queryKey }) => {
+      const [, query] = queryKey;
+
+      if (!query) {
+        return { success: true, products: [] };
+      }
+
+      const response = await api.get(
+        `/product/search/suggestions?q=${query}`,
+       {
+       headers: {
+        "Cache-Control": "no-cache",
+         Pragma: "no-cache",
+       }
+      }
+
+      );
+
+      console.log("Data------------>", response.data);
+      return response.data;
+    },
+    enabled: !!searchQuery, // prevents empty calls
+  });
+};
+
+
+export const getSearchRecommendation = (searchQuery: string) => {
+  return useQuery<ProductRecommendationResponse>({
+    queryKey: ["ProductSuggestions", searchQuery],
+    queryFn: async ({ queryKey }) => {
+      const [, query] = queryKey;
+
+      if (!query) {
+        return { success: true, products: [] };
+      }
+
+      const response = await api.get(
+        `/product/query?q=${query}`,
+       {
+       headers: {
+        "Cache-Control": "no-cache",
+         Pragma: "no-cache",
+       }
+      }
+
+      );
+
+      console.log("Data------------>", response.data);
+      return response.data;
+    },
+    enabled: !!searchQuery, // prevents empty calls
+  });
 };

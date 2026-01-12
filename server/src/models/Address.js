@@ -12,6 +12,8 @@ const AddressSchema = new mongoose.Schema({
   state: { type: String, required: true },
   pincode: { type: String, required: true },
   country: { type: String, default: "India" },
+  isDefault: { type: Boolean, default: false },
+  type: { type: String, enum: ["home", "work", "other"], default: "home" },
 });
 
 const Address = mongoose.model('Address', AddressSchema);

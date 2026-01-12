@@ -1,33 +1,29 @@
 "use client";
-
 import AddressCard from "@/components/cards/AddressCard";
-import Error from "@/components/error/Error";
-import FormSubmissionLoader from "@/components/loaders/FormSubmissionLoader";
 import AddNewAddressForm from "@/components/models/AddAddresseModel";
-import { useDeleteAddress, useGetAddresses } from "@/hooks/useUser";
+import DeleteAddressDialog from "@/components/models/DeleteAddress";
+import { useGetAddresses } from "@/hooks/buyer/useAddress";
+import { useAddressStore } from "@/stores/buyer/address.user";
+import { useUserStore } from "@/stores/user.store";
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import { toast } from "react-toastify";
+
 
 export default function Page() {
-  const { data: address, isLoading, error } = useGetAddresses();
-  const deleteAdd = useDeleteAddress();
+  const { isLoading } = useGetAddresses();
+  const addresses = useAddressStore(s=>s.addresses)
   const [isOpen, setIsOpen] = useState(false);
-
+  const[isDeleteDialogOpen,setIsDeleteDialogOpen]=useState(false);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const handleAddNewAddress = () => setIsOpen(true);
-
-  const handleRemove = (id: string) => {
-    const confirmed = window.confirm("Do you want to delete this address?");
-    if (confirmed) {
-      deleteAdd.mutate(id);
-      // toast handled in mutation onSuccess
-    } else {
-      toast("Delete canceled");
-    }
+ const user = useUserStore((s) => s.user);
+  const handleRemove = (id:string) => {
+    setSelectedAddressId(id)
+     setIsDeleteDialogOpen(true)
   };
-
-  if (isLoading) return <FormSubmissionLoader />;
-  if (error) return <Error />;
+  if (isLoading) return <div className="flex justify-center items-center w-full">
+    <div className="lds-ring"><div></div><div></div><div></div><div></div></div>
+  </div>
 
   return (
     <div className="w-[75%] p-6">
@@ -36,21 +32,20 @@ export default function Page() {
         <h1 className="text-2xl font-semibold text-gray-900">
           My Addresses
         </h1>
-        <button
+      {user &&  <button
           onClick={handleAddNewAddress}
-          className="flex items-center space-x-2 text-red-500 hover:text-red-600 font-medium transition-colors"
+          className="flex items-center cursor-pointer space-x-2 text-red-500 hover:text-red-600 font-medium transition-colors"
         >
           <Plus size={20} />
           <span className="text-sm font-bold">ADD NEW ADDRESS</span>
-        </button>
+        </button>}
       </div>
 
       {/* Address List */}
       <div className="space-y-4">
-        {address &&
-        Array.isArray(address.addresses) &&
-        address.addresses.length > 0 ? (
-          address.addresses.map((add: Address) => (
+        {addresses &&
+        addresses.length > 0 ? (
+          addresses.map((add: Address) => (
             <AddressCard
               key={add._id}
               id={add._id}
@@ -59,12 +54,12 @@ export default function Page() {
               city={add.city}
               state={add.state}
               pincode={add.pincode}
-              isHome={add.type === "Home"}
+              isHome={add.type === "home"}
               onRemove={handleRemove}
             />
           ))
         ) : (
-          <div className="p-6 border rounded-md text-center">
+          <div className="p-6 rounded-md text-center">
             <h2 className="text-xl font-semibold">
               No addresses yet
             </h2>
@@ -76,7 +71,12 @@ export default function Page() {
       </div>
 
       {/* Add New Address Form */}
-      <AddNewAddressForm setIsOpen={setIsOpen} isOpen={isOpen} />
+     {isOpen && (
+        <AddNewAddressForm isOpen={isOpen} setIsOpen={setIsOpen} />
+      )}
+     {isDeleteDialogOpen && selectedAddressId&&(
+        <DeleteAddressDialog isOpen={isDeleteDialogOpen} setIsOpen={setIsDeleteDialogOpen} addressId={selectedAddressId} />
+      )}
     </div>
   );
 }

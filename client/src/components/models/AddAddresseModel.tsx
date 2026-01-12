@@ -1,9 +1,13 @@
-import { useAddAddress } from '@/hooks/useUser';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { X } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
+import { toast } from 'react-toastify';
+import { useQueryClient } from '@tanstack/react-query';
+import { useCreateAddress } from '@/hooks/buyer/useAddress';
 
 const addressSchema = z.object({
 
@@ -21,7 +25,8 @@ type AddressFormData = z.infer<typeof addressSchema>;
 
 export default function AddNewAddressForm({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: (open: boolean) => void }) {
   const [currentStep, setCurrentStep] = useState(1);
-
+const queryClient = useQueryClient();
+  const { mutate, isPending } = useCreateAddress();
   const {
     register,
     handleSubmit,
@@ -51,35 +56,35 @@ export default function AddNewAddressForm({ isOpen, setIsOpen }: { isOpen: boole
     setCurrentStep(1);
   };
 
-  const address = useAddAddress();
 
   const onSubmit = (data: AddressFormData) => {
-    address.mutate(
+    mutate(
       {
-        type: "Home",
+        type: "home",
         landmark: data.landmark,
         state: data.state,
         city: data.cityTown,
         address: data.address,
         pincode: data.postCode,
         country: "India",
-        _id:""
+        isDefault: data.makeDefault || false,
       },
       {
         onSuccess: (data) => {
-          console.log("Address added", data);
-          // setUser(data.user); // update Zustand store
+         toast.success("Address added successfully");
+         setIsOpen(false);
+         queryClient.invalidateQueries({ queryKey: ["Address"] });
         },
         onError: (error) =>
-          console.error(`Failed to address: ${error}`),
+          toast.error("Failed to add address. Please try again."),
       }
     );
-    setIsOpen(false);
+    
   };
 
   return (
     <>
-      {isOpen && <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      {isOpen && <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b">
@@ -95,58 +100,6 @@ export default function AddNewAddressForm({ isOpen, setIsOpen }: { isOpen: boole
           <div className="p-6">
             {currentStep === 1 && (
               <div className="space-y-4">
-                {/* First Name 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  FIRST NAME <span className="text-red-500">*</span>
-                </label>
-                <input
-                  {...register('firstName')}
-                  type="text"
-                  placeholder="Enter name here"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                />
-                {errors.firstName && (
-                  <p className="text-red-500 text-xs mt-1">{errors.firstName.message}</p>
-                )}
-              </div>*/}
-
-                {/* Last Name 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  LAST NAME <span className="text-red-500">*</span>
-                </label>
-                <input
-                  {...register('lastName')}
-                  type="text"
-                  placeholder="Enter name here"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                />
-                {errors.lastName && (
-                  <p className="text-red-500 text-xs mt-1">{errors.lastName.message}</p>
-                )}
-              </div>*/}
-
-                {/* Mobile Number and Post Code 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    MOBILE NUMBER <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-2 text-gray-600">+91</span>
-                    <input
-                      {...register('mobileNumber')}
-                      type="tel"
-                      placeholder="Enter mobile number here"
-                      className="w-full pl-12 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    />
-                  </div>
-                  {errors.mobileNumber && (
-                    <p className="text-red-500 text-xs mt-1">{errors.mobileNumber.message}</p>
-                  )}
-                </div>
-                <div>*/}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
 
@@ -202,7 +155,7 @@ export default function AddNewAddressForm({ isOpen, setIsOpen }: { isOpen: boole
                   <button
                     type="button"
                     onClick={nextStep}
-                    className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition-colors"
+                    className="bg-red-600 cursor-pointer text-white px-6 py-2 rounded hover:bg-red-700 transition-colors"
                   >
                     Next
                   </button>
@@ -228,23 +181,8 @@ export default function AddNewAddressForm({ isOpen, setIsOpen }: { isOpen: boole
                   )}
                 </div>
 
-                {/* Address 2 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  ADDRESS 2 (AREA, COLONY, STREET, SECTOR, VILLAGE) <span className="text-red-500">*</span>
-                </label>
-                <input
-                  {...register('address2')}
-                  type="text"
-                  placeholder="Enter delivery area, colony, street, sector, village"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                />
-                {errors.address2 && (
-                  <p className="text-red-500 text-xs mt-1">{errors.address2.message}</p>
-                )}
-              </div>*}
 
-              {/* Landmark */}
+                {/* Landmark */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     LANDMARK <span className="text-red-500">*</span>
@@ -260,47 +198,7 @@ export default function AddNewAddressForm({ isOpen, setIsOpen }: { isOpen: boole
                   )}
                 </div>
 
-                {/* Instructions 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Instructions (Optional)
-                </label>
-                <textarea
-                  {...register('instructions')}
-                  placeholder="Any instruction please add here"
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
-                />
-              </div>*}
-
-              {/* Address Type 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  ADDRESS TYPE
-                </label>
-                <div className="flex space-x-6">
-                  <label className="flex items-center">
-                    <input
-                      {...register('addressType')}
-                      type="radio"
-                      value="home"
-                      className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">Home</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      {...register('addressType')}
-                      type="radio"
-                      value="office"
-                      className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">Office/Commercial</span>
-                  </label>
-                </div>
-              </div>*}
-
-              {/* Make Default */}
+                {/* Make Default */}
                 <div className="flex items-center">
                   <input
                     {...register('makeDefault')}
@@ -317,24 +215,28 @@ export default function AddNewAddressForm({ isOpen, setIsOpen }: { isOpen: boole
                   <button
                     type="button"
                     onClick={prevStep}
-                    className="text-red-600 px-6 py-2 border border-red-600 rounded hover:bg-red-50 transition-colors"
+                    className="text-red-600 cursor-pointer px-6 py-2 border border-red-600 rounded hover:bg-red-50 transition-colors"
                   >
                     Back
                   </button>
-                  <div className="space-x-3">
+                  <div className="space-x-3 flex">
                     <button
                       type="button"
                       onClick={() => setIsOpen(false)}
-                      className="text-red-600 px-6 py-2 hover:bg-gray-50 transition-colors"
+                      className="text-red-600 px-6 py-2 cursor-pointer hover:bg-gray-50 transition-colors"
                     >
                       CANCEL
                     </button>
                     <button
+                      disabled={isPending}
                       type="button"
                       onClick={handleSubmit(onSubmit)}
-                      className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition-colors"
+                      className={` ${isPending ? "cursor-not-allowed bg-red-400":"cursor-pointer bg-red-600"} text-white px-6 py-2 rounded hover:bg-red-500 flex justify-center items-center gap-2 transition-colors`}
                     >
                       SUBMIT
+                      {
+                        isPending && <FormSubmissionLoader />
+                      }
                     </button>
                   </div>
                 </div>

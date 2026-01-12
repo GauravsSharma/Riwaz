@@ -1,16 +1,17 @@
 
-import { useEditAddress } from '@/hooks/useUser';
+import { useEditAddress } from '@/hooks/buyer/useAddress';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { X } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
 
 const addressSchema = z.object({
   postCode: z.string().min(1, 'Post code is required'),
   state: z.string().min(1, 'State is required'),
   cityTown: z.string().min(1, 'City/Town is required'),
-  address1: z.string().min(1, 'Address is required'),
+  address: z.string().min(1, 'Address is required'),
   landmark: z.string().min(1, 'Landmark is required'),
   makeDefault: z.boolean().optional()
 });
@@ -25,7 +26,7 @@ interface EditAddressFormProps {
     postCode: string;
     state: string;
     cityTown: string;
-    address1: string;
+    address: string;
     landmark: string;
   };
 }
@@ -34,7 +35,7 @@ export default function EditAddressForm({
   id,
   isOpen,
   setIsOpen,
-  
+
 }: EditAddressFormProps) {
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -49,7 +50,7 @@ export default function EditAddressForm({
       postCode: '',
       state: '',
       cityTown: '',
-      address1: '',
+      address: '',
       landmark: '',
       makeDefault: false
     }
@@ -72,22 +73,24 @@ export default function EditAddressForm({
     setCurrentStep(1);
   };
 
-  const address = useEditAddress();
+  const {mutate,isPending} = useEditAddress();
 
   const onSubmit = (data: AddressFormData) => {
     console.log('Form submitted:', data);
-        address.mutate(
+    mutate(
       {
         id: id,
-        landmark: data.landmark,
-        state: data.state,
-        city: data.cityTown,
-        address1: data.address1,
-        pincode: data.postCode,
+        data: {
+          id,
+          landmark: data.landmark,
+          state: data.state,
+          city: data.cityTown,
+          address: data.address,
+          pincode: data.postCode,
+        }
       },
       {
-        onSuccess: (data) => {
-          console.log('Address updated', data);
+        onSuccess: () => {
           setIsOpen(false);
           setCurrentStep(1); // Reset step after successful update
         },
@@ -95,16 +98,12 @@ export default function EditAddressForm({
           console.error(`Failed to update address: ${error}`),
       }
     );
-
-
-
-
   };
 
   return (
     <>
       {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b">
@@ -191,13 +190,13 @@ export default function EditAddressForm({
                       <span className="text-red-500">*</span>
                     </label>
                     <input
-                      {...register('address1')}
+                      {...register('address')}
                       type="text"
                       placeholder="Enter delivery address here"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     />
-                    {errors.address1 && (
-                      <p className="text-red-500 text-xs mt-1">{errors.address1.message}</p>
+                    {errors.address && (
+                      <p className="text-red-500 text-xs mt-1">{errors.address.message}</p>
                     )}
                   </div>
 
@@ -238,7 +237,7 @@ export default function EditAddressForm({
                     >
                       Back
                     </button>
-                    <div className="space-x-3">
+                    <div className="flex justify-center items-center space-x-3">
                       <button
                         type="button"
                         onClick={() => setIsOpen(false)}
@@ -247,11 +246,13 @@ export default function EditAddressForm({
                         CANCEL
                       </button>
                       <button
+                      disabled={isPending}
                         type="button"
                         onClick={handleSubmit(onSubmit)}
-                        className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition-colors"
+                        className={` ${isPending ? "cursor-not-allowed bg-red-400":"cursor-pointer bg-red-600"} text-white px-6 py-2 rounded hover:bg-red-500 flex justify-center items-center gap-2 transition-colors`}
                       >
                         UPDATE
+                        {isPending && <FormSubmissionLoader/>}
                       </button>
                     </div>
                   </div>

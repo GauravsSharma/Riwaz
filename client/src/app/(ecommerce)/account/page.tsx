@@ -13,7 +13,7 @@ export default function Page() {
   const user = useUserStore((s) => s.user);
   const { isLoading, error } = useCurrentUser();
 
-  if (isLoading) return <UsersFall />;
+  if (isLoading || !user) return <UsersFall />;
   if (error) return <Error />;
 
   return (

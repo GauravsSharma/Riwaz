@@ -183,27 +183,29 @@ export const getAddresses = async (req, res) => {
 }
 export const addAddress = async (req, res) => {
     try {
-        const { landmark, address1, address2 = "", state, city, pincode } = req.body;
+        const { landmark, address, state, city, pincode,isDefault } = req.body;
         const userId = req.user.userId;
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: 'User not found.' });
         }
-        if (!landmark || !address1 || !state || !city || !pincode) {
+        if (!landmark || !address || !state || !city || !pincode) {
             return res.status(400).json({ message: 'All address fields except address2 are required.' });
         }
-        const address = await Address.create({
+        const new_address = await Address.create({
             landmark,
-            address1,
-            address2,
+            address,
             state,
             city,
             pincode,
-            userId
+            userId,
+            country: "India",
+            isDefault:isDefault||true,
+            type:"home"
         })
-        user.address.push(address._id)
+        user.address.push(new_address._id)
         await user.save();
-        return res.status(200).json({ success: true, address });
+        return res.status(200).json({ success: true, address:new_address });
     } catch (error) {
         return res.status(500).json({ success: false, message: `Internal server error: ${error}` });
     }
@@ -211,37 +213,34 @@ export const addAddress = async (req, res) => {
 export const updateAddress = async (req, res) => {
     try {
         const { id } = req.params;
-        const { landmark, address1, address2, state, city, pincode } = req.body;
+        const { landmark, address, state, city, pincode } = req.body;
         const userId = req.user.userId;
         if (!id) {
             return res.status(404).json({ message: 'User not found.' });
         }
 
-        const address = await Address.findById(id);
-        if (address.userId.toString() !== userId) {
+        const db_address = await Address.findById(id);
+        if (db_address.userId.toString() !== userId) {
             return res.status(404).json({ message: 'You are not authorized to perform this action.' });
         }
 
         if (landmark) {
-            address.landmark = landmark;
+            db_address.landmark = landmark;
         }
-        if (address1) {
-            address.address1 = address1;
-        }
-        if (address2) {
-            address.address2 = address2;
+        if (address) {
+            db_address.address = address;
         }
         if (state) {
-            address.state = state;
+            db_address.state = state;
         }
         if (city) {
-            address.city = city;
+            db_address.city = city;
         }
         if (pincode) {
-            address.pincode = pincode;
+            db_address.pincode = pincode;
         }
-        await address.save();
-        return res.status(200).json({ success: true, address });
+        await db_address.save();
+        return res.status(200).json({ success: true, address:db_address });
 
     } catch (error) {
         return res.status(500).json({ success: false, message: `Internal server error: ${error}` });

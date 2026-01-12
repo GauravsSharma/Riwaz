@@ -57,7 +57,7 @@ export default function LoginModal({ isOpen, setIsOpen,becomeASeller }: { isOpen
   return (
     <>
       {
-        isOpen && <div className="fixed inset-0 bg-black/75 bg-opacity-50 flex items-center justify-center z-50 p-4 ">
+       isOpen && <div className="fixed inset-0 bg-black/75 bg-opacity-50 flex items-center justify-center z-50 p-4 ">
           <div className="bg-white rounded-sm shadow-xl max-w-xl w-full mx-4 relative">
             {/* Close button */}
             <button

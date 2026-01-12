@@ -107,7 +107,7 @@ interface CartItem {
   originalPrice: number
 }
 interface Address {
-  type:"Home"|"Office"|"Other"
+  type:"home"|"office"|"other"
   _id:string,
   address: string,
   landmark: string,
@@ -115,4 +115,5 @@ interface Address {
   state:string,
   pincode: string,
   country: string,
+  isDefault: boolean
 }
