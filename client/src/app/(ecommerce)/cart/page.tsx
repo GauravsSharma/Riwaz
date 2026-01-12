@@ -23,7 +23,7 @@ const ShoppingCartPage = () => {
   const totalAmount = useUserCart((s) => s.totalDiscountedAmount);
   const totalActualAmount = useUserCart((s) => s.totalActualAmount);
   const [items, setItems] = useState<CartItem[]>([]);
-  const { mutate } = useCreateCheckoutSession();
+
   const { isLoading } = useGetCartItems(!!user)
   const cartItems = useUserCart((s) => s.items);
   useGetCartSummary()
@@ -55,17 +55,7 @@ const ShoppingCartPage = () => {
       return;
     }
     setShowCheckoutPage(true)
-    // setIsCheckOutLoaderOpen(true);
-    // mutate({ coupon: "NONE" }, {
-    //   onSuccess: (order: RazorpayOrder) => {
-    //     setIsCheckOutLoaderOpen(false);
-    //     loadPaymentPage(order)
-    //   },
-    //   onError: () => {
-    //     setIsCheckOutLoaderOpen(false)
-    //     toast.error("Something went wrong")
-    //   }
-    // })
+   
   }
   const loadPaymentPage = (order: RazorpayOrder) => {
     let options = {
@@ -110,7 +100,7 @@ const ShoppingCartPage = () => {
               setIsOpen={setIsOpen}
             />
           }
-          {showCheckoutPage && <CheckoutDetailPage setShowCheckoutPage={setShowCheckoutPage}/>}
+          {showCheckoutPage && <CheckoutDetailPage setShowCheckoutPage={setShowCheckoutPage} setIsCheckOutLoaderOpen={setIsCheckOutLoaderOpen} loadPaymentPage={loadPaymentPage}/> }
 
           {/* Price Details Section */}
           {items && items.length > 0 && <CartPageSidebar

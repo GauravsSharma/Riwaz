@@ -2,60 +2,50 @@
 "use client"
 import React, { useState } from 'react';
 import { MapPin, Plus, CreditCard, Banknote, ChevronRight, ArrowLeft } from 'lucide-react';
+import { useUserCart } from '@/stores/buyer/cart.user';
+import Cart_Card from '../cards/Cart_Card';
+import { toast } from 'react-toastify';
+import { useCreateCheckoutSession } from '@/hooks/buyer/useUserCart';
 
 // Types
-interface Address {
-  _id: string;
-  address: string;
-  landmark: string;
-  state: string;
-  pincode: string;
-}
+// interface Address {
+//   _id: string;
+//   address: string;
+//   landmark: string;
+//   state: string;
+//   pincode: string;
+// }
 
-interface Product {
-  _id: string;
-  img: string;
-  title: string;
-  color: string;
-  price: number;
-  quantity: number;
-}
 
 interface CheckoutData {
   selectedAddressId: string | null;
-  products: Product[];
+  products: CartItem[] | null;
   paymentMethod: 'online' | 'cod' | null;
 }
 
 // Sample Data
 const sampleAddresses: Address[] = [
   {
-    _id: 'addr_1',
-    address: 'Paktola Tajganj shivmandir',
-    landmark: 'Near Shiv Temple',
-    state: 'Uttar Pradesh',
-    pincode: '282002'
+    type: "Home",
+    _id: "addr_001",
+    address: "Flat No. 302, Shree Residency, MG Road",
+    landmark: "Near City Mall",
+    city: "Indore",
+    state: "Madhya Pradesh",
+    pincode: "452001",
+    country: "India",
   },
   {
-    _id: 'addr_2',
-    address: '123 Main Street, Sadar Bazaar',
-    landmark: 'Opposite City Mall',
-    state: 'Uttar Pradesh',
-    pincode: '282001'
-  }
+    type: "Office",
+    _id: "addr_002",
+    address: "5th Floor, Tech Park Tower, Sector 62",
+    landmark: "Opposite Metro Station",
+    city: "Noida",
+    state: "Uttar Pradesh",
+    pincode: "201309",
+    country: "India",
+  },
 ];
-
-const sampleProducts: Product[] = [
-  {
-    _id: 'prod_1',
-    img: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=200&h=200&fit=crop',
-    title: 'Dusty Pink Textured Oversized Shirt',
-    color: 'Dusty Pink',
-    price: 799,
-    quantity: 1
-  }
-];
-
 // Components
 const DeliveryAddressCard: React.FC<{
   address: Address;
@@ -123,7 +113,7 @@ const DeliverySection: React.FC<{
 );
 
 const OrderSummarySection: React.FC<{
-  products: Product[];
+  products: CartItem[];
   estimatedDelivery: string;
   isEnabled: boolean;
   onContinue: () => void;
@@ -143,38 +133,18 @@ const OrderSummarySection: React.FC<{
     </p>
 
     <div className="space-y-4">
-      {products.map((product) => (
-        <div key={product._id} className="flex gap-4 p-4 border border-gray-200 rounded-lg">
-          <img
-            src={product.img}
-            alt={product.title}
-            className="w-24 h-24 object-cover rounded-lg"
-          />
-          <div className="flex-1">
-            <h3 className="font-medium text-gray-900">{product.title}</h3>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-sm text-gray-600">Color:</span>
-              <div className="flex items-center gap-1">
-                <div className="w-4 h-4 rounded-full bg-pink-300 border border-gray-300" />
-                <span className="text-sm text-gray-800">{product.color}</span>
-              </div>
-            </div>
-            <div className="flex items-center justify-between mt-2">
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">QTY</span>
-                <div className="flex items-center gap-2 border border-gray-300 rounded px-2 py-1">
-                  <button className="text-gray-600 hover:text-gray-900">-</button>
-                  <span className="font-medium">{product.quantity}</span>
-                  <button className="text-gray-600 hover:text-gray-900">+</button>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-lg font-bold text-gray-900">₹{product.price.toFixed(2)}</div>
-                <div className="text-xs text-green-600 font-medium">(33% off)</div>
-              </div>
-            </div>
-          </div>
-        </div>
+      {products.map((item) => (
+        <Cart_Card
+          key={item.productId}
+          title={item.title}
+          color={item.color}
+          price={item.unitPrice}
+          thumbnail={item.thumbnail}
+          quan={item.quantity}
+          productId={item.productId}
+          setItem={() => { }}
+          setIsOpen={() => { }}
+          discountPercentage={item.discountPercentage} />
       ))}
     </div>
 
@@ -255,103 +225,24 @@ const PaymentSection: React.FC<{
   </div>
 );
 
-const AddAddressModal: React.FC<{
-  isOpen: boolean;
-  onClose: () => void;
-  onAdd: (address: Omit<Address, '_id'>) => void;
-}> = ({ isOpen, onClose, onAdd }) => {
-  const [formData, setFormData] = useState({
-    address: '',
-    landmark: '',
-    state: '',
-    pincode: ''
-  });
-
-  if (!isOpen) return null;
-
-  const handleSubmit = () => {
-    onAdd(formData);
-    setFormData({ address: '', landmark: '', state: '', pincode: '' });
-    onClose();
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-md w-full p-6">
-        <h3 className="text-xl font-bold mb-4">Add New Address</h3>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-            <input
-              type="text"
-              value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Landmark</label>
-            <input
-              type="text"
-              value={formData.landmark}
-              onChange={(e) => setFormData({ ...formData, landmark: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
-            <input
-              type="text"
-              value={formData.state}
-              onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
-            <input
-              type="text"
-              value={formData.pincode}
-              onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
-          </div>
-          <div className="flex gap-3">
-            <button
-              onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSubmit}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
-              Add Address
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 // Main Component
 export default function CheckoutDetailPage({
-    setShowCheckoutPage
-}:{
-    setShowCheckoutPage:(x:boolean)=>void
+  setShowCheckoutPage,
+  setIsCheckOutLoaderOpen,
+  loadPaymentPage
+}: {
+  loadPaymentPage: (order: RazorpayOrder) => void
+  setShowCheckoutPage: (x: boolean) => void
+  setIsCheckOutLoaderOpen: (x: boolean) => void
 }) {
   const [addresses, setAddresses] = useState<Address[]>(sampleAddresses);
+  const cartItems: CartItem[] | null = useUserCart((state) => state.items);
   const [checkoutData, setCheckoutData] = useState<CheckoutData>({
     selectedAddressId: null,
-    products: sampleProducts,
+    products: cartItems,
     paymentMethod: null
   });
+  const { mutate } = useCreateCheckoutSession();
   const [showOrderSummary, setShowOrderSummary] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -361,13 +252,6 @@ export default function CheckoutDetailPage({
     setShowOrderSummary(true);
   };
 
-  const handleAddAddress = (newAddress: Omit<Address, '_id'>) => {
-    const address: Address = {
-      ...newAddress,
-      _id: `addr_${Date.now()}`
-    };
-    setAddresses([...addresses, address]);
-  };
 
   const handleContinueToPayment = () => {
     setShowPayment(true);
@@ -378,37 +262,44 @@ export default function CheckoutDetailPage({
   };
 
   const handlePlaceOrder = () => {
-    const finalData = {
-      selectedAddressId: checkoutData.selectedAddressId,
-      products: checkoutData.products.map(p => ({
-        _id: p._id,
-        img: p.img,
-        title: p.title,
-        color: p.color,
-        price: p.price,
-        quantity: p.quantity
-      })),
-      paymentMethod: checkoutData.paymentMethod
-    };
-
-    console.log('=== ORDER PLACED ===');
-    console.log('Selected Address ID:', finalData.selectedAddressId);
-    console.log('Products:', finalData.products);
-    console.log('Payment Method:', finalData.paymentMethod);
-    console.log('===================');
-
-    alert('Order placed successfully! Check console for details.');
+    if (checkoutData.products === null || checkoutData.selectedAddressId===null) return;
+    setIsCheckOutLoaderOpen(true);
+    mutate({ coupon: "NONE" ,shippingAddress:checkoutData.selectedAddressId}, {
+      onSuccess: (order: RazorpayOrder) => {
+        setIsCheckOutLoaderOpen(false);
+        if (checkoutData.paymentMethod === 'cod') {
+        } else {
+          loadPaymentPage(order)
+        }
+      },
+      onError: () => {
+        setIsCheckOutLoaderOpen(false)
+        toast.error("Something went wrong")
+      }
+    })
   };
+  if (checkoutData.products === null) {
+    return <div className="xl:col-span-2 py-8 px-4">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <h1 className=" flex items-center gap-3 text-3xl font-bold text-gray-900 mb-8">
+          <div className='flex justify-center items-center border-2 border-zinc-500 cursor-pointer rounded-sm ' onClick={() => setShowCheckoutPage(false)}>
+            <ArrowLeft className=' text-zinc-500' />
+          </div>
+          Checkout</h1>
+        <div className=' text-center text-gray-700 font-medium text-lg'>Your cart is empty. Please add items to cart before proceeding to checkout.</div>
+      </div>
+    </div>
+  }
 
   return (
     <div className="xl:col-span-2 py-8 px-4">
       <div className="max-w-4xl mx-auto space-y-6">
         <h1 className=" flex items-center gap-3 text-3xl font-bold text-gray-900 mb-8">
-            <div className='flex justify-center items-center border-2 border-zinc-500 cursor-pointer rounded-sm ' onClick={()=>setShowCheckoutPage(false)}>
-              <ArrowLeft className=' text-zinc-500'/>
-            </div>
-            
-            Checkout</h1>
+          <div className='flex justify-center items-center border-2 border-zinc-500 cursor-pointer rounded-sm ' onClick={() => setShowCheckoutPage(false)}>
+            <ArrowLeft className=' text-zinc-500' />
+          </div>
+
+          Checkout</h1>
 
         <DeliverySection
           addresses={addresses}
@@ -431,12 +322,6 @@ export default function CheckoutDetailPage({
           onPlaceOrder={handlePlaceOrder}
         />
       </div>
-
-      <AddAddressModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onAdd={handleAddAddress}
-      />
     </div>
   );
 }

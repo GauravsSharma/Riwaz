@@ -12,7 +12,8 @@ interface CartSummary {
   itemCount: number,
 }
 interface CheckoutSessionPayload{
-    coupon:string
+    coupon:string,
+    shippingAddress:string
 }
 export const useGetCartItems = (enabled: boolean) => {
   const setCartItems = useUserCart((s) => s.setCartItems);

@@ -11,6 +11,12 @@ export const createCheckoutSession = async (req, res) => {
     try {
         const { shippingAddress, paymentMethod } = req.body;
         const userId = req.user.userId;
+        if (!shippingAddress) {
+            return res.status(400).json({
+                success: false,
+                message: "Shipping address id not found.",
+            });
+        }
         const address = await Address.findById(shippingAddress);
         if (!address) {
             return res.status(400).json({
@@ -67,7 +73,65 @@ export const createCheckoutSession = async (req, res) => {
         });
     }
 };
-
+export const createAndConfirmOrder = async (req, res) => {
+    try {
+        const { shippingAddress, paymentMethod } = req.body;
+        const userId = req.user.userId;
+        if (!shippingAddress) {
+            return res.status(400).json({
+                success: false,
+                message: "Shipping address id not found.",
+            });
+        }
+        const address = await Address.findById(shippingAddress);
+        if (!address) {
+            return res.status(400).json({
+                success: false,
+                message: "Shipping address not found.",
+            });
+        }
+        if (address.userId !== userId) {
+            return res.status(401).json({
+                success: false,
+                message: "Please kindly select your address",
+            });
+        }
+        const cartItems = await UserCart
+            .findOne({ userId })
+        const totalAmount = cartItems.products.reduce((acc, item) => item.unitPrice * item.quantity + acc, 0)
+        // console.log(order)
+        const order = await Order.create({
+            userId,
+            orderItems: cartItems.map(item => ({
+                productId: item.productId,
+                quantity: item.quantity,
+                price: item.unitPrice,
+                color: item.color,
+                thumbnail: item.thumbnail,
+            })),
+            shippingAddress,
+            paymentMethod: paymentMethod,
+            paymentStatus: "pending",
+            orderStatus: "confirmed",
+            itemsPrice: totalAmount,
+            shippingPrice: 0,
+            totalPrice: totalAmount,
+            deliveredAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+        });
+        cartItems.products = []
+        await cartItems.save()
+        return res.status(200).json({
+            success: true,
+            message: "Your order has been placed successfully.",
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Failed to create checkout session.",
+            error: error.message,
+        });
+    }
+}
 export const paymentVerification = async (req, res) => {
     try {
         const {
@@ -75,6 +139,8 @@ export const paymentVerification = async (req, res) => {
             razorpay_order_id,
             razorpay_signature
         } = req.body;
+        const userId = req.user.userId;
+        const userCart = await UserCart.findOne({ userId });
         const order = await Order.find({ razorpayOrderId: razorpay_order_id })
         if (!order) {
             return res.status(404).json({
@@ -103,6 +169,9 @@ export const paymentVerification = async (req, res) => {
         order.paymentId = razorpay_payment_id,
         order.paymentMode = payment.method,
         order.orderStatus = "confirmed"
+
+        userCart.products = []
+        await userCart.save()
         await order.save()
         return res.status(200).json({
             success: true,
