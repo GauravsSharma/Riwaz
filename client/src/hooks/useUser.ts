@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 
 interface UserState {
   user: User | null;
-  setUser: (user: User) => void;
+  setUser: (user: User | null) => void;
 }
 
 // ------------------------
@@ -124,3 +124,21 @@ export const useUpdateOrEditProfile = () =>{
     });
 
 }
+export const useLogout = (setIsOpen: (open: boolean) => void) => {
+  const setUser = useUserStore((s: UserState) => s.setUser);
+
+  return useMutation({
+    mutationFn: async () => {
+      const res = await api.post("/user/logout");
+      return res.data;
+    },
+    onSuccess: () => {
+      setUser(null);
+      setIsOpen(false);
+      toast.success("Logout successful!");
+    },
+    onError: () => {
+      toast.error("Logout failed!");
+    },
+  });
+};
