@@ -97,7 +97,7 @@ export default function Header() {
 
   return (
     <div className="fixed top-0 left-0 w-full z-50">
-      <div className="hidden md:block bg-linear-to-r from-pink-400 to-purple-400">
+      <div className="block bg-linear-to-r from-pink-400 to-purple-400">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between items-center h-12 text-white text-xs">
             <div className="flex gap-4 items-center">
