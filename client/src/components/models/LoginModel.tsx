@@ -46,7 +46,7 @@ export default function LoginModal({ isOpen, setIsOpen,becomeASeller }: { isOpen
         userType: becomeASeller ? "seller" : "customer",
       },
       {
-        onSuccess: (res) => {
+        onSuccess: () => {
           toast.success("Login successful!");
           setIsOpen(false);
         },

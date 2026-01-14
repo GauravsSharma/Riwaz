@@ -1,12 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 import { useDeleteProduct } from '@/hooks/seller/useSellerProduct';
 import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
 
-interface Product {
-    id: string;
-    name: string;
-}
 interface DeleteProductDialogProps {
     productId: string;
     productName: string;
@@ -43,7 +39,7 @@ const DeleteProductDialog: React.FC<DeleteProductDialogProps> = ({ productId, pr
                         </div>
 
                         <p className="text-gray-600 mb-2">
-                            Are you sure you want to delete <span className="font-semibold text-gray-900">"{productName}"</span>?
+                            Are you sure you want to delete <span className="font-semibold text-gray-900">&ldquo;{productName}&rdquo;</span>?
                         </p>
 
                         <p className="text-sm text-gray-500 mb-6">

@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import LoginModal from '../models/LoginModel';
-import Image from 'next/image';
-
 
 const  UsersFall = () =>{
 

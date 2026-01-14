@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { Star, CheckCircle, Delete, DeleteIcon, Trash2 } from 'lucide-react';
-import AddReviewDialog from '../models/AddReviewModel';
+import { Star, CheckCircle, Trash2 } from 'lucide-react';
 import { useUserStore } from '@/stores/user.store';
-import { Trash } from 'lucide';
 import DeleteReviewDialog from '../models/DeleteReviewModel';
 import { formatReviewDate } from '@/utils/dateFomater';
 

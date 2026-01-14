@@ -6,14 +6,15 @@ import ProductDetailed from '@/components/sections/ProductDetailed'
 import SareeCategorySection from '@/components/sections/SareeCategorySection'
 import SareeStoreSection from '@/components/sections/SareeStoreSection'
 import { useGetProducts, useGetSingleProduct } from '@/hooks/buyer/useProducts'
-import { useMergeCart } from '@/hooks/buyer/useUserCart'
+import { useGetCartSummary, useMergeCart } from '@/hooks/buyer/useUserCart'
 import { useCurrentUser } from '@/hooks/useUser'
+import { useUserCart } from '@/stores/buyer/cart.user'
 import { useUserStore } from '@/stores/user.store'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 
-const page = () => {
+const Page = () => {
   const { isLoading } = useCurrentUser();
   const { isPending: isNormalSareesLoading, data: normalSarees } = useGetProducts(`?search=georgette%2Csarees&limit=4`);
   const { isPending: isBaluchariSareesLoading, data: baluchariSarees } = useGetProducts("?search=baluchari%2Csarees&limit=4");
@@ -23,12 +24,24 @@ const page = () => {
   const user = useUserStore((s) => s.user);
   const { mutate: mergeCart } = useMergeCart();
   const queryClient = useQueryClient();
-
+  useGetCartSummary()
+  const setCount = useUserCart((s) => s.setCount);
   const router = useRouter();
   const hasMergedRef = useRef(false);
+ useEffect(() => {
+  if (!user) {
+    const guestCart = localStorage.getItem("guest-cart");
+    if (guestCart) {
+      const parsedCart = JSON.parse(guestCart);
+      setCount(parsedCart.length);
+    } else {
+      setCount(0);
+    }
+  }
+}, [user, setCount]);
 
   useEffect(() => {
-    
+
     if (!user || user.userType !== "customer" || hasMergedRef.current) return;
     const guestCart = localStorage.getItem("guest-cart");
     if (!guestCart) return;
@@ -41,14 +54,14 @@ const page = () => {
         localStorage.removeItem("guest-cart");
       },
     });
-  }, [user]);
+  }, [user,mergeCart, queryClient]);
 
   useEffect(() => {
     if (!isLoading && user?.userType === "seller") {
       router.push("/admin/dashboard");
     }
 
-  }, [user, isLoading]);
+  }, [user, isLoading,router]);
 
 
   return (
@@ -68,7 +81,7 @@ const page = () => {
         <h3 className='font-semibold fraunces text-3xl sm:text-5xl'>Featured Product</h3>
         <p className='text-md text-gray-600 mt-1 sm:mt-2'>A perfect blend of tradition, luxury, and grace.</p>
       </div>
-      
+
       {!singleProductLoading && data && <ProductDetailed
         product={data.product}
         variants={data.variants}
@@ -99,4 +112,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page

@@ -169,7 +169,7 @@ export const searchProducts = async (req, res) => {
   }
 };
 
-export const getProductRecommendationByQuery = async (req, res) => {
+export const useGetProductRecommendationByQuery = async (req, res) => {
   try {
     const { q } = req.query;
 

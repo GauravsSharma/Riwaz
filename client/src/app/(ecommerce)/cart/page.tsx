@@ -1,31 +1,52 @@
 "use client";
-import React, { useState } from 'react';
-import { Minus, Plus, Trash2, Heart, Tag, Truck } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Tag, Truck } from 'lucide-react';
 import Cart_Card from '@/components/cards/Cart_Card';
-import { useGetCartItems } from '@/hooks/buyer/useUserCart';
+import { useGetCartItems, useGetCartSummary } from '@/hooks/buyer/useUserCart';
 import { useUserCart } from '@/stores/buyer/cart.user';
 import DeleteCartItem from '@/components/models/DeleteCartItem';
+import { useUserStore } from '@/stores/user.store';
 
 const ShoppingCartPage = () => {
   const [item, setItem] = useState<string>();
+  const user = useUserStore(s => s.user)
   const [isOpen, setIsOpen] = useState(false);
   const [showCouponInput, setShowCouponInput] = useState(false);
   const [couponCode, setCouponCode] = useState('');
-  const { isPending } = useGetCartItems()
+  const { isLoading } = useGetCartItems(!!user)
+  useGetCartSummary()
   const totalAmount = useUserCart((s) => s.totalDiscountedAmount);
   const totalActualAmount = useUserCart((s) => s.totalActualAmount);
-  const items = useUserCart((s) => s.items);
+  const setTotalActualAmount = useUserCart((s) => s.setTotalActualAmount);
+  const setTotalDiscountedAmount = useUserCart((s) => s.setTotalDiscountedAmount);
+  const [items, setItems] = useState<CartItem[]>([]);
+  const cartItems = useUserCart((s) => s.items);
 
-  if (isPending) {
-    return <div>Loading...</div>
-  }
   const handleCouponToggle = () => {
     setShowCouponInput(!showCouponInput);
   };
+  useEffect(() => {
+    if (user && cartItems) {
+      setItems(cartItems);
+    } else {
+      const localItems = JSON.parse(
+        localStorage.getItem('guest-cart') || '[]'
+      );
+      setItems(localItems);
+      const totalActualAmount = localItems.reduce((acc: number, item: CartItem) => {
+        return acc + (item.originalPrice * item.quantity)
+      }, 0)
+      const totalDiscountedAmount = localItems.reduce((acc: number, item: CartItem) => {
+        return acc + (item.unitPrice * item.quantity)
+      }, 0)
+      setTotalActualAmount(totalActualAmount)
+      setTotalDiscountedAmount(totalDiscountedAmount)
+    }
+  }, [user, cartItems,setTotalActualAmount,setTotalDiscountedAmount]);
 
-  const discount = totalActualAmount-totalAmount;  
-  const totalMRP = totalAmount
-
+  if (isLoading) {
+    return <div className='h-screen bg-amber-200 flex justify-center items-center'>Loading...</div>
+  }
   return (
     <div className="min-h-screen bg-gray-50 relative mt-34">
       <div className="max-w-7xl mx-auto px-4 py-6">
@@ -37,16 +58,16 @@ const ShoppingCartPage = () => {
               <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-200">
                 <h1 className="text-xl md:text-2xl font-bold text-gray-900">Shopping cart</h1>
                 <div className="text-base md:text-lg font-semibold text-gray-900">
-                  Total: ₹{totalMRP.toFixed(2)}
+                  Total: ₹{totalAmount.toFixed(2)}
                 </div>
               </div>
 
               {/* Cart Item */}
               {
                 items && items.length > 0 ? (
-                  items.map((item,i) => (
+                  items.map((item, i) => (
                     <Cart_Card
-                      key={item.productId+i}
+                      key={item.productId + i}
                       title={item.title}
                       color={item.color}
                       price={item.unitPrice}
@@ -66,18 +87,18 @@ const ShoppingCartPage = () => {
           </div>
 
           {/* Price Details Section */}
-          <div className="xl:col-span-1 h-screen sticky top-6 right-0">
+          {items && items.length > 0 && <div className="xl:col-span-1 h-screen sticky top-6 right-0">
             <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
               <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4 md:mb-6">Price Details</h2>
 
               <div className="space-y-3 md:space-y-4 mb-4 md:mb-6">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Total MRP</span>
-                  <span className="font-medium">₹{totalMRP.toFixed(2)}</span>
+                  <span className="font-medium">₹{totalAmount.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Discount on MRP</span>
-                  <span className="font-medium text-green-600">-₹{(discount).toFixed(2)}</span>
+                  <span className="font-medium text-green-600">-₹{(totalActualAmount - totalAmount).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Delivery</span>
@@ -130,7 +151,7 @@ const ShoppingCartPage = () => {
                 </button>
               </div>
             </div>
-          </div>
+          </div>}
         </div>
       </div>
       {

@@ -9,7 +9,7 @@ interface DeleteAddressDialogProps {
     isOpen: boolean;
     setIsOpen: (isOpen: boolean) => void;
 }
-const DeleteAddressDialog: React.FC<DeleteAddressDialogProps> = ({ addressId, isOpen, setIsOpen }) => {
+const DeleteAddressDialog: React.FC<DeleteAddressDialogProps> = ({ addressId, setIsOpen }) => {
     const { mutate, isPending } = useDeleteAddress(() => {
         setIsOpen(false);
     });

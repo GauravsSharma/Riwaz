@@ -1,10 +1,4 @@
-// interface User {
-//   id: string;
-//   name: string;
-//   phone: string;
-//   type: "buyer" | "seller"| null;
-// }
-
+declare module "*.css";
 interface User {
   _id: string;
   fullName: string | null;
@@ -69,7 +63,8 @@ interface MainProduct{
       url:string,
       public_id:string
     }
-  ]
+  ],
+  color: string,
 }
 interface Variant{
   thumbnail:{

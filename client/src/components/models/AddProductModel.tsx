@@ -20,7 +20,13 @@ export const productSchema = z.object({
   color: z.string().min(1),
   parentId: z.string()
 });
-
+interface ApiError extends Error {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}
 type ProductFormData = z.infer<typeof productSchema>;
 
 const fabrics = [
@@ -41,7 +47,13 @@ const types = [
   'Laheriya', 'Paithani', 'Patola', 'Plain', 'Printed', 'Sequence',
   'Swarovski', 'Warli Printed', 'Woven', 'Zari Stripe'
 ]
-
+interface ApiError {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}
 export default function AddProductModal({ isOpen, setIsOpen, parentId,setCreatedProductId,setImageOpenModel }: 
   { isOpen: boolean; 
     setIsOpen: (open: boolean) => void, 
@@ -51,7 +63,7 @@ export default function AddProductModal({ isOpen, setIsOpen, parentId,setCreated
   }
 ) {
   // All hooks must be called unconditionally at the top
-  const stores = useSellerStore((s) => s.stores);
+   useSellerStore((s) => s.stores);
   const { mutate: addProductMutation, isPending } = useAddProduct()
   const [formData, setFormData] = useState<ProductFormData>({
     title: '',
@@ -67,7 +79,7 @@ export default function AddProductModal({ isOpen, setIsOpen, parentId,setCreated
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleInputChange = (field: keyof ProductFormData, value: any) => {
+  const handleInputChange = (field: keyof ProductFormData, value: string|number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field]) {
@@ -124,7 +136,7 @@ export default function AddProductModal({ isOpen, setIsOpen, parentId,setCreated
 
           });
         },
-        onError: (error: any) => {
+        onError: (error:ApiError) => {
           toast.error(error?.response?.data?.message || "Failed to add product");
         }
 

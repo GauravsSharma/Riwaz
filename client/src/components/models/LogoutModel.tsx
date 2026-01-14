@@ -7,7 +7,7 @@ interface LogoutModelProps {
     isOpen: boolean;
     setIsOpen: (isOpen: boolean) => void;
 }
-const LogoutModel: React.FC<LogoutModelProps> = ({ isOpen, setIsOpen }) => {
+const LogoutModel: React.FC<LogoutModelProps> = ({ setIsOpen }) => {
     const { mutate, isPending } = useLogout(setIsOpen)
     const handleLogout = () => {
         mutate()
@@ -25,7 +25,7 @@ const LogoutModel: React.FC<LogoutModelProps> = ({ isOpen, setIsOpen }) => {
                     </button>
 
                     <div className="flex items-center gap-3 mb-4">
-                        <div className="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                        <div className="shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
                             <AlertTriangle className="text-red-600" size={24} />
                         </div>
                         <h2 className="text-xl font-semibold text-gray-900">Are you sure ?</h2>

@@ -3,6 +3,7 @@ import { X, Plus, Upload, Trash2 } from 'lucide-react';
 import { useUploadMedia } from '@/hooks/seller/useSellerProduct';
 import { toast } from 'react-toastify';
 import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
+import Image from 'next/image';
 
 interface ImageMetadata {
   id: string;
@@ -46,7 +47,7 @@ const ProductImageDialog: React.FC<ProductImageDialogProps> = ({
 
   const handleRemove = (id: string) => {
     if (images.length > 1) {
-      setImages(images.filter(img => img.id !== id));
+      setImages(images.filter(Image => Image.id !== id));
       setMetadata(metadata.filter(meta => meta.id !== id));
     }
   };
@@ -55,8 +56,8 @@ const ProductImageDialog: React.FC<ProductImageDialogProps> = ({
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImages(images.map(img =>
-          img.id === id ? { ...img, file, preview: reader.result as string } : img
+        setImages(images.map(Image =>
+          Image.id === id ? { ...Image, file, preview: reader.result as string } : Image
         ));
       };
       reader.readAsDataURL(file);
@@ -72,9 +73,9 @@ const ProductImageDialog: React.FC<ProductImageDialogProps> = ({
   const handleSubmit = () => {
     const formData = new FormData();
 
-    images.forEach((img) => {
-      if (img.file) { 
-        formData.append("images", img.file);
+    images.forEach((Image) => {
+      if (Image.file) { 
+        formData.append("images", Image.file);
       }
     });
     formData.append("meta_data", JSON.stringify(metadata));
@@ -150,7 +151,7 @@ const ProductImageDialog: React.FC<ProductImageDialogProps> = ({
                           className="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition-colors bg-white"
                         >
                           {image.preview ? (
-                            <img
+                            <Image
                               src={image.preview}
                               alt="Preview"
                               className="h-full w-full object-contain rounded-lg"

@@ -7,11 +7,8 @@ import {
   ShoppingCart, 
   Package, 
   Users, 
-  Megaphone, 
-  TrendingUp, 
   Settings, 
-  HomeIcon,
-  Building2
+  Building2,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';

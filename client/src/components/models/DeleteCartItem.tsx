@@ -3,6 +3,9 @@ import { AlertTriangle, X } from 'lucide-react';
 import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
 import { useDeleteItem } from '@/hooks/buyer/useUserCart';
 import { useQueryClient } from '@tanstack/react-query';
+import { useUserStore } from '@/stores/user.store';
+import { useUserCart } from '@/stores/buyer/cart.user';
+import { toast } from 'react-toastify';
 
 interface DeleteCartItemProps {
     productId: string;
@@ -11,12 +14,30 @@ interface DeleteCartItemProps {
 }
 const DeleteCartItem: React.FC<DeleteCartItemProps> = ({ productId, isOpen, setIsOpen }) => {
       const queryClient = useQueryClient();
+      const user = useUserStore(s=>s.user)
+      const count = useUserCart(s=>s.count)
+      const setCount = useUserCart(s=>s.setCount)
+      const setCartItems = useUserCart(s=>s.setCartItems)
     const { mutate: deleteItem,isPending } = useDeleteItem(productId,()=>{
         setIsOpen(false);
          queryClient.invalidateQueries({ queryKey: ['cart-summary-store'] });
     });
     const handleDelete = () => {
-        deleteItem()
+        if(!user){
+            const cartItem = localStorage.getItem('guest-cart')||'[]';
+            const items = JSON.parse(cartItem);
+            const index = items.findIndex((pro:CartItem)=>pro.productId===productId)
+            if(index=== -1) return;
+            items.splice(index,1);
+            localStorage.setItem('guest-cart',JSON.stringify(items));
+            setCartItems(items)
+            toast.success("Item removed");
+            setCount(count===0?0:count-1);
+            setIsOpen(false);
+        }
+        else{
+            deleteItem()
+        }
     };
 
     return (
@@ -87,5 +108,3 @@ const DeleteCartItem: React.FC<DeleteCartItemProps> = ({ productId, isOpen, setI
 };
 
 export default DeleteCartItem;
-
-

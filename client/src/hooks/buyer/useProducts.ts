@@ -54,7 +54,7 @@ export const useGetMainProduct = (productId: string) => {
     });
 };
 
-export const getProductRecommendation = (searchQuery: string) => {
+export const useGetProductRecommendation = (searchQuery: string) => {
   return useQuery<ProductSuggestionResponse>({
     queryKey: ["searchSuggestions", searchQuery],
     queryFn: async ({ queryKey }) => {
@@ -83,7 +83,7 @@ export const getProductRecommendation = (searchQuery: string) => {
 };
 
 
-export const getSearchRecommendation = (searchQuery: string) => {
+export const useGetSearchRecommendation = (searchQuery: string) => {
   return useQuery<ProductRecommendationResponse>({
     queryKey: ["ProductSuggestions", searchQuery],
     queryFn: async ({ queryKey }) => {

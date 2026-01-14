@@ -1,6 +1,6 @@
 import api from "@/lib/axios";
 import { useUserStore } from "@/stores/user.store";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
 interface UserState {

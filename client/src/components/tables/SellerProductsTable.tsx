@@ -1,17 +1,17 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   useReactTable,
   getCoreRowModel,
   getExpandedRowModel,
   flexRender,
-  ColumnDef,
-  Row
+  ColumnDef
 } from '@tanstack/react-table';
 import { ChevronDown, ChevronRight, Plus, MoreVertical, Edit, Trash2 } from 'lucide-react';
 import AddBaseProductModel from '../models/AddBaseProductModel';
 import DeleteProductDialog from '../models/DeleteProduct';
 import AddProductModal from '../models/AddProductModel';
 import ProductImageDialog from '../models/AddImages';
+import Image from 'next/image';
 
 
 type TableRow = BaseProduct | (SellerProduct & { isParent?: false; parentId: string });
@@ -42,9 +42,9 @@ const SareeProductTable = ({
     return data.slice(start, start + pageSize);
   }, [data, pageIndex, pageSize]);
 
-  const toggleMenu = (variantId: string) => {
+  const toggleMenu = useCallback((variantId: string) => {
     setOpenMenuId(openMenuId === variantId ? null : variantId);
-  };
+  },[openMenuId,setOpenMenuId])
 
   const handleEdit = (variantId: string) => {
     console.log('Edit variant:', variantId);
@@ -112,9 +112,11 @@ const SareeProductTable = ({
             return (
               <div className="flex items-center gap-3">
                 <span className="text-gray-400 text-sm">└─</span>
-                <img
+                <Image
                   src={variant.thumbnail?.url || "https://sudathi.com/cdn/shop/files/4292S921_4.jpg?v=1756404457&width=750"}
                   alt={variant.title}
+                  height={48}
+                  width={48}
                   className="w-12 h-12 rounded object-cover border border-gray-200"
                 />
                 <div>
@@ -238,7 +240,7 @@ const SareeProductTable = ({
         }
       }
     ],
-    [openMenuId]
+    [openMenuId,toggleMenu]
   );
 
   const table = useReactTable({

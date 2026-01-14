@@ -1,6 +1,6 @@
 import api from "@/lib/axios";
 import { EditAddressInput, useAddressStore } from "@/stores/buyer/address.user";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
 /**
@@ -42,7 +42,6 @@ export const useCreateAddress = () => {
  */
 export const useEditAddress = () => {
   const updateAddress = useAddressStore((s) => s.updateAddress);
-  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: EditAddressInput }) => {
@@ -64,7 +63,6 @@ export const useEditAddress = () => {
  */
 export const useDeleteAddress = (callback:()=>void) => {
   const removeAddress = useAddressStore((s) => s.removeAddress);
-  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (id: string) => {

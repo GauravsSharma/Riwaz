@@ -1,13 +1,14 @@
-import { useAdditem, useGetCartSummary } from '@/hooks/buyer/useUserCart';
+import { useAdditem } from '@/hooks/buyer/useUserCart';
 import { Banknote, ChevronDown, Minus, Plus, RotateCcw, Share2, Truck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 import { toast } from 'react-toastify';
 import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
-import { useQueryClient } from '@tanstack/react-query';
 import MobileImageCarousel from '../carousels/ProductViewCarousel';
 import { useUserStore } from '@/stores/user.store';
 import ImageModal from '../models/ImageModel';
+import { useUserCart } from '@/stores/buyer/cart.user';
+import Image from 'next/image';
 // import MobileImageCarousel from './MobileImageCarousel';
 
 type Section = 'details' | 'return' | 'shipping' | 'seller' | 'help';
@@ -22,6 +23,7 @@ interface Props {
     variants: Variant[],
     isFromHome?: boolean
 }
+
 const ProductDetailed = ({
     product,
     productImages,
@@ -31,6 +33,8 @@ const ProductDetailed = ({
     isFromHome = false
 }: Props) => {
     const [selectedImage, setSelectedImage] = useState(0);
+    const count = useUserCart(s=>s.count)
+    const setCount = useUserCart(s=>s.setCount)
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
     const user = useUserStore((s) => s.user);
     const [expandedSections, setExpandedSections] = useState<Record<Section, boolean>>({
@@ -40,7 +44,6 @@ const ProductDetailed = ({
         seller: false,
         help: false
     });
-    const queryClient = useQueryClient();
     const router = useRouter()
     const [quantity, setQuantity] = useState(1);
     const { mutate, isPending } = useAdditem()
@@ -55,11 +58,9 @@ const ProductDetailed = ({
     };
     const addItemToLocal = () => {
         const storedCart = localStorage.getItem("guest-cart");
-
         const parsedCart = storedCart ? JSON.parse(storedCart) : [];
-
         const existingItemIndex = parsedCart.findIndex(
-            (item: any) => item.productId === product._id
+            (item: CartItem) => item.productId === product._id
         );
 
         if (existingItemIndex !== -1) {
@@ -68,18 +69,24 @@ const ProductDetailed = ({
             parsedCart.push({
                 productId: product._id,
                 quantity,
+                title:product.title,
+                unitPrice:product.price,
+                thumbnail:product.images[0].url,
+                color:product.color,
+                discountPercentage:product.discountPercentage,
+                originalPrice:product.originalPrice
             });
+            setCount(count+1);
         }
-
+        
         localStorage.setItem("guest-cart", JSON.stringify(parsedCart));
         toast.success("Item added to cart successfully!");
-
     }
     const handleAddToCart = () => {
         if (user) {
             mutate({ productId: product._id, quantity }, {
                 onSuccess: () => {
-                    queryClient.invalidateQueries({ queryKey: ['cart-summary-store'] });
+                    setCount(count+1);
                     toast.success("Item added to cart successfully!")
                 },
                 onError: () => {
@@ -100,7 +107,7 @@ const ProductDetailed = ({
            {isImageModalOpen && <ImageModal
             isOpen={isImageModalOpen}
             setIsOpen={setIsImageModalOpen}
-            images={productImages.map(img => img.url)}
+            images={productImages.map(Image => Image.url)}
             />}
             <div className="w-full lg:w-1/2 lg:sticky lg:top-0 lg:h-screen lg:overflow-hidden">
                 {/* Mobile Carousel - Show only on mobile */}
@@ -121,12 +128,14 @@ const ProductDetailed = ({
                             {productImages.map((image, index) => (
                                 <div
                                     key={image.public_id}
-                                    className={`cursor-pointer border-2 rounded-lg overflow-hidden flex-shrink-0 ${selectedImage === index ? 'border-purple-700' : 'border-gray-200'
+                                    className={`cursor-pointer border-2 rounded-lg overflow-hidden shrink-0 ${selectedImage === index ? 'border-purple-700' : 'border-gray-200'
                                         }`}
                                     onClick={() => setSelectedImage(index)}
                                 >
-                                    <img
+                                    <Image
                                         src={image.url}
+                                        height={80}
+                                        width={300}
                                         alt={`Product ${index + 1}`}
                                         className="w-full h-20 object-cover hover:opacity-80 transition"
                                     />
@@ -146,10 +155,12 @@ const ProductDetailed = ({
                                     {product.discountPercentage}% OFF
                                 </div>
                             )}
-                            <img
+                            <Image
+                             height={1000}
+                                width={300}
                                 src={productImages[selectedImage].url}
                                 alt={product.title}
-                                className="w-full h-[60rem] lg:h-full object-cover rounded-lg"
+                                className="w-full h-240 lg:h-full object-cover rounded-lg"
                             />
                         </div>
                     )}
@@ -322,7 +333,9 @@ const ProductDetailed = ({
                                         onClick={() => { router.push(`/item/${variant._id}`) }}
                                         className={`cursor-pointer border-2 rounded-lg overflow-hidden transition border-gray-200`}
                                     >
-                                        <img
+                                        <Image
+                                         height={180}
+                                        width={150}
                                             src={variant.thumbnail.url}
                                             alt={variant.color}
                                             className="w-36 h-44 sm:w-full sm:h-60 object-cover"

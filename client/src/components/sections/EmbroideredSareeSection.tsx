@@ -1,4 +1,5 @@
 import { Heart, ShoppingCart, Star } from 'lucide-react';
+import Image from 'next/image';
 import { useState } from 'react';
 
 interface SareeProduct {
@@ -40,7 +41,7 @@ const SareeCard = ({ product }: { product: SareeProduct }) => {
 
       {/* Image Container */}
       <div className="relative h-80 overflow-hidden bg-gradient-to-br from-pink-50 to-purple-50">
-        <img 
+        <Image
           src={product.image} 
           alt={product.name}
           className={`w-full h-full object-cover transition-transform duration-700 ${isHovered ? 'scale-110' : 'scale-100'}`}

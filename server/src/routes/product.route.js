@@ -1,6 +1,6 @@
 import express from 'express';
 import { authMiddleware } from '../middlewares/auth.js';
-import { getProductById, getProductsByType, getProducts, getSingleProduct, searchProducts, getProductRecommendationByQuery, getSearchSuggestions } from '../controllers/product-buyers.controller.js';
+import { getProductById, getProductsByType, getProducts, getSingleProduct, searchProducts, useGetProductRecommendationByQuery, getSearchSuggestions } from '../controllers/product-buyers.controller.js';
 import { addVariant, createProduct, deleteProduct, getStoreProducts, uploadMedia } from '../controllers/product-admin.controller.js';
 import { sellerMiddleware } from '../middlewares/seller.js';
 import { upload } from '../config/multer.js';
@@ -11,7 +11,7 @@ const router = express.Router();
 router.get('/', getProducts);
 router.get('/search', searchProducts);
 router.get("/search/suggestions", getSearchSuggestions); // /search/suggestions?q=your-query
-router.get('/query', getProductRecommendationByQuery);// /query?q=your-query
+router.get('/query', useGetProductRecommendationByQuery);// /query?q=your-query
 router.get('/single', getSingleProduct);
 router.get('/id/:id', getProductById);
 
