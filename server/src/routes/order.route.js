@@ -1,14 +1,12 @@
-
-
 import express from 'express';
 import { authMiddleware } from '../middlewares/auth.js';
-import { createCheckoutSession, placeOrder } from '../controllers/order.controller.js';
-
+import { createAndConfirmOrder, createCheckoutSession, paymentVerification } from '../controllers/order.controller.js';
 
 const router = express.Router();
 
-router.post("/place-order",authMiddleware,placeOrder)
 router.post("/create-checkout-session",authMiddleware,createCheckoutSession)
+router.post("/paymentVerification",authMiddleware,paymentVerification)
+router.post("/create-order",authMiddleware,createAndConfirmOrder)
 
 export default router;
 

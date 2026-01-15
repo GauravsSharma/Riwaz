@@ -116,3 +116,18 @@ interface Address {
   country: string,
   isDefault: boolean
 }
+interface RazorpayOrder {
+  id: string;
+  entity: "order";
+  amount: number;        // total amount (in paise)
+  amount_paid: number;   // amount paid (in paise)
+  amount_due: number;    // remaining amount (in paise)
+  currency: string;      // "INR"
+  receipt: string | null;
+  offer_id: string | null;
+  status: "created" | "attempted" | "paid";
+  attempts: number;
+  notes: any[];          // Razorpay allows key-value notes
+  created_at: number;    // UNIX timestamp (seconds)
+}
+

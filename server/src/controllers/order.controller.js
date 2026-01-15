@@ -1,58 +1,67 @@
-import Stripe from "stripe";
 import Order from '../models/Order.js';
 import UserCart from '../models/userCart.js';
-import Product from '../models/product.js';
-import { stripe } from "../../api/index.js";
+import crypto from "crypto";
+
+import { rozarPayInstance } from '../config/rozarpay.js';
+import Address from '../models/Address.js';
 // import { stripe } from "../../server.js";
 
 // you have to change the variant to productId
 export const createCheckoutSession = async (req, res) => {
     try {
+        const { shippingAddress, paymentMethod } = req.body;
         const userId = req.user.userId;
-        
-       
-        const usercart = await UserCart.findOne({ userId }).populate("products.productId");
-        if (!usercart) {
+        if (!shippingAddress) {
             return res.status(400).json({
                 success: false,
-                message: "User cart not found.",
+                message: "Shipping address id not found.",
             });
         }
-
-        if (usercart.products.length === 0) {
+        const address = await Address.findById(shippingAddress);
+        if (!address) {
             return res.status(400).json({
                 success: false,
-                message: "User cart is empty.",
+                message: "Shipping address not found.",
             });
         }
-        const line_items = usercart.products.map((item) => ({
-            price_data: {
-                currency: "usd",
-                product_data: {
-                    name: item.productId?.title || "Unknown Product",
-                    description: item.productId?.description || "",
-                    images: item.thumbnail.url ? [item.thumbnail.url] : [],
-                },
-                unit_amount: Math.round(item.unitPrice * 100), // Stripe uses cents
-            },
-            quantity: item.quantity,
-        }));
-
-        const session = await stripe.checkout.sessions.create({
-            payment_method_types: ["card"], // ✅ should be "card", not "cards"
-            mode: "payment",
-            line_items,
-            success_url: `${process.env.CLIENT_URL}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.CLIENT_URL}/checkout-cancel`,
-            metadata: {
-                userId,
-            },
+        if (address.userId !== userId) {
+            return res.status(401).json({
+                success: false,
+                message: "Please kindly select your address",
+            });
+        }
+        const cartItems = await UserCart
+            .findOne({ userId })
+        const totalAmount = cartItems.products.reduce((acc, item) => item.unitPrice * item.quantity + acc, 0)
+        const options = {
+            amount: totalAmount * 100,
+            currency: "INR"
+        }
+        const razorpayOrder = await rozarPayInstance.orders.create(options);
+        // console.log(order)
+        const order = await Order.create({
+            userId,
+            orderItems: cartItems.map(item => ({
+                productId: item.productId,
+                quantity: item.quantity,
+                price: item.unitPrice,
+                color: item.color,
+                thumbnail: item.thumbnail,
+            })),
+            shippingAddress,
+            paymentMethod: paymentMethod,
+            paymentStatus: "pending",
+            orderStatus: "pending",
+            itemsPrice: totalAmount,
+            shippingPrice: 0,
+            totalPrice: totalAmount,
+            deliveredAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+            razorpayOrderId: razorpayOrder.id
         });
-
         return res.status(200).json({
             success: true,
             message: "Checkout session created successfully.",
-            sessionUrl: session.url,
+            order: razorpayOrder
         });
 
     } catch (error) {
@@ -64,156 +73,106 @@ export const createCheckoutSession = async (req, res) => {
         });
     }
 };
-
-export const placeOrder = async (req, res) => {
+export const createAndConfirmOrder = async (req, res) => {
     try {
-        const {
-            shippingAddress,
-            paymentMethod,
-            paymentStatus,
-            paymentId = null,
-            orderStatus,
-            deliveredAt
-        } = req.body;
-
-        // Validation for required fields
+        const { shippingAddress, paymentMethod } = req.body;
+        const userId = req.user.userId;
         if (!shippingAddress) {
             return res.status(400).json({
                 success: false,
-                message: "Shipping address is required"
+                message: "Shipping address id not found.",
             });
         }
-
-        // Validate shippingAddress is a valid ObjectId
-        if (!mongoose.Types.ObjectId.isValid(shippingAddress)) {
+        const address = await Address.findById(shippingAddress);
+        if (!address) {
             return res.status(400).json({
                 success: false,
-                message: "Invalid shipping address ID"
+                message: "Shipping address not found.",
             });
         }
-
-        // Validate paymentMethod
-        const validPaymentMethods = ["COD", "Razorpay", "Stripe"];
-        if (paymentMethod && !validPaymentMethods.includes(paymentMethod)) {
-            return res.status(400).json({
+        if (address.userId !== userId) {
+            return res.status(401).json({
                 success: false,
-                message: `Payment method must be one of: ${validPaymentMethods.join(", ")}`
+                message: "Please kindly select your address",
             });
         }
-
-        // Validate paymentStatus
-        const validPaymentStatuses = ["pending", "paid", "failed"];
-        if (paymentStatus && !validPaymentStatuses.includes(paymentStatus)) {
-            return res.status(400).json({
-                success: false,
-                message: `Payment status must be one of: ${validPaymentStatuses.join(", ")}`
-            });
-        }
-
-        // Validate orderStatus
-        const validOrderStatuses = ["pending", "confirmed", "shipped", "delivered", "cancelled"];
-        if (orderStatus && !validOrderStatuses.includes(orderStatus)) {
-            return res.status(400).json({
-                success: false,
-                message: `Order status must be one of: ${validOrderStatuses.join(", ")}`
-            });
-        }
-
-        // Validate deliveredAt is a valid date if provided
-        if (deliveredAt) {
-            const date = new Date(deliveredAt);
-            if (isNaN(date.getTime())) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Invalid date format for deliveredAt"
-                });
-            }
-        }
-
-        const userId = req.user.userId;
-
-        // Validate user cart exists
-        const usercart = await UserCart.findOne({ userId });
-        if (!usercart) {
-            return res.status(404).json({
-                success: false,
-                message: "User cart not found"
-            });
-        }
-
-        const products = usercart.products;
-
-        // Validate cart is not empty
-        if (!products || products.length === 0) {
-            return res.status(400).json({
-                success: false,
-                message: "Cart is empty. Cannot place order."
-            });
-        }
-
-        const orderedItems = [];
-        let totalPrice = 0;
-
-        for (let item of products) {
-            const product = await Product.findById(item.productId)
-
-            // Validate product exists
-            if (!product) {
-                return res.status(404).json({
-                    success: false,
-                    message: `Product with ID ${item.productId} not found`
-                });
-            }
-
-          
-            // Validate stock availability
-            if (item.quantity > product.stock) {
-                return res.status(400).json({
-                    success: false,
-                    message: `Insufficient stock for ${product.name || 'product'} (${item.color}). Available: ${product.stock}, Requested: ${item.quantity}`
-                });
-            }
-
-            // Validate quantity is positive
-            if (item.quantity <= 0) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Quantity must be greater than 0"
-                });
-            }
-
-            const orderItem = {
-                productId: product._id,
-                quantity: item.quantity,
-                price: product.price,
-                color: product.color
-            }
-            orderedItems.push(orderItem);
-            totalPrice += (orderItem.price * orderItem.quantity);
-        }
-
-        // Validate total price is positive
-        if (totalPrice <= 0) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid order total. Total price must be greater than 0"
-            });
-        }
-
+        const cartItems = await UserCart
+            .findOne({ userId })
+        const totalAmount = cartItems.products.reduce((acc, item) => item.unitPrice * item.quantity + acc, 0)
+        // console.log(order)
         const order = await Order.create({
             userId,
-            orderItems: orderedItems,
+            orderItems: cartItems.map(item => ({
+                productId: item.productId,
+                quantity: item.quantity,
+                price: item.unitPrice,
+                color: item.color,
+                thumbnail: item.thumbnail,
+            })),
             shippingAddress,
-            paymentMethod: paymentMethod || "COD",
-            paymentStatus: paymentStatus || "pending",
-            paymentId,
-            orderStatus: orderStatus || "pending",
-            deliveredAt: deliveredAt ? new Date(deliveredAt) : undefined,
+            paymentMethod: paymentMethod,
+            paymentStatus: "pending",
+            orderStatus: "confirmed",
+            itemsPrice: totalAmount,
             shippingPrice: 0,
-            itemsPrice: totalPrice,
-            totalPrice,
-        })
+            totalPrice: totalAmount,
+            deliveredAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+        });
+        cartItems.products = []
+        await cartItems.save()
+        return res.status(200).json({
+            success: true,
+            message: "Your order has been placed successfully.",
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Failed to create checkout session.",
+            error: error.message,
+        });
+    }
+}
+export const paymentVerification = async (req, res) => {
+    try {
+        const {
+            razorpay_payment_id,
+            razorpay_order_id,
+            razorpay_signature
+        } = req.body;
+        const userId = req.user.userId;
+        const userCart = await UserCart.findOne({ userId });
+        const order = await Order.find({ razorpayOrderId: razorpay_order_id })
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: "No order found.",
+            });
+        }
+        if (order.userId !== userId) {
+            return res.status(401).json({
+                success: false,
+                message: "Unauthorized user order access.",
+            });
+        }
+        const body = razorpay_order_id + "|" + razorpay_payment_id;
 
+        const expectedSignature = crypto
+            .createHmac("sha256", process.env.ROZARPAY_SECRET)
+            .update(body)
+            .digest("hex");
+
+        if (expectedSignature !== razorpay_signature) {
+            return res.status(400).json({ success: false, message: "Invalid signature" });
+        }
+        const payment = await rozarPayInstance.payments.fetch(razorpay_payment_id);
+        order.paymentStatus = "paid"
+        order.paymentId = razorpay_payment_id,
+        order.paymentMode = payment.method,
+        order.orderStatus = "confirmed"
+
+        userCart.products = []
+        await userCart.save()
+        await order.save()
         return res.status(200).json({
             success: true,
             order

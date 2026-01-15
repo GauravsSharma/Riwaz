@@ -50,9 +50,6 @@ const Cart_Card = ({
 
   // Debounced API call
   useEffect(() => {
-    // Don't call API on initial render or if quantity matches initial value
-    if (quantity === quan) return;
-
     // Clear existing timer
     if (debounceTimer.current) {
       clearTimeout(debounceTimer.current);
@@ -84,10 +81,12 @@ const Cart_Card = ({
   }, [quantity, productId, quan, queryClient, updateQuantity]);
 
   const handleQuantityChange = (type: 'increase' | 'decrease') => {
+    
     if (user) {
       if (type === 'increase') {
         setQuantity(prev => prev + 1);
-      } else if (type === 'decrease' && quantity > 1) {
+      } else if (type === 'decrease') {
+        console.log("entered");
         setQuantity(prev => prev - 1);
       }
     } else {
@@ -179,7 +178,7 @@ const Cart_Card = ({
         <div className="border border-gray-200 rounded-lg shadow-sm overflow-hidden">
           {/* Product Image and Basic Info */}
           <div className="flex gap-3 p-3">
-            <div className="w-20 h-20 flex-shrink-0">
+            <div className="w-20 h-20 shrink-0">
               <Image
                 height={80}
                 width={80}
@@ -223,7 +222,7 @@ const Cart_Card = ({
                   >
                     <Minus size={14} />
                   </button>
-                  <span className="px-2 py-1 border-l border-r border-gray-300 min-w-[32px] text-center text-sm">
+                  <span className="px-2 py-1 border-l border-r border-gray-300 min-w-8 text-center text-sm">
                     {quantity}
                   </span>
                   <button
