@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { CheckCircle2, Mail, Home, Eye } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const OrderSuccessPage: React.FC<{
     orderId: string
@@ -10,7 +11,7 @@ const OrderSuccessPage: React.FC<{
   const [showCheckmark, setShowCheckmark] = useState(false);
   const [showContent, setShowContent] = useState(false);
   const [confettiPieces, setConfettiPieces] = useState<Array<{id: number, left: number, delay: number, duration: number}>>([]);
-
+  const router = useRouter()
   useEffect(() => {
     // Create confetti pieces
     const pieces = Array.from({ length: 50 }, (_, i) => ({
@@ -27,11 +28,11 @@ const OrderSuccessPage: React.FC<{
   }, []);
 
   const handleContinueShopping = () => {
-    window.location.href = '/';
+    router.push('/');
   };
 
   const handleViewOrders = () => {
-    window.location.href = '/orders';
+    router.push('/account/orders');
   };
 
   const handleCopyOrderId = () => {
