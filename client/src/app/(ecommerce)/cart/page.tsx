@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { useCreateCheckoutSession, useGetCartItems, useGetCartSummary } from '@/hooks/buyer/useUserCart';
+import { useClearCart,useGetCartItems, useGetCartSummary } from '@/hooks/buyer/useUserCart';
 import { useUserCart } from '@/stores/buyer/cart.user';
 import DeleteCartItem from '@/components/models/DeleteCartItem';
 import { useUserStore } from '@/stores/user.store';
@@ -10,24 +10,29 @@ import Script from 'next/script';
 import CartPageSidebar from '@/components/shared/sidebars/CartPageSidebar';
 import ViewCartItems from '@/components/sections/ViewCartItems';
 import CheckoutDetailPage from '@/components/cartPage/CheckoutDetailPage';
+import api from '@/lib/axios';
+import { useRouter } from 'next/navigation';
+import EmptyCart from '@/components/sections/EmptyCart';
+import { useGetAddresses } from '@/hooks/buyer/useAddress';
 
 const ShoppingCartPage = () => {
   const [item, setItem] = useState<string>();
   const user = useUserStore(s => s.user)
   const [isOpen, setIsOpen] = useState(false);
   const [showCouponInput, setShowCouponInput] = useState(false);
-  const [showCheckoutPage,setShowCheckoutPage] = useState(false);
+  const [showCheckoutPage, setShowCheckoutPage] = useState(false);
   const [isCheckOutLoaderOpen, setIsCheckOutLoaderOpen] = useState(false);
   const setTotalDiscountedAmount = useUserCart((s) => s.setTotalDiscountedAmount);
   const setTotalActualAmount = useUserCart((s) => s.setTotalActualAmount);
   const totalAmount = useUserCart((s) => s.totalDiscountedAmount);
   const totalActualAmount = useUserCart((s) => s.totalActualAmount);
+  useGetAddresses();
   const [items, setItems] = useState<CartItem[]>([]);
-
+  const router = useRouter();
   const { isLoading } = useGetCartItems(!!user)
   const cartItems = useUserCart((s) => s.items);
   useGetCartSummary()
-
+  const clearCart = useClearCart();
   const handleCouponToggle = () => {
     setShowCouponInput(!showCouponInput);
   };
@@ -55,38 +60,65 @@ const ShoppingCartPage = () => {
       return;
     }
     setShowCheckoutPage(true)
-   
+
   }
-  const loadPaymentPage = (order: RazorpayOrder) => {
-    let options = {
-      "key": process.env.NEXT_PUBLIC_RAZORPAY_KEY, // Enter the Key ID generated from the Dashboard
-      "amount": order.amount, // Amount is in currency subunits. 
-      "currency": "INR",
-      "name": "Riwaz",
-      "description": "",
-      "image": "/logo.png",
-      "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-      "callback_url": `${process.env.NEXT_PUBLIC_API_URL}/order/paymentVerification`,
-      "prefill": {
-        "name": "Gaurav Kumar",
-        "email": "gaurav.kumar@example.com",
-        "contact": "+919876543210"
-      },
-      "notes": {
-        "address": "Razorpay Corporate Office"
-      },
-      "theme": {
-        "color": "#3399cc"
+ const loadPaymentPage = (order: RazorpayOrder) => {
+  const options: RazorpayOptions = {
+    key: process.env.NEXT_PUBLIC_RAZORPAY_KEY!,
+    amount: order.amount,
+    currency: "INR",
+    name: "Riwaz",
+    description: "",
+    image: "/logo.png",
+    order_id: order.id,
+
+    handler: async (response) => {
+      try {
+        const res = await api.post<{
+          success: boolean;
+          orderId: string;
+        }>("/order/paymentVerification", {
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_signature: response.razorpay_signature,
+        });
+
+        if (res.data.success) {
+          clearCart.mutate();
+          router.push(`/success/${res.data.orderId}`);
+        }
+      } catch (err) {
+        console.log(err);
+        
+        toast.error("Payment verification failed");
       }
-    };
-    const razorpay = new (window as any).Razorpay(options);
-    razorpay.open();
-  }
+    },
+
+    prefill: {
+      name: "Gaurav Kumar",
+      email: "gaurav.kumar@example.com",
+      contact: "+919876543210",
+    },
+
+    notes: {
+      address: "Razorpay Corporate Office",
+    },
+
+    theme: {
+      color: "#3399cc",
+    },
+  };
+
+  const razorpay = new window.Razorpay(options);
+  razorpay.open();
+};
 
   if (isLoading) {
     return <div className='h-screen bg-amber-200 flex justify-center items-center'>Loading...</div>
   }
-
+  if(!items || items.length === 0){
+    return <EmptyCart/>
+  }
   return (
     <div className="min-h-screen bg-gray-50 relative mt-34">
       <div className="max-w-7xl mx-auto px-4 py-6">
@@ -100,7 +132,7 @@ const ShoppingCartPage = () => {
               setIsOpen={setIsOpen}
             />
           }
-          {showCheckoutPage && <CheckoutDetailPage setShowCheckoutPage={setShowCheckoutPage} setIsCheckOutLoaderOpen={setIsCheckOutLoaderOpen} loadPaymentPage={loadPaymentPage}/> }
+          {showCheckoutPage && <CheckoutDetailPage setShowCheckoutPage={setShowCheckoutPage} setIsCheckOutLoaderOpen={setIsCheckOutLoaderOpen} loadPaymentPage={loadPaymentPage} />}
 
           {/* Price Details Section */}
           {items && items.length > 0 && <CartPageSidebar
@@ -108,7 +140,7 @@ const ShoppingCartPage = () => {
             totalActualAmount={totalActualAmount}
             handleCouponToggle={handleCouponToggle}
             handleCheckout={handleCheckout}
-            showCheckoutPage = {showCheckoutPage}
+            showCheckoutPage={showCheckoutPage}
           />}
         </div>
       </div>

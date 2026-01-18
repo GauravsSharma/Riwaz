@@ -50,6 +50,7 @@ const Cart_Card = ({
 
   // Debounced API call
   useEffect(() => {
+    if(!user) return;
     // Clear existing timer
     if (debounceTimer.current) {
       clearTimeout(debounceTimer.current);
@@ -78,11 +79,13 @@ const Cart_Card = ({
         clearTimeout(debounceTimer.current);
       }
     };
-  }, [quantity, productId, quan, queryClient, updateQuantity]);
+  }, [quantity, productId, quan, queryClient, updateQuantity,user]);
 
   const handleQuantityChange = (type: 'increase' | 'decrease') => {
     
     if (user) {
+      console.log(user);
+      
       if (type === 'increase') {
         setQuantity(prev => prev + 1);
       } else if (type === 'decrease') {

@@ -66,7 +66,7 @@ export default function ProfileEditForm() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white">
+    <div className="max-w-2xl mx-auto sm:p-6 bg-white">
       <div className="mb-8">
         <h2 className="text-xl font-semibold text-gray-900 mb-6">
           General Information

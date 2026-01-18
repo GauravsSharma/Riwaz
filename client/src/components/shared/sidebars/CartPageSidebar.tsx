@@ -14,7 +14,7 @@ const CartPageSidebar = ({
     handleCheckout: () => void,
     showCheckoutPage:boolean
 }) => {
-    const [showCouponInput, setShowCouponInput] = React.useState(false);
+    const [showCouponInput] = React.useState(false);
     const [couponCode, setCouponCode] = React.useState('');
     return (
         <>

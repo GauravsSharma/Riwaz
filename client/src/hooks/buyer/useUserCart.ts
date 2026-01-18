@@ -13,7 +13,8 @@ interface CartSummary {
 }
 interface CheckoutSessionPayload{
     coupon:string,
-    shippingAddress:string
+    shippingAddress:string,
+    paymentMethod:string
 }
 export const useGetCartItems = (enabled: boolean) => {
   const setCartItems = useUserCart((s) => s.setCartItems);
@@ -101,5 +102,34 @@ export const useCreateCheckoutSession = () => {
       const res = await api.post("/order/create-checkout-session",data);
       return res.data.order;
     },
+  });
+};
+
+
+export const useCreateOrder = () => {
+  return useMutation({
+    mutationFn: async (data:CheckoutSessionPayload) => {
+      const res = await api.post("/order/create-order",data);
+      return res.data.orderId;
+    },
+  });
+};
+export const useClearCart = () => {
+  return useMutation({
+    mutationFn: async () => {
+      const res = await api.delete("/usercart/clear");
+      return res.data;
+    },
+  });
+};
+
+export const useGetUSerOrders = () => {
+  return useQuery<UserOrder[]>({
+    queryKey: ["order-store"],
+    queryFn: async () => {
+      const res = await api.get(`/order/getUserOrder?status=confirmed`);
+      return res.data.orders;
+    },
+   
   });
 };

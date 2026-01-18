@@ -2,6 +2,7 @@
 "use client"
 import React, { useState } from 'react';
 import { MapPin, Plus, CreditCard, Banknote, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
 
 // Types
 interface Address {
@@ -145,7 +146,9 @@ const OrderSummarySection: React.FC<{
     <div className="space-y-4">
       {products.map((product) => (
         <div key={product._id} className="flex gap-4 p-4 border border-gray-200 rounded-lg">
-          <img
+          <Image
+          height={96}
+          width={96}
             src={product.img}
             alt={product.title}
             className="w-24 h-24 object-cover rounded-lg"

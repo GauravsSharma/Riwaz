@@ -26,7 +26,7 @@ export default function Page() {
   </div>
 
   return (
-    <div className="w-[75%] p-6">
+    <div className="w-full sm:w-[75%] sm:p-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-semibold text-gray-900">

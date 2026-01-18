@@ -1,11 +1,13 @@
 
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MapPin, Plus, CreditCard, Banknote, ChevronRight, ArrowLeft } from 'lucide-react';
 import { useUserCart } from '@/stores/buyer/cart.user';
 import Cart_Card from '../cards/Cart_Card';
 import { toast } from 'react-toastify';
-import { useCreateCheckoutSession } from '@/hooks/buyer/useUserCart';
+import { useClearCart, useCreateCheckoutSession, useCreateOrder } from '@/hooks/buyer/useUserCart';
+import { useAddressStore } from '@/stores/buyer/address.user';
+import { useRouter } from 'next/navigation';
 
 // Types
 // interface Address {
@@ -13,39 +15,16 @@ import { useCreateCheckoutSession } from '@/hooks/buyer/useUserCart';
 //   address: string;
 //   landmark: string;
 //   state: string;
-//   pincode: string;
+//   pinCODe: string;
 // }
 
 
 interface CheckoutData {
   selectedAddressId: string | null;
   products: CartItem[] | null;
-  paymentMethod: 'online' | 'cod' | null;
+  paymentMethod: 'COD' | 'Razorpay' | 'Stripe' | null;
 }
 
-// Sample Data
-const sampleAddresses: Address[] = [
-  {
-    type: "Home",
-    _id: "addr_001",
-    address: "Flat No. 302, Shree Residency, MG Road",
-    landmark: "Near City Mall",
-    city: "Indore",
-    state: "Madhya Pradesh",
-    pincode: "452001",
-    country: "India",
-  },
-  {
-    type: "Office",
-    _id: "addr_002",
-    address: "5th Floor, Tech Park Tower, Sector 62",
-    landmark: "Opposite Metro Station",
-    city: "Noida",
-    state: "Uttar Pradesh",
-    pincode: "201309",
-    country: "India",
-  },
-];
 // Components
 const DeliveryAddressCard: React.FC<{
   address: Address;
@@ -162,8 +141,8 @@ const OrderSummarySection: React.FC<{
 
 const PaymentSection: React.FC<{
   isEnabled: boolean;
-  selectedMethod: 'online' | 'cod' | null;
-  onSelectMethod: (method: 'online' | 'cod') => void;
+  selectedMethod: 'COD' | 'Razorpay' | 'Stripe' | null;
+  onSelectMethod: (method: 'COD' | 'Razorpay' | 'Stripe') => void;
   onPlaceOrder: () => void;
 }> = ({ isEnabled, selectedMethod, onSelectMethod, onPlaceOrder }) => (
   <div className={`bg-white rounded-lg border border-gray-200 p-6 transition-opacity ${!isEnabled ? 'opacity-50 pointer-events-none' : ''
@@ -178,32 +157,32 @@ const PaymentSection: React.FC<{
 
     <div className="space-y-3">
       <div
-        onClick={() => onSelectMethod('online')}
-        className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${selectedMethod === 'online' ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
+        onClick={() => onSelectMethod('Razorpay')}
+        className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${selectedMethod === 'Razorpay' ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
           }`}
       >
         <div className="flex items-center gap-3">
-          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedMethod === 'online' ? 'border-blue-600' : 'border-gray-300'
+          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedMethod === 'Razorpay' ? 'border-blue-600' : 'border-gray-300'
             }`}>
-            {selectedMethod === 'online' && <div className="w-3 h-3 rounded-full bg-blue-600" />}
+            {selectedMethod === 'Razorpay' && <div className="w-3 h-3 rounded-full bg-blue-600" />}
           </div>
           <CreditCard className="w-6 h-6 text-gray-700" />
           <div className="flex-1">
-            <p className="font-medium text-gray-900">Online Payment</p>
+            <p className="font-medium text-gray-900">Razorpay Payment</p>
             <p className="text-sm text-gray-600">Pay using Credit/Debit Card</p>
           </div>
         </div>
       </div>
 
       <div
-        onClick={() => onSelectMethod('cod')}
-        className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${selectedMethod === 'cod' ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
+        onClick={() => onSelectMethod('COD')}
+        className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${selectedMethod === 'COD' ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
           }`}
       >
         <div className="flex items-center gap-3">
-          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedMethod === 'cod' ? 'border-blue-600' : 'border-gray-300'
+          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedMethod === 'COD' ? 'border-blue-600' : 'border-gray-300'
             }`}>
-            {selectedMethod === 'cod' && <div className="w-3 h-3 rounded-full bg-blue-600" />}
+            {selectedMethod === 'COD' && <div className="w-3 h-3 rounded-full bg-blue-600" />}
           </div>
           <Banknote className="w-6 h-6 text-gray-700" />
           <div className="flex-1">
@@ -235,7 +214,8 @@ export default function CheckoutDetailPage({
   setShowCheckoutPage: (x: boolean) => void
   setIsCheckOutLoaderOpen: (x: boolean) => void
 }) {
-  const [addresses, setAddresses] = useState<Address[]>(sampleAddresses);
+  const addressesFromStore: Address[] = useAddressStore((state) => state.addresses);
+  const [addresses, setAddresses] = useState<Address[]>();
   const cartItems: CartItem[] | null = useUserCart((state) => state.items);
   const [checkoutData, setCheckoutData] = useState<CheckoutData>({
     selectedAddressId: null,
@@ -243,40 +223,71 @@ export default function CheckoutDetailPage({
     paymentMethod: null
   });
   const { mutate } = useCreateCheckoutSession();
+  const { mutate: mutateCreateOrder } = useCreateOrder()
+  const {mutate:clearCartIten} = useClearCart()
+  const setCartItems = useUserCart(s=>s.setCartItems)
+  const setCount = useUserCart(s=>s.setCount)
+  const setTotalActualAmount = useUserCart(s=>s.setTotalActualAmount)
+  const setTotalDiscountedAmount = useUserCart(s=>s.setTotalDiscountedAmount)
   const [showOrderSummary, setShowOrderSummary] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [, setIsModalOpen] = useState(false);
+  const router = useRouter();
   const handleSelectAddress = (id: string) => {
     setCheckoutData({ ...checkoutData, selectedAddressId: id });
     setShowOrderSummary(true);
   };
-
-
   const handleContinueToPayment = () => {
     setShowPayment(true);
   };
 
-  const handleSelectPaymentMethod = (method: 'online' | 'cod') => {
+  const handleSelectPaymentMethod = (method: 'COD' | 'Razorpay' | 'Stripe') => {
     setCheckoutData({ ...checkoutData, paymentMethod: method });
   };
-
-  const handlePlaceOrder = () => {
-    if (checkoutData.products === null || checkoutData.selectedAddressId===null) return;
-    setIsCheckOutLoaderOpen(true);
-    mutate({ coupon: "NONE" ,shippingAddress:checkoutData.selectedAddressId}, {
-      onSuccess: (order: RazorpayOrder) => {
-        setIsCheckOutLoaderOpen(false);
-        if (checkoutData.paymentMethod === 'cod') {
-        } else {
-          loadPaymentPage(order)
-        }
-      },
-      onError: () => {
-        setIsCheckOutLoaderOpen(false)
-        toast.error("Something went wrong")
+  const clearCart = ()=>{
+     clearCartIten(undefined,{
+      onSuccess: ()=>{
+        setCartItems([])
+        setCount(0)
+        setTotalActualAmount(0)
+        setTotalDiscountedAmount(0)
       }
-    })
+     })
+  }
+  useEffect(() => {
+    setAddresses(addressesFromStore.length ? addressesFromStore : []);
+  }, [addressesFromStore]);
+  const handlePlaceOrder = () => {
+    // console.log(checkoutData);
+    if (checkoutData.products === null || checkoutData.selectedAddressId === null || checkoutData.paymentMethod === null) return;
+    
+    setIsCheckOutLoaderOpen(true);
+    if (checkoutData.paymentMethod === "Razorpay") {
+      mutate({ coupon: "NONE", shippingAddress: checkoutData.selectedAddressId, paymentMethod: checkoutData.paymentMethod }, {
+        onSuccess: (order:RazorpayOrder) => {
+          setIsCheckOutLoaderOpen(false)
+          loadPaymentPage(order)
+        },
+        onError: () => {
+          setIsCheckOutLoaderOpen(false)
+          toast.error("Something went wrong")
+        }
+      })
+    }
+    else if( checkoutData.paymentMethod === "COD"){
+      mutateCreateOrder({ coupon: "NONE", shippingAddress: checkoutData.selectedAddressId, paymentMethod: checkoutData.paymentMethod }, {
+        onSuccess: (orderId:string) => { 
+          clearCart()
+          setIsCheckOutLoaderOpen(false)
+          toast.success("Order placed successfully")
+          router.push(`/success/${orderId}`)
+        },
+        onError: () => {
+          setIsCheckOutLoaderOpen(false)
+          toast.error("Something went wrong")
+        }
+      })
+    }
   };
   if (checkoutData.products === null) {
     return <div className="xl:col-span-2 py-8 px-4">
@@ -290,6 +301,7 @@ export default function CheckoutDetailPage({
       </div>
     </div>
   }
+  
 
   return (
     <div className="xl:col-span-2 py-8 px-4">
@@ -301,12 +313,12 @@ export default function CheckoutDetailPage({
 
           Checkout</h1>
 
-        <DeliverySection
+        {addresses && <DeliverySection
           addresses={addresses}
           selectedId={checkoutData.selectedAddressId}
           onSelectAddress={handleSelectAddress}
           onAddAddress={() => setIsModalOpen(true)}
-        />
+        />}
 
         <OrderSummarySection
           products={checkoutData.products}

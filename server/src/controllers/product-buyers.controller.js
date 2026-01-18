@@ -11,7 +11,6 @@ export const getProducts = async (req, res) => {
 
     // Fetch primary image for each product
 
-    console.log("Request received:", req);
 
     res.status(200).json(products);
   } catch (error) {
@@ -31,7 +30,7 @@ export const getSingleProduct = async (req, res) => {
         path: "images",
         select: "url public_id"
       });
-    console.log("product",product);
+
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
@@ -48,15 +47,13 @@ export const getSingleProduct = async (req, res) => {
 
 export const getProductById = async (req, res) => {
   try {
-    console.log("Entered in getProductById");
+    
 
     const { id } = req.params;
     if (!id) {
       return res.status(400).json({ message: "Product ID is required" });
     }
-    console.log(id);
-
-    console.log(req + "request");
+    
     const product = await Product.findById(id)
       .populate({
         path: "tags",
@@ -98,7 +95,6 @@ export const searchProducts = async (req, res) => {
       sortOrder = 'desc'
     } = req.query;
 
-    console.log("Filters received:", req.query);
 
     // Build the query object
     const query = { isActive: true }; // Only show active products
@@ -173,7 +169,7 @@ export const useGetProductRecommendationByQuery = async (req, res) => {
   try {
     const { q } = req.query;
 
-    console.log("q query: ",q);
+
 
     if (!q || q.trim().length === 0) {
       return res.status(200).json([]);
@@ -256,7 +252,7 @@ export const getProductsByType = async (req, res) => {
     if (!type) {
       return res.status(400).json({ message: "Product type is required" });
     }
-    console.log("Product type:", type);
+  
     const products = await Product.find({
       type: type,
       isActive: true,

@@ -1,12 +1,5 @@
 import mongoose from "mongoose";
 
-// how user will place a order ?
-// create address schema
-// store address based on user address fields 
-// send the address id from frontend 
-
-
-// before calling the create order api, check
 const orderItemSchema = new mongoose.Schema({
   productId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -14,7 +7,7 @@ const orderItemSchema = new mongoose.Schema({
     required: true,
   },
   quantity: { type: Number, required: true, min: 1 },
-  price: { type: Number, required: true }, // price per item
+  price: { type: Number, required: true },
   color: {
     type: String,
     required: true
@@ -24,7 +17,6 @@ const orderItemSchema = new mongoose.Schema({
     required: true
   }
 });
-
 
 const orderSchema = new mongoose.Schema(
   {
@@ -87,7 +79,7 @@ const orderSchema = new mongoose.Schema(
     },
     razorpayOrderId: {
       type: String,
-      unique: true,
+      default: null,
     }
   },
   {
