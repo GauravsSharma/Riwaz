@@ -1,26 +1,4 @@
 import mongoose from "mongoose";
-const addressSchema = new mongoose.Schema({
-  state: {
-    type: String,
-    required: true
-  },
-  city: {
-    type: String,
-    required: true,
-  },
-  landmark: {
-    type: String,
-    required: true
-  },
-  address1: {
-    type: String,
-    required: true,
-  },
-  address2: {
-    type: String,
-    default: ""
-  }
-})
 const userSchema = new mongoose.Schema(
   {
     // Unique ID (MongoDB will automatically generate an ObjectId)

@@ -7,11 +7,11 @@ import {
   ColumnDef
 } from '@tanstack/react-table';
 import { ChevronDown, ChevronRight, Plus, MoreVertical, Edit, Trash2 } from 'lucide-react';
-import AddBaseProductModel from '../models/AddBaseProductModel';
 import DeleteProductDialog from '../models/DeleteProduct';
 import AddProductModal from '../models/AddProductModel';
 import ProductImageDialog from '../models/AddImages';
 import Image from 'next/image';
+
 
 
 type TableRow = BaseProduct | (SellerProduct & { isParent?: false; parentId: string });
@@ -21,16 +21,18 @@ const SareeProductTable = ({
 }: {
   data: BaseProduct[]
 }) => {
-  console.log(data, "from table");
 
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [isDeleteModelOpen, setIsDeleteModelOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<SellerProduct>();
   const [selectedBaseProductId, setSelectedBaseProductId] = useState<string>();
-  const [showAddBaseProductDialog, setShowAddBaseProductDialog] = useState(false);
+
   const [showAddVariantModel, setShowAddVariantModel] = useState(false);
   const [showAddImagesModel, setShowAddImagesModel] = useState(false);
   const [createdProductId, setCreatedProductId] = useState<string>()
+
+  const [editProduct, setEditProduct] = useState<SellerProduct | undefined>();
+  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   // pagination (pageIndex is 0-based)
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize] = useState(2); // show 2 parent products per page
@@ -44,10 +46,13 @@ const SareeProductTable = ({
 
   const toggleMenu = useCallback((variantId: string) => {
     setOpenMenuId(openMenuId === variantId ? null : variantId);
-  },[openMenuId,setOpenMenuId])
+  }, [openMenuId, setOpenMenuId])
 
-  const handleEdit = (variantId: string) => {
-    console.log('Edit variant:', variantId);
+  const handleEdit = (variant: SellerProduct,parentId:string) => {
+    setSelectedBaseProductId(parentId)
+    setEditProduct(variant);
+    setModalMode('edit');
+    setShowAddVariantModel(true);
     setOpenMenuId(null);
   };
 
@@ -58,7 +63,7 @@ const SareeProductTable = ({
   };
 
   const handleAddVariant = (parentId: string) => {
-    console.log('Add variant to parent:', parentId);
+    setEditProduct(undefined)
     setSelectedBaseProductId(parentId)
     setShowAddVariantModel(true);
   };
@@ -219,7 +224,7 @@ const SareeProductTable = ({
                   ></div>
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
                     <button
-                      onClick={() => handleEdit(variant._id)}
+                      onClick={() => handleEdit(variant as SellerProduct,variant.parentId)}
                       className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
                     >
                       <Edit size={16} />
@@ -236,11 +241,11 @@ const SareeProductTable = ({
                 </>
               )}
             </div>
-          )
+          );
         }
       }
     ],
-    [openMenuId,toggleMenu]
+    [openMenuId, toggleMenu]
   );
 
   const table = useReactTable({
@@ -264,18 +269,9 @@ const SareeProductTable = ({
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Product Management (Parent-Child Model)</h1>
-          <button
-            onClick={() => setShowAddBaseProductDialog(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium cursor-pointer"
-          >
-            <Plus size={18} />
-            Add Base Product
-          </button>
-        </div>
+    <div className="min-h-screen ">
+      <div className="mx-auto">
+
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
@@ -353,13 +349,11 @@ const SareeProductTable = ({
         </div>
       </div>
 
-      {/* Add Base Product Dialog */}
-      {showAddBaseProductDialog && (
-        <AddBaseProductModel setShowAddBaseProductDialog={setShowAddBaseProductDialog} />
-      )}
+
       {selectedProduct && isDeleteModelOpen && <DeleteProductDialog isOpen={isDeleteModelOpen} setIsOpen={setIsDeleteModelOpen} productId={selectedProduct._id} productName={selectedProduct?.title} />}
       {
-        selectedBaseProductId && showAddVariantModel && <AddProductModal isOpen={showAddVariantModel} setIsOpen={setShowAddVariantModel} setCreatedProductId={setCreatedProductId} parentId={selectedBaseProductId} setImageOpenModel={setShowAddImagesModel} />
+        selectedBaseProductId && showAddVariantModel && <AddProductModal isOpen={showAddVariantModel} setIsOpen={setShowAddVariantModel} setCreatedProductId={setCreatedProductId} parentId={selectedBaseProductId} setImageOpenModel={setShowAddImagesModel} editProduct={editProduct}
+          mode={modalMode} />
       }
       {
         createdProductId && showAddImagesModel && <ProductImageDialog isOpen={showAddImagesModel} setIsOpen={setShowAddImagesModel} productId={createdProductId} />

@@ -11,6 +11,7 @@ import userCartRoute from "../src/routes/userCart.route.js";
 import productReview from "../src/routes/productReview.route.js";
 import orderRoute from "../src/routes/order.route.js";
 import parentProduct from "../src/routes/parentProduct.route.js";
+import dashboardRoutes from "../src/routes/dashboard.route.js";
 import connectDB from "../src/db/db.js";
 
 const app = express();
@@ -36,6 +37,7 @@ app.use("/api/usercart", userCartRoute);
 app.use("/api/review", productReview);
 app.use("/api/order", orderRoute);
 app.use("/api/parentProduct", parentProduct);
+app.use("/api/dashboard", dashboardRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

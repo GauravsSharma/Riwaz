@@ -4,43 +4,68 @@ import { Plus, MapPin, Store, MoreVertical, Edit2, Trash2 } from 'lucide-react';
 import AddStoreModel from '@/components/models/AddStoreModel';
 import { useSellerStore } from '@/stores/seller/store.store';
 import DeleteStoreModel from '@/components/models/DeleteStore';
+import AdminPageHeading from '@/components/headings/AdminPageHeading';
+import { useGetAllStores } from '@/hooks/seller/useStore';
+import StoreCardSkeleton from '@/components/loaders/StoreCardSkeleton';
 
 
 const StoresPage = () => {
+  const { isLoading, isError } = useGetAllStores()
   const stores = useSellerStore((s) => s.stores);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
-  const [selectedStore,setSelectedStore] = useState<Store|undefined>()
-  const [isDeleteModelOpen,setIsDeleteModelOpen] = useState(false)
-  
-  const handleEditStore = (store:Store) => {
+  const [selectedStore, setSelectedStore] = useState<Store | undefined>()
+  const [isDeleteModelOpen, setIsDeleteModelOpen] = useState(false)
+
+  const handleEditStore = (store: Store) => {
     setSelectedStore(store)
     setIsDialogOpen(true)
     setOpenDropdownId(null);
   };
 
-  const handleDeleteStore = (store:Store) => {
-   setSelectedStore(store)
-   setIsDeleteModelOpen(true)
+  const handleDeleteStore = (store: Store) => {
+    setSelectedStore(store)
+    setIsDeleteModelOpen(true)
     setOpenDropdownId(null);
   };
 
   const toggleDropdown = (storeId: string) => {
     setOpenDropdownId(openDropdownId === storeId ? null : storeId);
   };
+  if (isLoading) {
+    return <div className='px-8 py-12'>
+      <div></div>
+      <div className='flex justify-center items-center flex-wrap gap-3'>
+        {
+          [12, 2, 3, 4].map((i) => <StoreCardSkeleton key={i} />)
+        }
+      </div>
+    </div>
+  }
+  if (isError) {
+    return <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+      <p className="text-red-600 font-medium">Failed to load orders</p>
+      <button
+        onClick={() => window.location.reload()}
+        className="mt-3 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+      >
+        Retry
+      </button>
+    </div>
+  }
 
   return (
     <div className="min-h-screen w-full">
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
-        <div className="flex justify-between items-center mb-12">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">My Stores</h1>
-            <p className="text-gray-600">Manage and view all your store locations</p>
-          </div>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12">
+          <AdminPageHeading
+            title='Stores'
+            desciption='Manage your stores effectively from this panel.'
+          />
           <button
-            onClick={() =>{setSelectedStore(undefined);setIsDialogOpen(true)}}
-            className="flex cursor-pointer items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded shadow-lg hover:shadow-xl transition-all duration-200 font-medium"
+            onClick={() => { setSelectedStore(undefined); setIsDialogOpen(true) }}
+            className="flex md:w-auto w-full justify-center cursor-pointer items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded shadow-lg hover:shadow-xl transition-all duration-200 font-medium"
           >
             <Plus size={20} />
             Add New Store
@@ -60,7 +85,7 @@ const StoresPage = () => {
                   <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center group-hover:bg-indigo-200 transition-colors">
                     <Store className="text-indigo-600" size={24} />
                   </div>
-                  
+
                   {/* Three Dot Menu */}
                   <div className="relative">
                     <button
@@ -69,7 +94,7 @@ const StoresPage = () => {
                     >
                       <MoreVertical size={20} className="text-gray-600" />
                     </button>
-                    
+
                     {/* Dropdown Menu */}
                     {openDropdownId === store._id && (
                       <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
@@ -91,7 +116,7 @@ const StoresPage = () => {
                     )}
                   </div>
                 </div>
-                
+
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{store.name}</h3>
                 <p className="text-gray-600 mb-4 line-clamp-2">{store.description}</p>
                 <div className="flex items-center gap-2 text-gray-500">
@@ -121,17 +146,17 @@ const StoresPage = () => {
       </div>
 
       {/* Dialog */}
-      <AddStoreModel setIsDialogOpen={setIsDialogOpen} isDialogOpen={isDialogOpen} storeData={selectedStore}/>
-      
+      <AddStoreModel setIsDialogOpen={setIsDialogOpen} isDialogOpen={isDialogOpen} storeData={selectedStore} />
+
       {/* Click outside to close dropdown */}
       {openDropdownId && (
-        <div 
-          className="fixed inset-0 z-0" 
+        <div
+          className="fixed inset-0 z-0"
           onClick={() => setOpenDropdownId(null)}
         />
       )}
       {
-        isDeleteModelOpen&& selectedStore && <DeleteStoreModel setIsOpen={setIsDeleteModelOpen} isOpen={isDeleteModelOpen} storeId={selectedStore._id}/>
+        isDeleteModelOpen && selectedStore && <DeleteStoreModel setIsOpen={setIsDeleteModelOpen} isOpen={isDeleteModelOpen} storeId={selectedStore._id} />
       }
     </div>
   );

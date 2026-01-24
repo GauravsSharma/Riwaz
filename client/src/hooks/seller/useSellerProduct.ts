@@ -19,16 +19,16 @@ interface BaseProductPayload {
     title:string,
     storeId:string
 }
+
 // GET /api/users/me
-export const useGetAllSellerProducts = (storeId: string) => {
+export const useGetAllSellerProducts = () => {
     const setProducts = useSellerProducts((s) => s.setProducts);
 
     return useQuery<SellerProduct[]>({
-        queryKey: ["seller-product", storeId],
+        queryKey: ["seller-product"],
         queryFn: async () => {
-            const res = await api.get(`/parentProduct/${storeId}`)
+            const res = await api.get(`/parentProduct`)
             setProducts(res.data.parentProducts);
-            console.log("Data------------>", res.data);
             return res.data.parentProducts;
         },
     });
@@ -39,6 +39,14 @@ export const useAddProduct = () => {
     return useMutation({
         mutationFn: async (data: ProductDataPayload) => {
             const res = await api.post("/product", data);
+            return res.data;
+        },
+    });
+};
+export const useUpdateProduct = () => {
+    return useMutation({
+        mutationFn: async ({id,data}:{id:string,data:ProductDataPayload}) => {
+            const res = await api.put(`/product/${id}`, data);
             return res.data;
         },
     });

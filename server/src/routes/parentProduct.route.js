@@ -7,7 +7,7 @@ import { createParentProduct, getParentProducts } from '../controllers/parentPro
 
 const router = express.Router();
 
-router.get("/:storeId",sellerMiddleware,getParentProducts)
+router.get("/",sellerMiddleware,getParentProducts)
 
 router.post("/",sellerMiddleware,createParentProduct)
 

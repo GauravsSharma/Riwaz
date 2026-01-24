@@ -1,96 +1,118 @@
 'use client';
 
 import React from 'react';
-import { 
-  ChevronLeft, 
-  BarChart3, 
-  ShoppingCart, 
-  Package, 
-  Users, 
-  Settings, 
+import {
+  BarChart3,
+  ShoppingCart,
+  Package,
   Building2,
+  LogOut,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import LogoutModel from '@/components/models/LogoutModel';
+import Image from 'next/image';
+
+const menuItems = [
+  { icon: BarChart3, label: 'Overview', url: '/admin/dashboard' },
+  { icon: Building2, label: 'Stores', url: '/admin/stores' },
+  { icon: ShoppingCart, label: 'Orders', url: '/admin/orders' },
+  { icon: Package, label: 'Products', url: '/admin/products' },
+];
 
 const AdminSidebar = () => {
   const pathname = usePathname();
-
-  const menuItems = [
-    { icon: BarChart3, label: 'Overview', count: '24+', url: "/admin/dashboard" },
-    { icon: Building2, label: 'Stores', url: "/admin/stores" },
-    { icon: ShoppingCart, label: 'Orders', url: "/admin/orders" },
-    { icon: Package, label: 'Products', url: "/admin/products" },
-    { icon: Users, label: 'Customers', url: "/admin/customers" },
-    // { icon: Megaphone, label: 'Marketing', url: "/admin/marketing" },
-  ];
+  const [isOpen, setIsOpen] = React.useState(false);
 
   return (
-    <div className="w-64 h-screen sticky left-0 top-0 bg-gray-50 border-r border-gray-200 flex flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between p-6 border-b border-gray-200">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center">
-            <div className="w-4 h-4 bg-white rounded-full"></div>
-          </div>
-          <span className="text-lg font-semibold text-gray-900">Denca</span>
+    <>
+      {/* ================= DESKTOP SIDEBAR ================= */}
+      <aside className="hidden md:flex w-64 h-screen sticky top-0 bg-gray-50 border-r border-gray-200 flex-col">
+        {/* Header */}
+        <div className="flex items-center p-6 border-b border-slate-300">
+          <Link href="/" className="shrink-0">
+            <Image src="/logo.png" alt="Logo" width={150} height={150} />
+          </Link>
         </div>
-        <button className="p-1 hover:bg-gray-200 rounded-md transition-colors">
-          <ChevronLeft className="w-5 h-5 text-gray-600" />
-        </button>
-      </div>
 
-      {/* Menu Section */}
-      <div className="flex-1 px-3 py-6">
-        <div className="mb-6">
-          <p className="px-3 text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
-            Menu
-          </p>
-          
-          <nav className="space-y-1">
-            {menuItems.map((item, index) => {
+        {/* Menu */}
+        <nav className="flex-1 px-3 py-6 space-y-1">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.url;
+
+            return (
+              <Link
+                key={item.url}
+                href={item.url}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${isActive
+                    ? 'bg-purple-100 text-purple-700'
+                    : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+              >
+                <Icon className="w-5 h-5" />
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Logout */}
+        <div
+          onClick={() => setIsOpen(true)}
+          className="mx-3 mb-6 flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-red-600 hover:bg-red-100"
+        >
+          <LogOut className="w-5 h-5" />
+          Logout
+        </div>
+      </aside>
+
+      {/* ================= MOBILE BOTTOM BAR ================= */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50">
+        <div className="mx-4 mb-4 rounded-2xl backdrop-blur-xl bg-white/30 border border-white/20 shadow-lg">
+          <div className="flex justify-around items-center py-3">
+            {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.url;
 
               return (
                 <Link
-                  key={index}
+                  key={item.url}
                   href={item.url}
-                  className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group ${
-                    isActive 
-                      ? 'bg-purple-50 text-purple-700 border border-purple-200' 
-                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-                  }`}
+                  className={`flex flex-col items-center gap-1 text-[11px] transition ${isActive ? 'text-purple-600' : 'text-gray-600'
+                    }`}
                 >
-                  <div className="flex items-center space-x-3">
-                    <Icon className={`w-5 h-5 ${
-                      isActive ? 'text-purple-600' : 'text-gray-500 group-hover:text-gray-700'
-                    }`} />
-                    <span>{item.label}</span>
+                  <div
+                    className={`p-2 rounded-xl transition ${isActive
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-white/40'
+                      }`}
+                  >
+                    <Icon className="w-5 h-5" />
                   </div>
-                  {item.count && (
-                    <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
-                      {item.count}
-                    </span>
-                  )}
+                  {item.label}
                 </Link>
               );
             })}
-          </nav>
-        </div>
-      </div>
 
-      {/* Settings at bottom */}
-      <div className="px-3 pb-6">
-        <a
-          href="#"
-          className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-all duration-200 group"
-        >
-          <Settings className="w-5 h-5 text-gray-500 group-hover:text-gray-700" />
-          <span>Settings</span>
-        </a>
-      </div>
-    </div>
+            {/* Logout Button (Mobile) */}
+            <button
+              onClick={() => setIsOpen(true)}
+              className="flex flex-col items-center gap-1 text-[11px] text-red-500"
+            >
+              <div className="p-2 rounded-xl bg-red-100/60 hover:bg-red-200 transition">
+                <LogOut className="w-5 h-5" />
+              </div>
+              Logout
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {isOpen && (
+        <LogoutModel isOpen={isOpen} setIsOpen={setIsOpen} />
+      )}
+    </>
   );
 };
 

@@ -4,6 +4,8 @@ import crypto from "crypto";
 
 import { rozarPayInstance } from '../config/rozarpay.js';
 import Address from '../models/Address.js';
+import Product from '../models/product.js';
+import Store from '../models/store.js';
 // import { stripe } from "../../server.js";
 
 // you have to change the variant to productId
@@ -27,6 +29,18 @@ export const createCheckoutSession = async (req, res) => {
     const cartItems = await UserCart
       .findOne({ userId })
     const totalAmount = cartItems.products.reduce((acc, item) => item.unitPrice * item.quantity + acc, 0)
+    const productIds = cartItems.products.map(item => item.productId);
+
+    const products = await Product.find({
+      _id: { $in: productIds }
+    }).populate({
+      path: 'parentId',
+      select: 'storeId'
+    })
+    const storeIds = new Set();
+    for (let instance of products) {
+      storeIds.add(instance.parentId.storeId.toString());
+    }
     const options = {
       amount: totalAmount * 100,
       currency: "INR"
@@ -50,7 +64,8 @@ export const createCheckoutSession = async (req, res) => {
       shippingPrice: 0,
       totalPrice: totalAmount,
       deliveredAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
-      razorpayOrderId: razorpayOrder.id
+      razorpayOrderId: razorpayOrder.id,
+      storeId: [...storeIds][0]
     });
     return res.status(200).json({
       success: true,
@@ -106,7 +121,18 @@ export const createAndConfirmOrder = async (req, res) => {
       (acc, item) => acc + item.unitPrice * item.quantity,
       0
     );
+    const productIds = cart.products.map(item => item.productId);
 
+    const products = await Product.find({
+      _id: { $in: productIds }
+    }).populate({
+      path: 'parentId',
+      select: 'storeId'
+    })
+    const storeIds = new Set();
+    for (let instance of products) {
+      storeIds.add(instance.parentId.storeId.toString());
+    }
     const order = await Order.create({
       userId,
       orderItems: cart.products.map(item => ({
@@ -124,6 +150,7 @@ export const createAndConfirmOrder = async (req, res) => {
       shippingPrice: 0,
       totalPrice: totalAmount,
       deliveredAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+      storeId: [...storeIds][0]
     });
 
 
@@ -151,7 +178,7 @@ export const paymentVerification = async (req, res) => {
     } = req.body;
     const userId = req.user.userId;
     const userCart = await UserCart.findOne({ userId });
-    const order = await Order.findOne({ razorpayOrderId: razorpay_order_id,userId:userId }).sort({ createdAt: -1 })
+    const order = await Order.findOne({ razorpayOrderId: razorpay_order_id, userId: userId }).sort({ createdAt: -1 })
     if (!order) {
       return res.status(404).json({
         success: false,
@@ -254,11 +281,11 @@ export const getUserOrders = async (req, res) => {
 
     // Build filter query
     const filter = { userId };
-    
+
     if (status) {
       filter.orderStatus = status;
     }
-    
+
     // Calculate pagination
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
@@ -293,4 +320,50 @@ export const getUserOrders = async (req, res) => {
       error: error.message,
     });
   }
+};
+
+export const getAdminOrders = async (req, res) => {
+  try {
+    const ownerId = req.user.userId;
+    const storeId = await Store.findOne({ ownerId }).select('_id');
+    if (!storeId) {
+      return res.status(404).json({ success: false, message: "Store not found for this admin." });
+    }
+    const orders = await Order.find({ storeId: storeId._id })
+      .populate({
+        path: 'userId',
+        select: '_id fullName email phone userType isAdmin'
+      })
+      .populate({
+        path: 'shippingAddress',
+      })
+      .populate({
+        path: 'orderItems.productId',
+        select: 'title _id'
+      })
+      .sort({ createdAt: -1 });
+    res.status(200).json({ success: true, orders });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
+export const updateOrderStatus = async (req, res) => {
+  try {
+    const ownerId = req.user.userId;
+    const { orderId } = req.params;
+    const { orderStatus } = req.body;
+    const store = await Store.findOne({ ownerId }).select('_id');
+    if (!store) {
+      return res.status(404).json({ success: false, message: "Store not found for this admin." });
+    }
+    const order = await Order.findOne({ _id: orderId, storeId: store._id });
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found." });
+    }
+    order.orderStatus = orderStatus;
+    await order.save();
+    res.status(200).json({ success: true, message: "Order status updated successfully.", order });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  } 
 };

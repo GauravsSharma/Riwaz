@@ -20,66 +20,71 @@ interface Store {
   address: string;
 
 }
-interface Product{
+interface Product {
   _id: string;
   title: string;
   price: number;
-  originalPrice:number;
-  discountPercentage:number;
+  originalPrice: number;
+  discountPercentage: number;
   thumbnail: {
-    url:string,
-    public_id:string
+    url: string,
+    public_id: string
   };
 }
 
-interface SellerProduct{
-  _id: string;
-  title: string;
-  isActive: boolean;
-  stock: number;
-  price: number;
-  status:string
-  thumbnail: {
-    public_id: string;
-    url: string;
-  };
-  slug:string
-}
-interface BaseProduct{
-  _id:string,
-  title:string,
-  isParent:boolean
-  storeId:string,
-  varients:SellerProduct[]
-}
-
-interface MainProduct{
-  _id:string
-  title:string,
-  price:number,
-  originalPrice:number,
-  discountPercentage:number,
-  description:string,
-  images:[
-    {
-      url:string,
-      public_id:string
-    }
-  ],
+interface SellerProduct {
+  title: string,
+  _id: string,
+  price: number,
+  originalPrice: number,
+  stock: number,
+  description: string,
+  fabric: string,
+  work: string,
+  type: string,
   color: string,
-}
-interface Variant{
+  parentId: string,
   thumbnail:{
     url:string,
     public_id:string
   },
-  color:string,
-  _id:string
+  isActive:boolean
+}
+interface BaseProduct {
+  _id: string,
+  title: string,
+  isParent: boolean
+  storeId: string,
+  varients: SellerProduct[]
+}
+
+interface MainProduct {
+  _id: string
+  title: string,
+  price: number,
+  originalPrice: number,
+  discountPercentage: number,
+  description: string,
+  images: [
+    {
+      url: string,
+      public_id: string
+    }
+  ],
+  color: string,
+}
+interface Variant {
+  thumbnail: {
+    url: string,
+    public_id: string
+  },
+  color: string,
+  _id: string
 }
 
 interface ReviewUser {
   _id: string;
-  fullName:string
+  fullName: string
 }
 
 interface ProductReview {
@@ -89,7 +94,7 @@ interface ProductReview {
   userId: ReviewUser;
   createdAt: string;
 }
-interface RatingBreakdown{
+interface RatingBreakdown {
   1: number;
   2: number;
   3: number;
@@ -108,15 +113,15 @@ interface CartItem {
   originalPrice: number
 }
 interface Address {
-  type:"home"|"office"|"other"
-  _id:string,
+  _id: string,
   address: string,
   landmark: string,
   city: string,
-  state:string,
+  state: string,
   pincode: string,
   country: string,
-  isDefault: boolean
+  isDefault: boolean,
+  type: "home" | "work" | "other"
 }
 interface RazorpayOrder {
   id: string;
@@ -133,14 +138,14 @@ interface RazorpayOrder {
   created_at: number;    // UNIX timestamp (seconds)
 }
 
- interface OrderItem {
+interface OrderItem {
   productId: string;
   quantity: number;
   price: number;
   thumbnail: string;
 }
 
- interface Order {
+interface Order {
   id: string;
   items: OrderItem[];
   totalPrice: number;
@@ -169,19 +174,19 @@ interface UserOrder {
   createdAt: string;
   deliveredAt?: string;
 }
- interface RazorpayOrder {
+interface RazorpayOrder {
   id: string;
   amount: number;
   currency: "INR";
 }
 
- interface RazorpaySuccessResponse {
+interface RazorpaySuccessResponse {
   razorpay_payment_id: string;
   razorpay_order_id: string;
   razorpay_signature: string;
 }
 
- interface RazorpayOptions {
+interface RazorpayOptions {
   key: string;
   amount: number;
   currency: string;
@@ -200,4 +205,53 @@ interface UserOrder {
     color?: string;
   };
 }
+
+interface User {
+  _id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  userType: 'customer' | 'seller' | 'admin';
+  isAdmin: boolean;
+}
+interface AdminUser {
+  _id: string
+  fullName: string
+  email: string
+  phone: string
+  userType: 'customer' | 'seller' | 'admin'
+  isAdmin: boolean
+}
+interface AdminOrderItem {
+  productId: {
+    _id: string;
+    title: string;
+  };
+  quantity: number;
+  price: number;
+  color: string;
+  thumbnail: string;
+}
+
+interface AdminOrder {
+  _id: string;
+  userId: AdminUser;
+  orderItems: AdminOrderItem[];
+  shippingAddress: Address;
+  paymentMethod: 'COD' | 'Razorpay' | 'Stripe';
+  paymentMode?: 'upi' | 'card' | 'netbanking' | 'wallet';
+  paymentStatus: 'pending' | 'paid' | 'failed';
+  paymentId?: string;
+  itemsPrice: number;
+  shippingPrice: number;
+  totalPrice: number;
+  orderStatus: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
+  isCancelled: boolean;
+  cancelReason: string;
+  deliveredAt?: Date;
+  razorpayOrderId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 

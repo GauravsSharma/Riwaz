@@ -32,7 +32,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${figtree.variable} ${fraunces.variable} ${figtree.className}  antialiased`}>
         <QueryProvider>
-        <NextTopLoader color="white"/>
+        <NextTopLoader color="black"/>
           {children}
           <ToastContainer />
         </QueryProvider>

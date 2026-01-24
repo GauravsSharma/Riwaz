@@ -201,24 +201,18 @@ export const updateProduct = async (req, res) => {
 
   try {
     const { productId } = req.params;
-    const { title, description, fabric, work, type, stock, color, slug } = req.body;
+    const { title, description, fabric, work, type, stock, color, slug,price,originalPrice } = req.body;
     if (!productId) {
       return res.status(404).json({
         success: false,
         message: 'Product id not found'
       });
     }
-    const product = await Product.findById(productId).populate("storeId images")
+    const product = await Product.findById(productId)
     if (!product) {
       return res.status(400).json({
         success: false,
         message: 'Product not found'
-      });
-    }
-    if (product.storeId.ownerId.toString() !== userId.toString()) {
-      return res.status(401).json({
-        success: false,
-        message: 'You are not authorized to delete this product.'
       });
     }
     if (title) {
@@ -244,6 +238,12 @@ export const updateProduct = async (req, res) => {
     }
     if (color) {
       product.color = color;
+    }
+    if(price){
+      product.price = price
+    }
+    if(originalPrice){
+      product.originalPrice = originalPrice
     }
     await product.save();
     return res.status(200).json({

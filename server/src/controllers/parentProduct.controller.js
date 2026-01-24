@@ -1,5 +1,5 @@
 import ParentProduct from "../models/ParentProduct.js";
-
+import Store from "../models/store.js";
 export const createParentProduct = async (req, res) => {
     try {
         const { title, varients = [] ,storeId} = req.body;
@@ -22,16 +22,19 @@ export const createParentProduct = async (req, res) => {
     }
 };
 export const getParentProducts = async (req, res) => {
-    const {storeId} = req.params
+   const userId = req.user.userId;
+ 
     try {
-        if(!storeId){
-            return res.status(404).json({ success: false, message: 'StoreId needed' });
+        const store = await Store.findOne({ ownerId: userId });
+        if (!store) {
+            return res.status(404).json({ success: false, message: "Store not found" });
         }
-        const parentProducts = await ParentProduct.find({storeId}).select("title varients isParent _id storeId").populate({
+        
+        const parentProducts = await ParentProduct.find({storeId:store._id}).select("title varients isParent _id storeId").populate({
             path: "varients",
-            select: "_id title thumbnail price status stock slug isActive"
+            select: "_id title originalPrice thumbnail price status parentId color stock slug fabric work description isActive type"
         })
-        console.log(parentProducts);
+       
         
         res.status(200).json({
             success: true,

@@ -80,7 +80,12 @@ const orderSchema = new mongoose.Schema(
     razorpayOrderId: {
       type: String,
       default: null,
-    }
+    },
+    storeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Store', // references the Product model
+      required: true,
+    },
   },
   {
     timestamps: true,
