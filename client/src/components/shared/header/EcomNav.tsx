@@ -115,228 +115,239 @@ export default function Header() {
               </a>
             </div>
             <div className="flex gap-4">
-              {topLinks.map((l,index) => (
+              {topLinks.map((l, index) => (
 
-                <span key={l+index}>
+                <span key={l + index}>
 
-                  {l === "Become a Seller" ? <span key={l+index} className="cursor-pointer hover:underline"  onClick={() => {
+                  {l === "Become a Seller" ? <span key={l + index} className="cursor-pointer hover:underline" onClick={() => {
                     setBecomeASeller(true);
                     setIsLoginOpen(true);
                   }}>
                     {l}
-                  </span> : <span key={l+index} className="cursor-pointer hover:underline">
-                  {l}
-                </span > }
-            </span>
-              
+                  </span> : <span key={l + index} className="cursor-pointer hover:underline">
+                    {l}
+                  </span >}
+                </span>
+
               ))}
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-      {/* Desktop Header */ }
-  <header className="hidden lg:block bg-white border-b border-gray-200">
-    <div className="max-w-7xl mx-auto px-4 sm:px-2">
-      <div className="flex items-center justify-between h-20">
-        {/* Logo */}
-        <Link href="/" className="shrink-0">
-          <Image src="/logo.png" alt="Logo" width={150} height={150} />
-        </Link>
+      {/* Desktop Header */}
+      <header className="hidden lg:block bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-2">
+          <div className="flex items-center justify-between h-20">
+            {/* Logo */}
+            <Link href="/" className="shrink-0">
+              <Image src="/logo.png" alt="Logo" width={150} height={150} />
+            </Link>
 
-        {/* Navigation */}
-        <nav className="flex-1 flex justify-center">
-          <ul className="flex items-center space-x-6">
-            {navItems.map((item) => (
-              <li key={item}>
+            {/* Navigation */}
+            <nav className="flex-1 flex justify-center">
+              <ul className="flex items-center space-x-6">
+                {navItems.map((item) => (
+                  <li key={item}>
+                    <Link
+                      href={`/product-category?search=${item.toLowerCase()}`}
+                      className="text-gray-700 hover:text-pink-500 text-[15px] font-medium transition-colors"
+                    >
+                      {item}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            {/* Right Icons */}
+            <div className="flex items-center justify-center space-x-6">
+              <button className="text-gray-700 cursor-pointer hover:text-pink-500 transition-colors">
+                <Search className="w-5 h-5" onClick={() => setIsOpen(true)} />
+              </button>
+              {user ? (
+                <Link href="/account">
+                  <User className="w-5 h-5 cursor-pointer" />
+                </Link>
+              ) : (
+                <div
+                  onClick={() => {
+                    setBecomeASeller(false);
+                    setIsLoginOpen(true);
+                  }}
+                  className="text-gray-700 cursor-pointer hover:text-pink-500 text-[15px] font-medium transition-colors"
+                >
+                  Login
+                </div>
+              )}
+              <Link href="/cart">
+                <button className="relative cursor-pointer mt-2 text-gray-700 hover:text-pink-500 transition-colors">
+                  <ShoppingCart className="w-5 h-5" />
+                  <span className="absolute -top-2 -right-2 bg-gray-800 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {count}
+                  </span>
+                </button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile Header */}
+      <header className="lg:hidden bg-white border-b border-gray-200">
+        <div className="px-4">
+          <div className="flex items-center justify-between h-14">
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="text-gray-700"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+
+            {/* Logo */}
+            <Link href="/" className="shrink-0">
+              <Image src="/logo.png" alt="riwaz logo" width={150} height={150} />
+            </Link>
+
+            {/* Right Icons */}
+            <div className="flex items-center justify-center space-x-4">
+              <button className="text-gray-700 cursor-pointer">
+                <Search className="w-5 h-5"
+                  onClick={() => setIsOpen(true)}
+                />
+              </button>
+              <Link href="/cart">
+                <button className="relative cursor-pointer mt-2 text-gray-700">
+                  <ShoppingCart className="w-5 h-5" />
+                  <span className="absolute -top-1.5 -right-1.5 bg-gray-800 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                    {count}
+                  </span>
+                </button>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile menu content */}
+        {mobileMenuOpen && (
+          <div className="bg-white border-t border-gray-200">
+            <nav className="flex flex-col p-4 gap-3">
+              {navItems.map((item) => (
                 <Link
+                  key={item}
                   href={`/product-category?search=${item.toLowerCase()}`}
-                  className="text-gray-700 hover:text-pink-500 text-[15px] font-medium transition-colors"
+                  className="cursor-pointer hover:text-pink-500"
+                  onClick={() => setMobileMenuOpen(false)}
                 >
                   {item}
                 </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        {/* Right Icons */}
-        <div className="flex items-center justify-center space-x-6">
-          <button className="text-gray-700 cursor-pointer hover:text-pink-500 transition-colors">
-            <Search className="w-5 h-5" onClick={() => setIsOpen(true)} />
-          </button>
-          {user ? (
-            <Link href="/account">
-              <User className="w-5 h-5 cursor-pointer" />
-            </Link>
-          ) : (
-            <div
-              onClick={() => {
-                setBecomeASeller(false);
-                setIsLoginOpen(true);
-              }}
-              className="text-gray-700 cursor-pointer hover:text-pink-500 text-[15px] font-medium transition-colors"
-            >
-              Login
+              ))}
+            </nav>
+            <div className="flex flex-col p-4 gap-3 border-t font-bold text-sm text-zinc-700 border-zinc-400">
+              {
+                user ? <Link href={"/account"}>ACCOUNT</Link> : <p
+                className="cursor-pointer"
+                  onClick={() => {
+                    setBecomeASeller(true);
+                    setIsLoginOpen(true);
+                  }}
+                >LOGIN</p>
+              }
             </div>
-          )}
-          <Link href="/cart">
-            <button className="relative cursor-pointer mt-2 text-gray-700 hover:text-pink-500 transition-colors">
-              <ShoppingCart className="w-5 h-5" />
-              <span className="absolute -top-2 -right-2 bg-gray-800 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                {count}
-              </span>
-            </button>
-          </Link>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  {/* Mobile Header */ }
-  <header className="lg:hidden bg-white border-b border-gray-200">
-    <div className="px-4">
-      <div className="flex items-center justify-between h-14">
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="text-gray-700"
-        >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
-
-        {/* Logo */}
-        <Link href="/" className="shrink-0">
-          <Image src="/logo.png" alt="riwaz logo" width={150} height={150} />
-        </Link>
-
-        {/* Right Icons */}
-        <div className="flex items-center justify-center space-x-4">
-          <button className="text-gray-700 cursor-pointer">
-            <Search className="w-5 h-5"
-              onClick={() => setIsOpen(true)}
-            />
-          </button>
-          <Link href="/cart">
-            <button className="relative cursor-pointer mt-2 text-gray-700">
-              <ShoppingCart className="w-5 h-5" />
-              <span className="absolute -top-1.5 -right-1.5 bg-gray-800 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                {count}
-              </span>
-            </button>
-          </Link>
-        </div>
-      </div>
-    </div>
-
-    {/* Mobile menu content */}
-    {mobileMenuOpen && (
-      <div className="bg-white border-t border-gray-200">
-        <nav className="flex flex-col p-4 gap-3">
-          {navItems.map((item) => (
-            <Link
-              key={item}
-              href={`/product-category?search=${item.toLowerCase()}`}
-              className="cursor-pointer hover:text-pink-500"
-              onClick={() => setMobileMenuOpen(false)}
+          </div>
+        )}
+      </header>
+      {/* ================= SEARCH OVERLAY ================= */}
+      {
+        isOpen && (
+          <div
+            className="fixed backdrop-blur-xs z-100 top-0 pt-20 h-screen w-full flex justify-center items-start px-4"
+            onClick={handleClose}
+          >
+            <div
+              className="w-full max-w-2xl bg-white shadow-md rounded-lg"
+              onClick={(e) => e.stopPropagation()}
             >
-              {item}
-            </Link>
-          ))}
-        </nav>
-      </div>
-    )}
-  </header>
-  {/* ================= SEARCH OVERLAY ================= */ }
-  {
-    isOpen && (
-      <div
-        className="fixed backdrop-blur-xs z-100 top-0 pt-20 h-screen w-full flex justify-center items-start px-4"
-        onClick={handleClose}
-      >
-        <div
-          className="w-full max-w-2xl bg-white shadow-md rounded-lg"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="flex items-center gap-3 px-4 py-4 border-b border-slate-700">
-            <Search className="text-slate-400" />
-            <input
-              ref={inputRef}
-              value={searchQuery}
-              onChange={handleSearch}
-              placeholder="Search sarees..."
-              className="flex-1 bg-transparent outline-none text-black"
-            />
-            <X className="cursor-pointer" onClick={handleClose} />
-          </div>
+              <div className="flex items-center gap-3 px-4 py-4 border-b border-slate-700">
+                <Search className="text-slate-400" />
+                <input
+                  ref={inputRef}
+                  value={searchQuery}
+                  onChange={handleSearch}
+                  placeholder="Search sarees..."
+                  className="flex-1 bg-transparent outline-none text-black"
+                />
+                <X className="cursor-pointer" onClick={handleClose} />
+              </div>
 
-          <div className="p-4 overflow-y-auto">
-            {searchQuery ? (
-              <>
-                <h3 className="text-sm text-slate-400 mb-2">Suggested searches</h3>
-                {/* Suggestions fallback */}
-                {suggestionData?.suggestions?.length ? (
-                  suggestionData.suggestions.map((text: string, i: number) => (
-                    <div
-                      key={i}
-                      onClick={() => handleSuggestionClick(text)}
-                      className="p-2 hover:bg-pink-50 rounded cursor-pointer"
-                    >
-                      {text}
-                    </div>
-                  ))
+              <div className="p-4 overflow-y-auto">
+                {searchQuery ? (
+                  <>
+                    <h3 className="text-sm text-slate-400 mb-2">Suggested searches</h3>
+                    {/* Suggestions fallback */}
+                    {suggestionData?.suggestions?.length ? (
+                      suggestionData.suggestions.map((text: string, i: number) => (
+                        <div
+                          key={i}
+                          onClick={() => handleSuggestionClick(text)}
+                          className="p-2 hover:bg-pink-50 rounded cursor-pointer"
+                        >
+                          {text}
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-slate-400">No suggestions found</p>
+                    )}
+
+                    <h3 className="text-sm text-slate-400 mt-4 mb-2">Products</h3>
+                    {/* Products fallback */}
+                    {productData?.products?.length ? (
+                      productData.products.map((p: {
+                        _id: string;
+                        title: string;
+                        price: number;
+                        thumbnail: { url: string };
+                      }) => (
+                        <div
+                          key={p._id}
+                          onClick={() => handleProductClick(p._id)}
+                          className="flex gap-3 p-3 hover:bg-pink-50 rounded cursor-pointer"
+                        >
+                          <Image
+                            src={p.thumbnail.url}
+                            alt={p.title}
+                            width={64}
+                            height={64}
+                            className="w-16 h-16 rounded object-cover"
+                          />
+                          <div>
+                            <p className="text-black">{p.title}</p>
+                            <p className="text-sm text-slate-400">
+                              ₹{p.price.toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-slate-400 mt-2">No products found</p>
+                    )}
+                  </>
                 ) : (
-                  <p className="text-slate-400">No suggestions found</p>
+                  <p className="text-slate-400">No results</p>
                 )}
-
-                <h3 className="text-sm text-slate-400 mt-4 mb-2">Products</h3>
-                {/* Products fallback */}
-                {productData?.products?.length ? (
-                  productData.products.map((p: {
-                    _id: string;
-                    title: string;
-                    price: number;
-                    thumbnail: { url: string };
-                  }) => (
-                    <div
-                      key={p._id}
-                      onClick={() => handleProductClick(p._id)}
-                      className="flex gap-3 p-3 hover:bg-pink-50 rounded cursor-pointer"
-                    >
-                      <Image
-                        src={p.thumbnail.url}
-                        alt={p.title}
-                        width={64}
-                        height={64}
-                        className="w-16 h-16 rounded object-cover"
-                      />
-                      <div>
-                        <p className="text-black">{p.title}</p>
-                        <p className="text-sm text-slate-400">
-                          ₹{p.price.toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-slate-400 mt-2">No products found</p>
-                )}
-              </>
-            ) : (
-              <p className="text-slate-400">No results</p>
-            )}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    )
-  }
+        )
+      }
 
-  {/* ================= LOGIN MODAL ================= */ }
-  <LoginModal
-    isOpen={isLoginOpen}
-    setIsOpen={setIsLoginOpen}
-    becomeASeller={becomeASeller}
-  />
+      {/* ================= LOGIN MODAL ================= */}
+      <LoginModal
+        isOpen={isLoginOpen}
+        setIsOpen={setIsLoginOpen}
+        becomeASeller={becomeASeller}
+      />
     </div >
   );
 }
