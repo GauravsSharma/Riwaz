@@ -1,8 +1,8 @@
 import api from "@/lib/axios";
 import { useProductStore } from "@/stores/buyer/products.store";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 
-interface SingleProduct{
+interface SingleProduct {
   product: MainProduct;
   variants: Variant[];
   success: boolean;
@@ -13,22 +13,46 @@ export interface ProductRecommendationResponse {
   products: Product[];
 }
 
-export interface ProductSuggestionResponse{
-  success:boolean;
-  suggestions:string[]
+export interface ProductSuggestionResponse {
+  success: boolean;
+  suggestions: string[]
 }
-export const useGetProducts = (query:string) => {
-  const setProducts = useProductStore((s) => s.setProducts);
-  return useQuery<Product[]>({
-    queryKey: ["product-store",query],
-    queryFn: async () => {
-      const res = await api.get(`/product/search${query}`);
-      setProducts(res.data.products);
-    // console.log("Data------------>",res.data);
-      return res.data.products;
+interface QueryResponse {
+  products: Product[],
+  totalPages: number,
+  page: number
+}
+export const useGetProducts = (query: string) => {
+  return useInfiniteQuery<QueryResponse>({
+    queryKey: ["product-store", query],
+    initialPageParam: 1,
+    queryFn: async ({ pageParam = 1 }) => {
+      const res = await api.get(
+        `/product/search${query}&page=${pageParam}&limit=8`
+      );
+      return res.data;
+    },
+
+    getNextPageParam: (lastPage, allpages) => {
+      if (lastPage.page < lastPage.totalPages) {
+        return allpages.length + 1;
+      }
+      return undefined;
     },
   });
 };
+
+
+export const useGetProductByType = (type: string) => {
+  return useQuery<Product[]>({
+    queryKey:["get-products-by-type",type],
+    queryFn: async () => {
+      const res = await api.get(`/product/type/${type}`)
+      return res.data.products
+    }
+  })
+}
+
 
 export const useGetSingleProduct = () => {
   return useQuery<SingleProduct>({
@@ -40,18 +64,18 @@ export const useGetSingleProduct = () => {
   });
 };
 export const useGetMainProduct = (productId: string) => {
-    const setMainProduct = useProductStore((s) => s.setMainProduct);
-    const setVariants = useProductStore((s) => s.setVariants);
+  const setMainProduct = useProductStore((s) => s.setMainProduct);
+  const setVariants = useProductStore((s) => s.setVariants);
 
-    return useQuery<MainProduct>({
-        queryKey: ["main-product", productId],
-        queryFn: async () => {
-            const res = await api.get(`/product/id/${productId}`)
-            setMainProduct(res.data.product);
-            setVariants(res.data.variants)
-            return res.data.product;
-        },
-    });
+  return useQuery<MainProduct>({
+    queryKey: ["main-product", productId],
+    queryFn: async () => {
+      const res = await api.get(`/product/id/${productId}`)
+      setMainProduct(res.data.product);
+      setVariants(res.data.variants)
+      return res.data.product;
+    },
+  });
 };
 
 export const useGetProductRecommendation = (searchQuery: string) => {
@@ -66,12 +90,12 @@ export const useGetProductRecommendation = (searchQuery: string) => {
 
       const response = await api.get(
         `/product/search/suggestions?q=${query}`,
-       {
-       headers: {
-        "Cache-Control": "no-cache",
-         Pragma: "no-cache",
-       }
-      }
+        {
+          headers: {
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
+          }
+        }
 
       );
 
@@ -95,12 +119,12 @@ export const useGetSearchRecommendation = (searchQuery: string) => {
 
       const response = await api.get(
         `/product/query?q=${query}`,
-       {
-       headers: {
-        "Cache-Control": "no-cache",
-         Pragma: "no-cache",
-       }
-      }
+        {
+          headers: {
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
+          }
+        }
 
       );
 

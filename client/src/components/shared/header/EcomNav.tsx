@@ -44,7 +44,7 @@ export default function Header() {
     "Georgette Sarees",
   ];
 
-  const topLinks = ["Track Order", "Contact Us", "Become a Seller"];
+  const topLinks = ["Contact Us", "Become a Seller"];
 
   // Debounce the search query to avoid too many API calls
   const debounceQuery = useDebounce(searchQuery, 500);

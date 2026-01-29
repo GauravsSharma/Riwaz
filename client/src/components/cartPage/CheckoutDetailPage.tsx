@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { useClearCart, useCreateCheckoutSession, useCreateOrder } from '@/hooks/buyer/useUserCart';
 import { useAddressStore } from '@/stores/buyer/address.user';
 import { useRouter } from 'next/navigation';
+import AddNewAddressForm from '../models/AddAddresseModel';
 
 // Types
 // interface Address {
@@ -231,7 +232,7 @@ export default function CheckoutDetailPage({
   const setTotalDiscountedAmount = useUserCart(s=>s.setTotalDiscountedAmount)
   const [showOrderSummary, setShowOrderSummary] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
-  const [, setIsModalOpen] = useState(false);
+  const [isModelOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
   const handleSelectAddress = (id: string) => {
     setCheckoutData({ ...checkoutData, selectedAddressId: id });
@@ -333,6 +334,7 @@ export default function CheckoutDetailPage({
           onSelectMethod={handleSelectPaymentMethod}
           onPlaceOrder={handlePlaceOrder}
         />
+        <AddNewAddressForm isOpen={isModelOpen} setIsOpen={setIsModalOpen}/>
       </div>
     </div>
   );

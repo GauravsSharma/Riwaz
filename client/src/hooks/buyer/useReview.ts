@@ -1,7 +1,7 @@
 import api from "@/lib/axios";
 import { useReviewStore } from "@/stores/buyer/review.store";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { toast } from "react-toastify";
+
 interface ReviewDataPayload {
   productId: string,
   rating: number,
@@ -13,6 +13,8 @@ interface reviewResponse {
   totalReviews: number,
   ratingBreakdown: RatingBreakdown
 }
+
+
 export const useGetReviews = (productId: string) => {
   const setReviewData = useReviewStore(s => s.setReviewData)
   return useQuery<reviewResponse>({
@@ -36,20 +38,12 @@ export const useAddReview = () => {
     },
   });
 };
-export const useDeleteReview = (id: string) => {
-  const removeSingleReview = useReviewStore(s => s.removeSingleReview)
+export const useDeleteReview = () => {
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async (id:string) => {
       const res = await api.delete(`/review/${id}`);
       return res.data.id;
     },
-    onSuccess: (data) => { 
-      removeSingleReview(data)
-      toast.success("Review deleted successfully");
-    },
-
-    onError: () => {
-      toast.error("Failed to delete review. Please try again.");
-    }
+   
   });
 };

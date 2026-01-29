@@ -5,6 +5,7 @@ import { X, Image as ImageIcon, ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface AddReviewDialogProps {
     isOpen: boolean;
@@ -27,7 +28,7 @@ const AddReviewDialog = ({ isOpen, onClose }: AddReviewDialogProps) => {
     const [photos, setPhotos] = useState<File[]>([]);
     const { mutate, isPending } = useAddReview()
     const mainProduct = useProductStore(s => s.mainProduct)
-    
+    const queryClient  = useQueryClient()
     const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             setPhotos(Array.from(e.target.files));
@@ -60,6 +61,7 @@ const AddReviewDialog = ({ isOpen, onClose }: AddReviewDialogProps) => {
             onSuccess: () => {
                 toast.success("Review posted.")
                 handleClose();
+                queryClient.invalidateQueries({queryKey:["review-store"]})
             },
             onError: (error: ApiError) => {
                 toast.error(error.message)

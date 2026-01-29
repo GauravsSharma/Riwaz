@@ -42,7 +42,8 @@ const Cart_Card = ({
   // Debounce timer ref
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
   const user = useUserStore(s => s.user)
-  
+const lastSyncedQuantity = useRef(quan);
+
   // Sync with prop changes (when cart data refetches)
   useEffect(() => {
     setQuantity(quan);
@@ -50,7 +51,9 @@ const Cart_Card = ({
 
   // Debounced API call
   useEffect(() => {
-    if(!user) return;
+    if (!user) return;
+    
+     if (quantity === lastSyncedQuantity.current) return;
     // Clear existing timer
     if (debounceTimer.current) {
       clearTimeout(debounceTimer.current);
@@ -62,6 +65,7 @@ const Cart_Card = ({
         { productId, quantity },
         {
           onSuccess: () => {
+             lastSyncedQuantity.current = quantity;
             queryClient.invalidateQueries({ queryKey: ['cart-summary-store'] });
           },
           onError: () => {
@@ -79,13 +83,13 @@ const Cart_Card = ({
         clearTimeout(debounceTimer.current);
       }
     };
-  }, [quantity, productId, quan, queryClient, updateQuantity,user]);
+  }, [quantity, productId, quan, queryClient, updateQuantity, user]);
 
   const handleQuantityChange = (type: 'increase' | 'decrease') => {
-    
+
     if (user) {
       console.log(user);
-      
+
       if (type === 'increase') {
         setQuantity(prev => prev + 1);
       } else if (type === 'decrease') {

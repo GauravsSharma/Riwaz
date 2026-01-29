@@ -6,36 +6,42 @@ export default function SareeCategorySection() {
     {
       url: "/images/banarsi.webp",
       title: "Banarasi",
+      link: "/product-category?search=banari sarees",
       description: "Timeless elegance woven in silk",
       gradient: "from-purple-600/20 to-pink-600/20"
     },
     {
       url: "/images/baluchari.jpg",
       title: "Baluchari",
+      link: "/product-category?search=baluchari sarees",
       description: "Stories woven in every thread",
       gradient: "from-amber-600/20 to-red-600/20"
     },
     {
       url: "/images/kanjeevaram.jpg",
       title: "Kanjivaram",
+      link: "/product-category?search=kanjivaram sarees",
       description: "South Indian silk heritage",
       gradient: "from-emerald-600/20 to-teal-600/20"
     },
     {
       url: "/images/paithani.jpg",
-      title: "Paithani",
+      title: "Silk Woven",
+      link: "/product-category?search=silk woven",
       description: "Maharashtrian artistry at its finest",
       gradient: "from-fuchsia-600/20 to-purple-600/20"
     },
     {
       url: "/images/bhandhni.webp",
       title: "Bandhani",
+      link: "/product-category?search=bandhani sarees",
       description: "Vibrant tie-dye traditions",
       gradient: "from-rose-600/20 to-orange-600/20"
     },
     {
       url: "/images/chanderi.jpg",
       title: "Chanderi",
+      link: "/product-category?search=chanderi sarees",
       description: "Sheer elegance from Madhya Pradesh",
       gradient: "from-blue-600/20 to-indigo-600/20"
     }
@@ -61,6 +67,7 @@ export default function SareeCategorySection() {
               key={index} 
               url={item.url} 
               title={item.title}
+              link={item.link}
               description={item.description}
               gradient={item.gradient}
             />

@@ -5,20 +5,18 @@ import HomeSections from '@/components/sections/HomeSection'
 import ProductDetailed from '@/components/sections/ProductDetailed'
 import SareeCategorySection from '@/components/sections/SareeCategorySection'
 import SareeStoreSection from '@/components/sections/SareeStoreSection'
-import { useGetProducts, useGetSingleProduct } from '@/hooks/buyer/useProducts'
+import { useGetProductByType, useGetSingleProduct } from '@/hooks/buyer/useProducts'
 import { useGetCartSummary, useMergeCart } from '@/hooks/buyer/useUserCart'
-import { useCurrentUser } from '@/hooks/useUser'
 import { useUserCart } from '@/stores/buyer/cart.user'
 import { useUserStore } from '@/stores/user.store'
 import { useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 
 const Page = () => {
-  const { isLoading } = useCurrentUser();
-  const { isPending: isNormalSareesLoading, data: normalSarees } = useGetProducts(`?search=georgette%2Csarees&limit=4`);
-  const { isPending: isBaluchariSareesLoading, data: baluchariSarees } = useGetProducts("?search=baluchari%2Csarees&limit=4");
-  const { isPending: isSilkSareesLoading, data: silkSarees } = useGetProducts("?search=silk%2Csarees&limit=4");
+  
+  const { isPending: isNormalSareesLoading, data: normalSarees } = useGetProductByType(`Banarasi`);
+  const { isPending: isBaluchariSareesLoading, data: baluchariSarees } = useGetProductByType("Baluchari");
+  const { isPending: isSilkSareesLoading, data: silkSarees } = useGetProductByType("Bandhani");
   const { isLoading: singleProductLoading, data } = useGetSingleProduct()
   // console.log(data?.variants);
   const user = useUserStore((s) => s.user);
@@ -26,7 +24,7 @@ const Page = () => {
   const queryClient = useQueryClient();
   useGetCartSummary()
   const setCount = useUserCart((s) => s.setCount);
-  const router = useRouter();
+
   const hasMergedRef = useRef(false);
  useEffect(() => {
   if (!user) {
@@ -56,12 +54,7 @@ const Page = () => {
     });
   }, [user,mergeCart, queryClient]);
 
-  useEffect(() => {
-    if (!isLoading && user?.userType === "seller") {
-      router.push("/admin/dashboard");
-    }
 
-  }, [user, isLoading,router]);
 
 
   return (
@@ -100,7 +93,7 @@ const Page = () => {
           ))
         }
       </div>}
-      {!isSilkSareesLoading && silkSarees && <HomeSections products={silkSarees} title={"Silk Woven Sarees"} discription={"Best silk woven sarees stock only at riwaz."} />}
+      {!isSilkSareesLoading && silkSarees && <HomeSections products={silkSarees} title={"Bandhani Sarees"} discription={"Best bandhani sarees stock only at riwaz."} />}
       {isSilkSareesLoading && <div className="flex justify-center flex-wrap gap-2 gap-y-2 mt-20 md:mt-34">
         {
           [1, 2, 3, 4].map((_, i) => (

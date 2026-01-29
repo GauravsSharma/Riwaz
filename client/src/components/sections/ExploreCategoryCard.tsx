@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { JSX, useState } from 'react';
 
 interface CategoryParam {
@@ -6,18 +7,21 @@ interface CategoryParam {
   title: string;
   description: string;
   gradient: string;
+  link:string
 }
 
 export default function ExploreCategoryCard({ 
   url, 
   title, 
   description, 
-  gradient 
+  gradient ,
+  link
 }: CategoryParam): JSX.Element {
   const [isHovered, setIsHovered] = useState<boolean>(false);
   
   return (
-    <div 
+    <Link 
+    href={link}
       className="relative overflow-hidden cursor-pointer transition-all duration-500 transform hover:scale-105 hover:shadow-2xl group h-80 sm:h-96 md:h-[400px]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -46,6 +50,6 @@ export default function ExploreCategoryCard({
       <div className={`absolute top-4 right-4 bg-white/95 text-gray-800 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-500 ${isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
         Premium
       </div>
-    </div>
+    </Link>
   );
 }

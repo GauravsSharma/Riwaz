@@ -1,27 +1,35 @@
 import { AlertTriangle, X } from 'lucide-react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
 import { useDeleteReview } from '@/hooks/buyer/useReview';
+import { toast } from 'react-toastify';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface DeleteReviewDialogProps {
     reviewId: string;
     isOpen: boolean;
     setIsOpen: (isOpen: boolean) => void;
 }
-const DeleteReviewDialog: React.FC<DeleteReviewDialogProps> = ({ reviewId, isOpen, setIsOpen }) => {
-    const { mutate: deleteReview,isPending } = useDeleteReview(reviewId);
+const DeleteReviewDialog: React.FC<DeleteReviewDialogProps> = ({ reviewId, setIsOpen }) => {
+    const { mutate: deleteReview, isPending, isSuccess, isError } = useDeleteReview();
+    const queryClient = useQueryClient()
     const handleDelete = () => {
-        deleteReview()
-        setIsOpen(false);
+        deleteReview(reviewId)
     };
+    useEffect(() => {
+        if (isSuccess) {
+            toast.success("Review posted")
+            setIsOpen(false)
+            queryClient.invalidateQueries({ queryKey: ["review-store"] })
+        }
+        if (isError) {
+            toast.error("Something went wrong.")
+        }
+    }, [isError, isSuccess,queryClient,setIsOpen])
 
     return (
-       <>
-         {
-            isOpen && (
-                 <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4"
-        >
-              <div className="fixed inset-0 bg-black/30 bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <>
+            <div className="fixed inset-0 bg-black/30 bg-opacity-50 flex items-center justify-center p-4 z-50">
                     <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 relative animate-fadeIn">
                         <button
                             onClick={() => setIsOpen(false)}
@@ -54,13 +62,14 @@ const DeleteReviewDialog: React.FC<DeleteReviewDialogProps> = ({ reviewId, isOpe
                                 className={`px-4 py-2 cursor-pointer flex justify-center items-center gap-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium ${isPending ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                                 Delete
-                                {isPending && <FormSubmissionLoader/>}
+                                {isPending && <FormSubmissionLoader />}
                             </button>
                         </div>
                     </div>
                 </div>
+               
 
-            <style>{`
+                <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;
@@ -75,10 +84,8 @@ const DeleteReviewDialog: React.FC<DeleteReviewDialogProps> = ({ reviewId, isOpe
           animation: fadeIn 0.2s ease-out;
         }
       `}</style>
-        </div>
-            )
-         }
-       </>
+           
+        </>
     );
 };
 

@@ -4,6 +4,8 @@ import User from '../models/user.js';
 import { sendOTP } from '../utils/sendOtp.js';
 import { createUserCart } from '../utils/helper.js';
 
+const isProd = process.env.NODE_ENV === "production";
+
 // Replace with your secret key
 
 
@@ -78,22 +80,15 @@ export const verifyOtp = async (req, res) => {
 
         // Generate JWT token
         const token = jwt.sign({ userId: user.id, phone: user.phone, userType: user.userType }, process.env.JWT_SECRET, { expiresIn: '30d' });
-         await createUserCart(user._id);
+        await createUserCart(user._id);
+        
         res.cookie("token", token, {
             httpOnly: true,
-            secure: false,
-            sameSite: "lax",
-            path: "/",
-            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-        });
-
-        res.cookie("userType", user.userType, {
-            secure: false,
-            sameSite: "lax",
+            secure: isProd,
+            sameSite: isProd ? "none" : "lax",
             path: "/",
             maxAge: 30 * 24 * 60 * 60 * 1000,
         });
-       
         // Send response to frontend
         return res.status(200).json({
             message: "OTP verified successfully.",
@@ -183,7 +178,7 @@ export const getAddresses = async (req, res) => {
 }
 export const addAddress = async (req, res) => {
     try {
-        const { landmark, address, state, city, pincode,isDefault } = req.body;
+        const { landmark, address, state, city, pincode, isDefault } = req.body;
         const userId = req.user.userId;
         const user = await User.findById(userId);
         if (!user) {
@@ -200,12 +195,12 @@ export const addAddress = async (req, res) => {
             pincode,
             userId,
             country: "India",
-            isDefault:isDefault||true,
-            type:"home"
+            isDefault: isDefault || true,
+            type: "home"
         })
         user.address.push(new_address._id)
         await user.save();
-        return res.status(200).json({ success: true, address:new_address });
+        return res.status(200).json({ success: true, address: new_address });
     } catch (error) {
         return res.status(500).json({ success: false, message: `Internal server error: ${error}` });
     }
@@ -240,7 +235,7 @@ export const updateAddress = async (req, res) => {
             db_address.pincode = pincode;
         }
         await db_address.save();
-        return res.status(200).json({ success: true, address:db_address });
+        return res.status(200).json({ success: true, address: db_address });
 
     } catch (error) {
         return res.status(500).json({ success: false, message: `Internal server error: ${error}` });

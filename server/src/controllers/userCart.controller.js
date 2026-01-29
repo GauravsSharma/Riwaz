@@ -1,11 +1,11 @@
+import redisClient from "../config/redis.js";
 import Product from "../models/product.js";
 import UserCart from "../models/userCart.js";
 
 export const addToCart = async (req, res) => {
   try {
     const { productId, quantity } = req.body;
-    console.log(quantity);
-    
+
     const userId = req.user.userId;
 
     const product = await Product.findById(productId)
@@ -16,7 +16,7 @@ export const addToCart = async (req, res) => {
 
     let userCart = await UserCart.findOne({ userId });
     if (!userCart) {
-       return res.status(400).json({ success:false, message: "UserCart not found. Please login first" });
+      return res.status(400).json({ success: false, message: "UserCart not found. Please login first" });
     }
     const index = userCart.products.findIndex(
       (pro) => pro.productId.toString() === productId
@@ -25,18 +25,20 @@ export const addToCart = async (req, res) => {
     if (index === -1) {
       userCart.products.push({
         productId,
-        quantity:quantity,
-        originalPrice:product.originalPrice,
+        quantity: quantity,
+        originalPrice: product.originalPrice,
         title: product.title,
         unitPrice: product.price,
         color: product.color,
         thumbnail: product.thumbnail.url,
-        discountPercentage:product.discountPercentage
+        discountPercentage: product.discountPercentage
       });
     } else {
       userCart.products[index].quantity += quantity; // increment quantity
     }
     await userCart.save();
+
+    await redisClient.del(`cart:${userId}`);
 
     res.status(200).json({
       success: true,
@@ -44,11 +46,11 @@ export const addToCart = async (req, res) => {
       cartItem: {
         productId,
         title: product.title,
-        quantity:index===-1?userCart.products[0].quantity:userCart.products[index].quantity,
+        quantity: index === -1 ? userCart.products[0].quantity : userCart.products[index].quantity,
         unitPrice: product.price,
         color: product.color,
-        originalPrice:product.price,
-        discountPercentage:product.discountPercentage,
+        originalPrice: product.price,
+        discountPercentage: product.discountPercentage,
         thumbnail: product.thumbnail.url
       },
     });
@@ -60,7 +62,16 @@ export const addToCart = async (req, res) => {
 
 export const getCart = async (req, res) => {
   try {
+
     const userId = req.user.userId;
+
+    const cachedCart = await redisClient.get(`cart:${userId}`);
+    if (cachedCart) {
+      return res.status(200).json({
+        success: true,
+        cartItems: JSON.parse(cachedCart)
+      })
+    }
     const userCart = await UserCart.findOne({ userId });
     if (!userCart) {
       return res.status(404).json({
@@ -68,6 +79,14 @@ export const getCart = async (req, res) => {
         message: "No item found in the cart"
       })
     }
+
+    await redisClient.setEx(
+      `cart:${userId}`,
+      1800,
+      JSON.stringify(userCart.products)
+    );
+
+
     return res.status(200).json({
       success: true,
       cartItems: userCart.products
@@ -115,6 +134,7 @@ export const updateCart = async (req, res) => {
     for (const update of updates) {
       userCart.products[update.index].quantity = update.quantity;
     }
+    await redisClient.del(`cart:${userId}`);
 
     await userCart.save();
     return res.status(200).json({
@@ -159,6 +179,9 @@ export const removeItemFromCart = async (req, res) => {
     }
     userCart.products.splice(index, 1);
     await userCart.save()
+
+    await redisClient.del(`cart:${userId}`);
+
     return res.status(200).json({
       success: true,
       message: "Item removed",
@@ -171,8 +194,6 @@ export const removeItemFromCart = async (req, res) => {
     })
   }
 }
-//clearCart - Remove all items from cart at once
-// Useful after checkout or when user wants to start fresh
 
 export const clearCart = async (req, res) => {
   try {
@@ -180,6 +201,9 @@ export const clearCart = async (req, res) => {
     const userCart = await UserCart.findOne({ userId });
     userCart.products = [];
     await userCart.save();
+
+    await redisClient.del(`cart:${userId}`);
+
     return res.status(200).json({
       success: true,
       message: "Cart Cleared successfully."
@@ -217,8 +241,6 @@ export const getCartSummary = async (req, res) => {
   }
 }
 
-//updateItemQuantity - Update single item quantity
-// More efficient than updating entire cart for one item
 export const updateItemQuantity = async (req, res) => {
   try {
     const { productId, quantity } = req.body;
@@ -239,6 +261,9 @@ export const updateItemQuantity = async (req, res) => {
     }
     userCart.products[index].quantity = quantity;
     await userCart.save();
+
+    await redisClient.del(`cart:${userId}`);
+
     return res.status(200).json({
       success: true,
       cartItem: userCart.products[index]
@@ -255,7 +280,7 @@ export const updateItemQuantity = async (req, res) => {
 // mergeCart - Merge guest cart with user cart after login
 export const mergeCart = async (req, res) => {
   try {
-    const {cartItems} = req.body;
+    const { cartItems } = req.body;
     const userId = req.user.userId;
 
     if (!Array.isArray(cartItems)) {
@@ -294,8 +319,8 @@ export const mergeCart = async (req, res) => {
         existingItem.quantity += item.quantity;
       } else {
         userCart.products.push({
-          discountPercentage:product.discountPercentage,
-          originalPrice:product.originalPrice,
+          discountPercentage: product.discountPercentage,
+          originalPrice: product.originalPrice,
           title: product.title,
           productId: product._id,
           unitPrice: product.price,
@@ -307,6 +332,8 @@ export const mergeCart = async (req, res) => {
     }
 
     await userCart.save();
+
+    await redisClient.del(`cart:${userId}`);
 
     return res.status(200).json({
       success: true,
@@ -320,7 +347,6 @@ export const mergeCart = async (req, res) => {
     });
   }
 };
-
 
 // validateCart - Check if items are still in stock/valid before checkout
 export const validateCart = async (req, res) => {
@@ -364,7 +390,3 @@ export const validateCart = async (req, res) => {
     });
   }
 }
-
-//how user will place the order
-// payment gateway integration
-// user profle update 

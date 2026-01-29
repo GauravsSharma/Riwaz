@@ -13,6 +13,7 @@ router.get('/search', searchProducts);
 router.get("/search/suggestions", getSearchSuggestions); // /search/suggestions?q=your-query
 router.get('/query', useGetProductRecommendationByQuery);// /query?q=your-query
 router.get('/single', getSingleProduct);
+router.get('/type/:type', getProductsByType);
 router.get('/id/:id', getProductById);
 
 //seller routes

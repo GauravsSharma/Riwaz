@@ -33,7 +33,7 @@ export default function Page() {
         {user && (
           <div
             onClick={() => setIsLogoutModelOpen(true)}
-            className="bg-red-500 cursor-pointer hover:bg-red-600 text-white font-medium py-3 px-6 rounded transition-colors"
+            className="bg-red-500 hidden sm:block cursor-pointer hover:bg-red-600 text-white font-medium py-3 px-6 rounded transition-colors"
           >
             LOG OUT
           </div>

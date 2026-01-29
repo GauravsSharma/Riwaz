@@ -22,7 +22,11 @@ const Page = () => {
               <OrderCard key={order._id} order={order} />
             )) : <p className="text-gray-600">You have no orders yet.</p>
           }
+          {
+            (!data || data.length === 0) && <div className='flex text-xl text-zinc-600 font-semibold justify-center flex-col w-full items-center gap-5'>No orders found !!</div>
+          }
         </div>
+
       </div>
     </div>
   )

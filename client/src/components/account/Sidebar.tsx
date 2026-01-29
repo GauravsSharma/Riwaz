@@ -4,16 +4,18 @@ import {
   User, 
   RefreshCw, 
   ShoppingBag, 
-   
-  MapPin 
+  MapPin,
+  LogOut
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import LogoutModel from "../models/LogoutModel";
 
 export default function ProfileSidebar() {
   const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
+    const [isLogoutModelOpen, setIsLogoutModelOpen] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -29,6 +31,10 @@ export default function ProfileSidebar() {
     // Cleanup
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  const handleLogout = () => {
+  setIsLogoutModelOpen(true)
+  };
 
   const menuItems = [
     {
@@ -86,42 +92,66 @@ export default function ProfileSidebar() {
     );
   }
 
-  // Mobile Bottom Navigation
+  // Mobile Bottom Navigation with Glassmorphism
   return (
     <>
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
-        <nav className="flex justify-around items-center px-2 py-3">
-          {menuItems.map((item, index) => {
-            const IconComponent = item.icon;
-            const isActive = pathname === item.href;
+      <div className="fixed bottom-0 left-0 right-0 z-50">
+        {/* Glassmorphism container */}
+        <div className="mx-4 mb-4 rounded-2xl backdrop-blur-xl bg-white/70 border border-white/20 shadow-2xl">
+          <nav className="flex justify-around items-center px-2 py-4">
+            {menuItems.map((item, index) => {
+              const IconComponent = item.icon;
+              const isActive = pathname === item.href;
 
-            return (
-              <Link
-                key={index}
-                href={item.href}
-                className={`flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-all ${
-                  isActive
-                    ? "text-red-500"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                <div className={`relative ${isActive ? 'scale-110' : ''} transition-transform`}>
-                  {isActive && (
-                    <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-red-500 rounded-full" />
-                  )}
-                  <IconComponent className={`h-6 w-6 ${isActive ? 'stroke-[2.5]' : 'stroke-2'}`} />
-                </div>
-                <span className={`text-xs mt-1 font-medium ${isActive ? 'text-red-500' : 'text-gray-600'}`}>
-                  {item.label.split(' ')[0]}
-                </span>
-              </Link>
-            );
-          })}
-        </nav>
+              return (
+                <Link
+                  key={index}
+                  href={item.href}
+                  className={`flex flex-col items-center justify-center px-2 py-2 rounded-xl transition-all duration-300 ${
+                    isActive
+                      ? "text-red-500"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  <div className={`relative ${isActive ? 'scale-110' : ''} transition-transform duration-300`}>
+                    {isActive && (
+                      <div className="absolute -inset-2 bg-red-500/10 rounded-full blur-md" />
+                    )}
+                    {isActive && (
+                      <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-gradient-to-r from-red-400 to-red-600 rounded-full shadow-lg" />
+                    )}
+                    <IconComponent className={`h-6 w-6 relative z-10 ${isActive ? 'stroke-[2.5]' : 'stroke-2'}`} />
+                  </div>
+                  <span className={`text-xs mt-1.5 font-medium ${isActive ? 'text-red-500' : 'text-gray-600'}`}>
+                    {item.label.split(' ')[0]}
+                  </span>
+                </Link>
+              );
+            })}
+            
+            {/* Logout Button */}
+            <button
+              onClick={handleLogout}
+              className="flex flex-col items-center justify-center px-2 py-2 rounded-xl transition-all duration-300 text-gray-600 hover:text-red-500"
+            >
+              <div className="relative transition-transform duration-300 hover:scale-110">
+                <LogOut className="h-6 w-6 stroke-2" />
+              </div>
+              <span className="text-xs mt-1.5 font-medium">
+                Logout
+              </span>
+            </button>
+          </nav>
+        </div>
+            {isLogoutModelOpen && (
+        <LogoutModel
+          isOpen={isLogoutModelOpen}
+          setIsOpen={setIsLogoutModelOpen}
+        />
+      )}
       </div>
 
-      {/* Mobile spacing to prevent content from being hidden behind bottom nav */}
-      {/* <div className="h-20"></div> */}
+    
     </>
   );
 }

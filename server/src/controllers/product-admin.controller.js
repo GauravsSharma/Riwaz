@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 import cloudinary from '../config/cloudinary.js';
 import { getDiscountPercentage } from '../utils/helper.js';
 import ParentProduct from '../models/ParentProduct.js';
+import { invalidateProductCaches } from '../utils/redis.utils.js';
 
 // 06-11-25 test this api and create add prodcut as a variant api
 
@@ -47,7 +48,7 @@ export const createProduct = async (req, res) => {
 
     // Create Product
     const newProduct = await Product.create(
-      [{ title, description, slug: slugValue, fabric, work, type, stock, color, price,originalPrice,discountPercentage,parentId }],
+      [{ title, description, slug: slugValue, fabric, work, type, stock, color, price, originalPrice, discountPercentage, parentId }],
       { session }
     );
 
@@ -75,7 +76,7 @@ export const createProduct = async (req, res) => {
     await session.commitTransaction();
     const productWithRelations = await Product.findById(newProduct[0]._id)
       .populate('tags')
-   
+    await invalidateProductCaches()
     return res.status(201).json({
       message: 'Product created successfully.',
       product: productWithRelations,
@@ -123,7 +124,7 @@ export const uploadMedia = async (req, res) => {
         url: result.secure_url,
         public_id: result.public_id,
         altText: meta_data[i].type || "",
-        isPrimary: meta_data[i].type==="front",
+        isPrimary: meta_data[i].type === "front",
       });
       if (meta_data[i].type === "front") {
         thumbnail.url = result.secure_url
@@ -155,40 +156,40 @@ export const getStoreProducts = async (req, res) => {
     // If storeId is provided, verify store exists
     if (!storeId) {
       return res.status(404).json({
-          success: false,
-          message: 'StoreId not found'
-        });
-    }
-     const store = await Store.findById(storeId);
-      if (!store) {
-        return res.status(404).json({
-          success: false,
-          message: 'Store not found'
-        });
-      }
-      if(store.ownerId.toString() !== req.user.userId.toString()){
-        return res.status(401).json({
-          success: false,
-          message: 'You are not authorized to view products of this store.'
-        });
-      }
-      const storeProducts = await ParentProduct.find({ storeId }) 
-        .limit(10)               
-        .select('title price thumbnail stock _id isActive');
-
-      console.log(storeProducts);
-
-      if (!storeProducts.length) {
-        return res.status(404).json({
-          message: 'No products found in this store'
-        });
-      }
-
-      return res.status(200).json({
-        message: 'Store products retrieved successfully',
-        count: storeProducts.length,
-        products: storeProducts
+        success: false,
+        message: 'StoreId not found'
       });
+    }
+    const store = await Store.findById(storeId);
+    if (!store) {
+      return res.status(404).json({
+        success: false,
+        message: 'Store not found'
+      });
+    }
+    if (store.ownerId.toString() !== req.user.userId.toString()) {
+      return res.status(401).json({
+        success: false,
+        message: 'You are not authorized to view products of this store.'
+      });
+    }
+    const storeProducts = await ParentProduct.find({ storeId })
+      .limit(10)
+      .select('title price thumbnail stock _id isActive');
+
+    console.log(storeProducts);
+
+    if (!storeProducts.length) {
+      return res.status(404).json({
+        message: 'No products found in this store'
+      });
+    }
+
+    return res.status(200).json({
+      message: 'Store products retrieved successfully',
+      count: storeProducts.length,
+      products: storeProducts
+    });
   } catch (error) {
     return res.status(500).json({
       message: 'Failed to fetch products',
@@ -201,7 +202,7 @@ export const updateProduct = async (req, res) => {
 
   try {
     const { productId } = req.params;
-    const { title, description, fabric, work, type, stock, color, slug,price,originalPrice } = req.body;
+    const { title, description, fabric, work, type, stock, color, slug, price, originalPrice } = req.body;
     if (!productId) {
       return res.status(404).json({
         success: false,
@@ -239,13 +240,17 @@ export const updateProduct = async (req, res) => {
     if (color) {
       product.color = color;
     }
-    if(price){
+    if (price) {
       product.price = price
     }
-    if(originalPrice){
+    if (originalPrice) {
       product.originalPrice = originalPrice
     }
     await product.save();
+
+    await invalidateProductCaches(productId
+
+    )
     return res.status(200).json({
       success: true,
       message: 'Product updated successfully',
@@ -259,7 +264,6 @@ export const updateProduct = async (req, res) => {
     });
 
   }
-
 }
 
 export const deleteProduct = async (req, res) => {
@@ -280,7 +284,7 @@ export const deleteProduct = async (req, res) => {
       });
     }
     const parent = await ParentProduct.findById(product.parentId).populate("storeId")
-    console.log(parent)
+
     if (parent.storeId.ownerId.toString() !== userId.toString()) {
       return res.status(401).json({
         success: false,
@@ -292,12 +296,15 @@ export const deleteProduct = async (req, res) => {
       await cloudinary.uploader.destroy(image.public_id);
       await image.deleteOne();
     }
-    const idx = parent.varients.map((v)=>v.toString()===productId);
-    if(idx!==-1){
-      parent.varients.splice(idx,1);
+    const idx = parent.varients.map((v) => v.toString() === productId);
+    if (idx !== -1) {
+      parent.varients.splice(idx, 1);
     }
     await parent.save();
     await product.deleteOne();
+
+    await invalidateProductCaches(productId)
+    await redisClient.del(`product:review:${productId}`)
     return res.status(200).json({
       success: true,
       message: 'Product deleted'

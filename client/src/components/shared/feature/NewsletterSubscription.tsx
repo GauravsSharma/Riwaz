@@ -11,8 +11,8 @@ const NewsletterSubscription = () => {
   };
 
   return (
-    <div className="bg-white py-12 px-6">
-      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-center">
+    <div className="bg-white py-12 px-6 sm:px-16 md:px-24">
+      <div className="w-full mx-auto grid md:grid-cols-2 gap-15 items-center">
         {/* Left Side - Title and Description */}
         <div>
           <h2 className="text-3xl font-bold text-gray-900 mb-4">

@@ -2,7 +2,6 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import Stripe from "stripe";
 
 import userRoutes from "../src/routes/user.route.js";
 import storeRoutes from "../src/routes/store.route.js";
@@ -13,7 +12,6 @@ import orderRoute from "../src/routes/order.route.js";
 import parentProduct from "../src/routes/parentProduct.route.js";
 import dashboardRoutes from "../src/routes/dashboard.route.js";
 import connectDB from "../src/db/db.js";
-
 const app = express();
 app.use(
   cors({
@@ -27,8 +25,6 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 connectDB();
-
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 app.use("/api/user", userRoutes);
 app.use("/api/store", storeRoutes);

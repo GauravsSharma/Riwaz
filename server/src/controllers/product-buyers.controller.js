@@ -1,4 +1,7 @@
 import Product from "../models/product.js";
+import redisClient from "../config/redis.js";
+import { generateProductCacheKey } from "../utils/redis.utils.js";
+
 
 // customers
 export const getProducts = async (req, res) => {
@@ -38,7 +41,7 @@ export const getSingleProduct = async (req, res) => {
       parentId: product[0].parentId,
       _id: { $ne: product[0]._id }   // exclude current product
     }).select("thumbnail color _id");
-    res.status(200).json({ success: true, product:product[0], variants });
+    res.status(200).json({ success: true, product: product[0], variants });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
@@ -47,17 +50,29 @@ export const getSingleProduct = async (req, res) => {
 
 export const getProductById = async (req, res) => {
   try {
-    
-
     const { id } = req.params;
     if (!id) {
       return res.status(400).json({ message: "Product ID is required" });
     }
-    
+
+    const productCache = await redisClient.get(`product:${id}`);
+    const varientCache = await redisClient.get(`product:varients:${id}`);
+
+    if (productCache && varientCache) {
+      const product = JSON.parse(productCache);
+      const variants = JSON.parse(varientCache);
+      return res.status(200).json({
+        success: true,
+        product,
+        variants
+      })
+    }
+
+
     const product = await Product.findById(id)
       .populate({
         path: "tags",
-        select: "name slug"   // choose whatever fields you need
+        select: "name"   // choose whatever fields you need
       })
       .populate({
         path: "images",
@@ -66,12 +81,15 @@ export const getProductById = async (req, res) => {
 
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
-
     }
     const variants = await Product.find({
       parentId: product.parentId,
-      _id: { $ne: product._id }   // exclude current product
+      _id: { $ne: product._id }
     }).select("thumbnail color _id");
+
+    await redisClient.setEx(`product:${id}`, 500, JSON.stringify(product));
+    await redisClient.setEx(`product:varients:${id}`, 500, JSON.stringify(variants));
+
     res.status(200).json({ success: true, product, variants });
   } catch (error) {
     console.error(error);
@@ -80,9 +98,9 @@ export const getProductById = async (req, res) => {
 }
 // customers
 export const searchProducts = async (req, res) => {
- try {
+  try {
     const {
-      limit=5,
+      limit = 10,
       search,
       priceMin,
       priceMax,
@@ -95,51 +113,50 @@ export const searchProducts = async (req, res) => {
       sortOrder = 'desc'
     } = req.query;
 
+    const query = { isActive: true };
 
-    // Build the query object
-    const query = { isActive: true }; // Only show active products
-
-    // Text search on title and description
     if (search) {
       query.$text = { $search: search };
     }
 
-    // Price range filter
     if (priceMin || priceMax) {
       query.price = {};
       if (priceMin) query.price.$gte = Number(priceMin);
       if (priceMax) query.price.$lte = Number(priceMax);
     }
 
-    // Color filter (case-insensitive partial match)
     if (color) {
       query.color = { $regex: color, $options: 'i' };
     }
 
-    // Type filter (exact match from enum)
     if (type) {
       query.type = type;
     }
 
-    // Fabric filter (exact match from enum)
     if (fabric) {
       query.fabric = fabric;
     }
 
-    // Work filter (exact match from enum)
     if (work) {
       query.work = work;
     }
-
-    // Calculate pagination
     const skip = (Number(page) - 1) * Number(limit);
 
-    // Build sort object
     const sort = {};
     if (search) {
-      sort.score = { $meta: 'textScore' }; // Sort by text relevance if searching
+      sort.score = { $meta: 'textScore' };
     }
     sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+
+    console.log(query);
+    const cachedKey = generateProductCacheKey(req.query)
+    const cachedData = await redisClient.get(cachedKey);
+    if (cachedData) {
+      const data = JSON.parse(cachedData);
+      return res.status(200).json({
+        ...data
+      });
+    }
     // Execute query with pagination
     const products = await Product.find(query)
       .select('title price thumbnail originalPrice discountPercentage')
@@ -150,17 +167,24 @@ export const searchProducts = async (req, res) => {
 
     // Get total count for pagination
     const total = await Product.countDocuments(query);
+    const response = {
+      success: true,
+      totalPages: Math.ceil(total / limit),
+      page: Number(page),
+      limit: Number(limit),
+      products: products,
+    }
+    await redisClient.setEx(cachedKey, 180, JSON.stringify(response))
 
     res.status(200).json({
-      success: true,
-      products: products,
-  });
+      ...response
+    });
   } catch (error) {
     console.error("Error in getProductsByQuery:", error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
       message: "Server Error",
-      error: error.message 
+      error: error.message
     });
   }
 };
@@ -169,14 +193,17 @@ export const useGetProductRecommendationByQuery = async (req, res) => {
   try {
     const { q } = req.query;
 
-
-
     if (!q || q.trim().length === 0) {
       return res.status(200).json([]);
     }
 
     const keyword = q.trim();
-
+    const queryKey = `product-recommendation-by-query:${keyword}`
+    const cachedData = await redisClient.get(queryKey);
+    if (cachedData) {
+      const products = JSON.parse(cachedData);
+      return res.status(200).json({ success: true, products });
+    }
     const products = await Product.find({
       isActive: true,
       $or: [
@@ -192,12 +219,15 @@ export const useGetProductRecommendationByQuery = async (req, res) => {
       .select("title slug price thumbnail type")
       .limit(5);
 
-    res.status(200).json({success:true,products});
+    await redisClient.setEx(queryKey, 90, JSON.stringify(products))
+
+    res.status(200).json({ success: true, products });
   } catch (error) {
     console.error("Search error:", error);
-    res.status(500).json({ success:false,message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 export const getSearchSuggestions = async (req, res) => {
   try {
     const { q } = req.query;
@@ -207,7 +237,12 @@ export const getSearchSuggestions = async (req, res) => {
     }
 
     const keyword = q.trim();
-
+    const queryKey = `product0search-suggestions-by-query:${keyword}`
+    const cachedData = await redisClient.get(queryKey);
+    if (cachedData) {
+      const suggestions = JSON.parse(cachedData);
+      return res.status(200).json({ success: true, suggestions });
+    }
     const products = await Product.find({
       isActive: true,
       $or: [
@@ -237,14 +272,14 @@ export const getSearchSuggestions = async (req, res) => {
         suggestionsSet.add(`${p.work} saree`);
       }
     });
-
-    res.status(200).json({success:true,suggestions:[...suggestionsSet].slice(0, 8)});
+    const suggestions = [...suggestionsSet].slice(0, 8);
+    await redisClient.setEx(queryKey, 120, JSON.stringify(suggestions));
+    res.status(200).json({ success: true, suggestions });
   } catch (err) {
     console.error("Suggestion error:", err);
-    res.status(500).json({ success:false,message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
-
 
 export const getProductsByType = async (req, res) => {
   try {
@@ -252,13 +287,22 @@ export const getProductsByType = async (req, res) => {
     if (!type) {
       return res.status(400).json({ message: "Product type is required" });
     }
-  
+    const queryKey = `product-by-type:${type}`
+    const cachedData = await redisClient.get(queryKey);
+    if (cachedData) {
+      return res.status(200).json({
+        products: JSON.parse(cachedData)
+      })
+    }
     const products = await Product.find({
       type: type,
       isActive: true,
     })
       .select("title price thumbnail originalPrice discountPercentage _id")
       .limit(4)
+
+    await redisClient.set(queryKey, JSON.stringify(products))
+
     res.status(200).json({
       success: true,
       products
@@ -268,11 +312,3 @@ export const getProductsByType = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
-
-
-//review product route
-
-
-// add to card route
-// product review route
-// get similar products route

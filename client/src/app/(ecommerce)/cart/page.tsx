@@ -114,13 +114,13 @@ const ShoppingCartPage = () => {
 };
 
   if (isLoading) {
-    return <div className='h-screen bg-amber-200 flex justify-center items-center'>Loading...</div>
+    return <div className='h-screen bg-purple-200 flex justify-center text-xl font-semibold items-center'>Loading...</div>
   }
   if(!items || items.length === 0){
     return <EmptyCart/>
   }
   return (
-    <div className="min-h-screen bg-gray-50 relative mt-34">
+    <div className="min-h-screen bg-gray-50 relative mt-24 md:mt-34">
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           {/* Cart Items Section */}

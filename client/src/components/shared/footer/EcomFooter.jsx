@@ -88,8 +88,8 @@ const EcomFooter = () => {
                     <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
                   </svg>
                 </div>
-                <Link href="mailto:support@powerlook.in" className="text-blue-600 text-sm hover:text-blue-800 transition-colors">
-                  support@powerlook.in
+                <Link href="mailto:support@riwaz.in" className="text-blue-600 text-sm hover:text-blue-800 transition-colors">
+                  support@riwaz.in
                 </Link>
               </div>
               
@@ -119,7 +119,7 @@ const EcomFooter = () => {
           <div>
             <h3 className="text-md font-medium text-gray-900 mb-6">REGISTERED OFFICE ADDRESS</h3>
             <div className="text-gray-600 leading-relaxed">
-              <p className="font-medium">Powerlook Apparels Pvt Ltd</p>
+              <p className="font-medium">Riwaz Apparels Pvt Ltd</p>
               <p className="mt-2 text-sm">
                 Lotus Corporate Park Wing G02 - 1502, Ram Mandir Lane, off Western Express Highway, Goregaon, Mumbai, 400063
               </p>
@@ -133,7 +133,7 @@ const EcomFooter = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between">
             <div className="mb-4 sm:mb-0">
-              <h4 className="text-lg font-medium text-gray-900">Experience The Powerlook App</h4>
+              <h4 className="text-lg font-medium text-gray-900">Experience The Riwaz App</h4>
             </div>
             <div className="flex space-x-4">
               <Link href="#" className="block">
@@ -232,7 +232,7 @@ const EcomFooter = () => {
       <div className="bg-white border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <p className="text-center text-gray-500 text-sm">
-            © 2025 www.powerlook.in. All rights reserved.
+            © 2025 www.riwaz.in. All rights reserved.
           </p>
         </div>
       </div>
