@@ -246,10 +246,10 @@ export default function Header() {
             </nav>
             <div className="flex flex-col p-4 gap-3 border-t font-bold text-sm text-zinc-700 border-zinc-400">
               {
-                user ? <Link href={"/account"}>ACCOUNT</Link> : <p
+                user ? <Link href={"/account"} onClick={() => setMobileMenuOpen(false)}>ACCOUNT</Link> : <p
                 className="cursor-pointer ml-1"
                   onClick={() => {
-                    setBecomeASeller(true);
+                    setBecomeASeller(false);
                     setIsLoginOpen(true);
                   }}
                 >LOGIN</p>
