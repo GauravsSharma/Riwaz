@@ -247,7 +247,7 @@ export default function Header() {
             <div className="flex flex-col p-4 gap-3 border-t font-bold text-sm text-zinc-700 border-zinc-400">
               {
                 user ? <Link href={"/account"}>ACCOUNT</Link> : <p
-                className="cursor-pointer"
+                className="cursor-pointer ml-1"
                   onClick={() => {
                     setBecomeASeller(true);
                     setIsLoginOpen(true);
