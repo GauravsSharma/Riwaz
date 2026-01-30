@@ -62,7 +62,6 @@ export interface AddressResponse {
   addresses: Address[];
 }
 
-
 // ------------------------
 // GET current user
 // ------------------------

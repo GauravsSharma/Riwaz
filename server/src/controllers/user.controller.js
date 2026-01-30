@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import Address from '../models/Address.js';
 import User from '../models/user.js';
-import { sendOTP } from '../utils/sendOtp.js';
+// import { sendOTP } from '../utils/sendOtp.js';
 import { createUserCart } from '../utils/helper.js';
 
 const isProd = process.env.NODE_ENV === "production";
@@ -34,11 +34,12 @@ export const login = async (req, res) => {
         await user.save();
 
         // Send OTP via Twilio or other SMS provider
-        await sendOTP(phone, otp);
+        // await sendOTP(phone, otp);
 
         return res.status(200).json({
             success: true,
             message: "OTP sent successfully.",
+            otp,
             otpExpires,
         });
     } catch (error) {
@@ -123,11 +124,12 @@ export const becomeASeller = async (req, res) => {
         await user.save();
 
         // Send OTP via Twilio
-        await sendOTP(phone, otp);
+        // await sendOTP(phone, otp);
 
         return res.status(200).json({
             message: 'OTP sent successfully.',
             otpExpires,
+            otp
         });
 
     }

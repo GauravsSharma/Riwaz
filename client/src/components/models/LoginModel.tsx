@@ -1,40 +1,63 @@
 import { useSendOtp, useVerifyOtp } from '@/hooks/useUser';
-import { X } from 'lucide-react';
+import { X, Copy, Check } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
+interface OTPResponse{
+success:boolean,
+otp:string,
+otpExpires:string,
+message:string
+}
 
-export default function LoginModal({ isOpen, setIsOpen,becomeASeller }: { isOpen: boolean, setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,becomeASeller:boolean }) {
-  //   const [isOpen, setIsOpen] = useState(true);
+
+
+export default function LoginModal({ isOpen, setIsOpen, becomeASeller }: { isOpen: boolean, setIsOpen: React.Dispatch<React.SetStateAction<boolean>>, becomeASeller: boolean }) {
   const [mobileNumber, setMobileNumber] = useState('');
   const [receiveOffers, setReceiveOffers] = useState(true);
   const [showOptInput, setShowOtpInput] = useState(false);
   const [otp, setOtp] = useState('');
-  const {mutate:sendOtpMutation,isPending} = useSendOtp();
-  const {mutate:verifyOtpMutation,isPending:isVerifyOptPending} = useVerifyOtp();
+  const [recievedOtp, setRecievedOtp] = useState('');
+  const [copied, setCopied] = useState(false);
+  const { mutate: sendOtpMutation, isPending } = useSendOtp();
+  const { mutate: verifyOtpMutation, isPending: isVerifyOptPending } = useVerifyOtp();
 
   const handleClose = () => {
     setIsOpen(false);
   };
 
+  
+  const handleCopyOtp = async () => {
+   try {
+    await navigator.clipboard.writeText(String(recievedOtp));
+    setCopied(true);
+    toast.success("OTP copied to clipboard!");
+
+    setTimeout(() => setCopied(false), 2000);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      toast.error(err.message);
+    } else {
+      toast.error("Failed to copy OTP");
+    }
+  }
+  };
 
   const handleContinue = async () => {
     if (mobileNumber.length !== 10) {
       toast.error("Enter valid number");
       return;
     }
-     
-    console.log(mobileNumber+""+mobileNumber);
-
     sendOtpMutation(
       { phone: "+91" + mobileNumber },
       {
-        onSuccess: () => {
+        onSuccess: (data:OTPResponse) => {
+          setRecievedOtp(data.otp);
           setShowOtpInput(true);
           toast.success("OTP sent!");
         },
         onError: (error) => toast.error(`Failed to send OTP: ${error}`),
-      } 
+      }
     );
   };
 
@@ -48,16 +71,20 @@ export default function LoginModal({ isOpen, setIsOpen,becomeASeller }: { isOpen
       {
         onSuccess: () => {
           toast.success("Login successful!");
+          setRecievedOtp('')
+          setMobileNumber('')
+          setOtp('')
           setIsOpen(false);
         },
         onError: () => toast.error("Invalid OTP"),
       }
     );
   };
+
   return (
     <>
       {
-       isOpen && <div className="fixed inset-0 bg-black/75 bg-opacity-50 flex items-center justify-center z-50 p-4 ">
+        isOpen && <div className="fixed inset-0 bg-black/75 bg-opacity-50 flex items-center justify-center z-50 p-4 ">
           <div className="bg-white rounded-sm shadow-xl max-w-xl w-full mx-4 relative">
             {/* Close button */}
             <button
@@ -97,12 +124,42 @@ export default function LoginModal({ isOpen, setIsOpen,becomeASeller }: { isOpen
                   />
                 </div>
               </div>
+
+              {/* OTP Display Card - Show when OTP is received */}
+              {recievedOtp && showOptInput && (
+                <div className="mb-4 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <p className="text-xs text-gray-600 mb-1">Your OTP Code</p>
+                      <p className="text-2xl font-bold text-purple-700 tracking-wider">
+                        {recievedOtp}
+                      </p>
+                    </div>
+                    <button
+                      onClick={handleCopyOtp}
+                      className="ml-4 flex items-center gap-2 bg-white hover:bg-purple-50 text-purple-600 px-4 py-2 rounded-lg border border-purple-200 transition-all duration-200 hover:shadow-md"
+                    >
+                      {copied ? (
+                        <>
+                          <Check size={18} />
+                          <span className="text-sm font-medium">Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy size={18} />
+                          <span className="text-sm font-medium">Copy</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {showOptInput && <div className="mb-6">
                 <label className="block text-gray-600 text-sm font-medium mb-3">
                   OTP <span className="text-red-500">*</span>
                 </label>
                 <div className="flex border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-pink-200 focus-within:border-pink-300">
-
                   <input
                     type="tel"
                     value={otp}
@@ -136,25 +193,23 @@ export default function LoginModal({ isOpen, setIsOpen,becomeASeller }: { isOpen
 
               {/* Continue button */}
               {!showOptInput && <button
-                        disabled={isPending && mobileNumber.length!==10}
-                        onClick={handleContinue}
-                        className={`flex-1 flex justify-center w-full items-center gap-2 bg-purple-600 text-white px-4 py-3 cursor-pointer rounded-lg hover:bg-purple-700 transition-colors font-medium ${
-                            isPending ? "bg-purple-500 cursor-not-allowed" : ""
-                        }`}
-                    >
-                        Continue
-                        {isPending && <FormSubmissionLoader />}
-                    </button>}
+                disabled={isPending && mobileNumber.length !== 10}
+                onClick={handleContinue}
+                className={`flex-1 flex justify-center w-full items-center gap-2 bg-purple-600 text-white px-4 py-3 cursor-pointer rounded-lg hover:bg-purple-700 transition-colors font-medium ${isPending ? "bg-purple-500 cursor-not-allowed" : ""
+                  }`}
+              >
+                Continue
+                {isPending && <FormSubmissionLoader />}
+              </button>}
               {showOptInput && <button
-                        disabled={isVerifyOptPending}
-                        onClick={handleSubmit}
-                        className={`flex-1 flex w-full justify-center items-center gap-2 bg-purple-600 text-white px-4 py-3 cursor-pointer rounded-lg hover:bg-purple-700 transition-colors font-medium ${
-                            isVerifyOptPending ? "bg-purple-500 cursor-not-allowed" : ""
-                        }`}
-                    >
-                        Submit
-                        {isVerifyOptPending && <FormSubmissionLoader />}
-                    </button>}
+                disabled={isVerifyOptPending}
+                onClick={handleSubmit}
+                className={`flex-1 flex w-full justify-center items-center gap-2 bg-purple-600 text-white px-4 py-3 cursor-pointer rounded-lg hover:bg-purple-700 transition-colors font-medium ${isVerifyOptPending ? "bg-purple-500 cursor-not-allowed" : ""
+                  }`}
+              >
+                Submit
+                {isVerifyOptPending && <FormSubmissionLoader />}
+              </button>}
             </div>
           </div>
         </div>
