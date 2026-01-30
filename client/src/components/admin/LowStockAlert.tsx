@@ -7,8 +7,9 @@ interface LowStockItem {
   threshold: number;
 }
 
-const LowStockAlert: React.FC<{ items: LowStockItem[] }> = ({ items }) => (
-  <div className="bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50 rounded-2xl shadow-sm border border-rose-200 p-6 hover:shadow-lg transition-shadow">
+const LowStockAlert: React.FC<{ items: LowStockItem[] }> = ({ items }) => {
+  if(!items) return;
+  return  <div className="bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50 rounded-2xl shadow-sm border border-rose-200 p-6 hover:shadow-lg transition-shadow">
     <div className="flex items-center gap-2 mb-6">
       <div className="p-2 bg-rose-500 rounded-lg shadow-md">
         <AlertTriangle className="w-5 h-5 text-white" />
@@ -39,5 +40,5 @@ const LowStockAlert: React.FC<{ items: LowStockItem[] }> = ({ items }) => (
       ))}
     </div>
   </div>
-);
+}
 export default LowStockAlert;

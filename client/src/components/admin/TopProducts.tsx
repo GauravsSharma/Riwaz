@@ -8,8 +8,9 @@ interface Product {
   image: string;
 }
 
-const TopProducts: React.FC<{ products: Product[] }> = ({ products }) => (
-  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-shadow">
+const TopProducts: React.FC<{ products: Product[] }> = ({ products }) => {
+  if(!products || products.length==0) return;
+  return  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-shadow">
     <div className="flex items-center gap-2 mb-6">
       <Award className="w-5 h-5 text-amber-500" />
       <h2 className="text-lg font-bold text-gray-900">Top Products</h2>
@@ -59,6 +60,6 @@ const TopProducts: React.FC<{ products: Product[] }> = ({ products }) => (
       ))}
     </div>
   </div>
-);
+}
 
 export default TopProducts;

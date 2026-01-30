@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import React, { useEffect } from 'react'
 import { toast } from 'react-toastify';
 import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
+import { useSellerStore } from '@/stores/seller/store.store';
 interface ApiError extends Error {
   response?: {
     data?: {
@@ -19,11 +20,12 @@ const AddStoreModel = ({
   storeData,
   isDialogOpen,
   setIsDialogOpen,
-
+  setSelectedStore
 }: {
   storeData?: Store,
   isDialogOpen: boolean;
   setIsDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setSelectedStore: (data: Store | undefined) => void;
 }) => {
 
   const [formData, setFormData] = React.useState<FormData>({
@@ -31,16 +33,16 @@ const AddStoreModel = ({
     description: storeData ? storeData.description : "",
     address: storeData ? storeData.address : ""
   });
-  const {mutate:createStoreMutation,isPending:isAddPending} = useCreateStore()
-  const {mutate:updateStore,isPending:isUpdatPending} = useUpdateStore();
-
+  const { mutate: createStoreMutation, isPending: isAddPending } = useCreateStore()
+  const { mutate: updateStore, isPending: isUpdatPending } = useUpdateStore();
+  const addStore = useSellerStore(s=>s.createStore)
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   }
-  const isPending = storeData?isUpdatPending:isAddPending;
+  const isPending = storeData ? isUpdatPending : isAddPending;
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.description || !formData.address) {
@@ -51,6 +53,7 @@ const AddStoreModel = ({
       updateStore({ data: formData, id: storeData._id }, {
         onSuccess: () => {
           toast.success("Store updated successfully");
+          setSelectedStore(undefined)
           setIsDialogOpen(false);
         },
         onError: (error: ApiError) => {
@@ -59,9 +62,11 @@ const AddStoreModel = ({
       })
     } else {
       createStoreMutation(formData, {
-        onSuccess: () => {
+        onSuccess: (store:Store) => {
           toast.success("Store created successfully");
           setIsDialogOpen(false);
+          setSelectedStore(undefined)
+          addStore(store)
         },
         onError: (error: ApiError) => {
           toast.error(error.response?.data?.message || "Something went wrong");
@@ -69,24 +74,24 @@ const AddStoreModel = ({
       });
     }
   };
-  useEffect(()=>{
-    if(storeData){
+  useEffect(() => {
+    if (storeData) {
       const data = {
-        name:storeData.name,
-        address:storeData.address,
-        description:storeData.description
+        name: storeData.name,
+        address: storeData.address,
+        description: storeData.description
       }
       setFormData(data)
     }
-  },[storeData])
-  
+  }, [storeData])
+
   return (
     <div>
       {isDialogOpen && (
         <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-in fade-in duration-200">
             <div className="flex justify-between items-center p-6 border-b border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-900">{storeData?"Update Store":"Add new store"}</h2>
+              <h2 className="text-2xl font-bold text-gray-900">{storeData ? "Update Store" : "Add new store"}</h2>
               <button
                 onClick={() => setIsDialogOpen(false)}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -154,7 +159,7 @@ const AddStoreModel = ({
                   onClick={handleSubmit}
                   className={`px-4 py-2 cursor-pointer w-1/2 flex justify-center items-center gap-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-medium ${isPending ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  {storeData?"Update":"Add Store"}
+                  {storeData ? "Update" : "Add Store"}
                   {isPending && <FormSubmissionLoader />}
                 </button>
               </div>

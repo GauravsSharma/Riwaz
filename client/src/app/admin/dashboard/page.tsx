@@ -17,11 +17,14 @@ import AdminPageHeading from '@/components/headings/AdminPageHeading';
 import StatCardSkeleton from '@/components/loaders/StatCardSkeleton';
 import RevenueOverviewChartSkeleton from '@/components/loaders/RevenueOverviewChartSkeleton ';
 import SalesBreakdownSkeleton from '@/components/loaders/SalesBreakdownSkeleton';
+import StoreNotFound from '@/components/shared/retry/StoreNotFound';
+import Retry from '@/components/shared/retry/Retry';
+import { AxiosError } from 'axios';
 
 const AdminDashboard: React.FC = () => {
 
 
-  const { data, isLoading } = useGetDashboardStates()
+  const { data, isLoading,error } = useGetDashboardStates()
   const { data: lowStock } = useGetLowStock()
   const { data: topProducts} = useGetTopThree()
   const { data: recentOrders } = useGetRecentOrders()
@@ -30,6 +33,18 @@ const AdminDashboard: React.FC = () => {
   const {
     data: revenue, isLoading: isRevenuesLoading
   } = useGetRevenuesByFilters(period);
+
+ if (error) {
+  const axiosError = error as AxiosError;
+
+  const statusCode = axiosError.response?.status;
+
+  if (statusCode === 404) {
+    return <StoreNotFound />;
+  }
+
+  return <Retry />;
+}
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 px-8 py-12">

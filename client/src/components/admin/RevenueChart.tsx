@@ -34,6 +34,10 @@ const periodLabelMap = {
 };
 
 const RevenueOverviewChart = ({ data, onPeriodChange }: Props) => {
+  if(!data){
+    return;
+  }
+  
   return (
     <div className="bg-white rounded-xl shadow-md p-6 w-full">
       {/* Header */}

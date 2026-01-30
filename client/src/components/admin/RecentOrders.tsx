@@ -9,6 +9,10 @@ interface Order {
 }
 
 const RecentOrders: React.FC<{ orders: Order[] }> = ({ orders }) => {
+    if(!orders || orders.length ===0){
+    return;
+  }
+  
   const statusStyles = {
     delivered: "bg-emerald-50 text-emerald-700 border-emerald-200",
     pending: "bg-amber-50 text-amber-700 border-amber-200",

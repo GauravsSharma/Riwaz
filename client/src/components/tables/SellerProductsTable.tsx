@@ -118,7 +118,7 @@ const SareeProductTable = ({
               <div className="flex items-center gap-3">
                 <span className="text-gray-400 text-sm">└─</span>
                 <Image
-                  src={variant.thumbnail?.url || "https://sudathi.com/cdn/shop/files/4292S921_4.jpg?v=1756404457&width=750"}
+                  src={variant.thumbnail?.url || "https://images.unsplash.com/photo-1769521140317-5c6dcd1266e7?q=80&w=875&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"}
                   alt={variant.title}
                   height={48}
                   width={48}

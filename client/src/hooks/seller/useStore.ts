@@ -28,7 +28,7 @@ export const useCreateStore = () => {
   return useMutation({
     mutationFn: async (data: StoreDataPayload) => {
       const res = await api.post("/store", data);
-      return res.data;
+      return res.data.store;
     },
   });
 };

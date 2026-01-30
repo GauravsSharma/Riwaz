@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 import { useDeleteProduct } from '@/hooks/seller/useSellerProduct';
 import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
@@ -10,11 +10,16 @@ interface DeleteProductDialogProps {
     setIsOpen: (isOpen: boolean) => void;
 }
 const DeleteProductDialog: React.FC<DeleteProductDialogProps> = ({ productId, productName, isOpen, setIsOpen }) => {
-    const { mutate: deleteProduct,isPending } = useDeleteProduct(productId);
+    const { mutate: deleteProduct,isPending,isSuccess} = useDeleteProduct(productId);
     const handleDelete = () => {
         deleteProduct()
-        setIsOpen(false);
     };
+
+    useEffect(()=>{
+     if(isSuccess){
+        setIsOpen(false);
+     }
+    },[isSuccess,setIsOpen])
 
     return (
        <>

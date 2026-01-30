@@ -129,14 +129,14 @@ const StoresPage = () => {
         </div>
 
         {/* Empty State */}
-        {!stores && (
+        {(!stores || stores.length ===0) && (
           <div className="text-center py-20">
             <Store className="mx-auto text-gray-400 mb-4" size={64} />
             <h3 className="text-2xl font-semibold text-gray-900 mb-2">No stores yet</h3>
             <p className="text-gray-600 mb-6">Get started by adding your first store</p>
             <button
               onClick={() => setIsDialogOpen(true)}
-              className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 font-medium"
+              className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 font-medium"
             >
               <Plus size={20} />
               Add New Store
@@ -146,7 +146,7 @@ const StoresPage = () => {
       </div>
 
       {/* Dialog */}
-      <AddStoreModel setIsDialogOpen={setIsDialogOpen} isDialogOpen={isDialogOpen} storeData={selectedStore} />
+      <AddStoreModel setIsDialogOpen={setIsDialogOpen} setSelectedStore = {setSelectedStore} isDialogOpen={isDialogOpen} storeData={selectedStore} />
 
       {/* Click outside to close dropdown */}
       {openDropdownId && (

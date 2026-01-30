@@ -10,12 +10,19 @@ export const createStore = async (req, res) => {
             return res.status(400).json({ message: "Some fields are missing." });
         }
 
-        const newStore = await Store.create({
+        const store = await Store.create({
             ownerId,
             name,
             description,
             address,
-        }).select("name description address _id")
+        });
+
+        const newStore = {
+            _id: store._id,
+            name: store.name,
+            description: store.description,
+            address: store.address,
+        };
 
         return res
             .status(201)
@@ -108,7 +115,7 @@ export const deleteStore = async (req, res) => {
             return res.status(404).json({ message: "Store not found." });
         }
         // console.log(store.ownerId._id, req.user.userId);
-        
+
         // only the owner can delete
         if (store.ownerId._id.toString() !== req.user.userId.toString()) {
             return res
@@ -118,7 +125,7 @@ export const deleteStore = async (req, res) => {
 
         await store.deleteOne();
 
-        return res.status(200).json({ message: "Store deleted successfully." });
+        return res.status(200).json({success:true,id, message: "Store deleted successfully." });
     } catch (error) {
         return res
             .status(500)

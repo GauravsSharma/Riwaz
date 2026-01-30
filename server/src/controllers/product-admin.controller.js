@@ -8,6 +8,7 @@ import cloudinary from '../config/cloudinary.js';
 import { getDiscountPercentage } from '../utils/helper.js';
 import ParentProduct from '../models/ParentProduct.js';
 import { invalidateProductCaches } from '../utils/redis.utils.js';
+import redisClient from '../config/redis.js';
 
 // 06-11-25 test this api and create add prodcut as a variant api
 
@@ -307,7 +308,8 @@ export const deleteProduct = async (req, res) => {
     await redisClient.del(`product:review:${productId}`)
     return res.status(200).json({
       success: true,
-      message: 'Product deleted'
+      message: 'Product deleted',
+      id:productId
     });
 
   } catch (error) {

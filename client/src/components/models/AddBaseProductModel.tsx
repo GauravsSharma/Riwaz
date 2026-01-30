@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
 import { toast } from 'react-toastify';
 import { useSellerStore } from '@/stores/seller/store.store';
+import { useSellerProducts } from '@/stores/seller/seller_product.store';
 
 interface AddBaseProductModelProps {
     setShowAddBaseProductDialog: (value: boolean) => void;
@@ -13,9 +14,9 @@ const AddBaseProductModel = ({ setShowAddBaseProductDialog }: AddBaseProductMode
     const [storeId, setStoreId] = useState('');
 
     const stores = useSellerStore(s => s.stores); // array of { _id, name }
-
+    
     const { mutate, isPending } = useAddBaseProduct()
-
+    const addBaseProduct = useSellerProducts(s=>s.addBaseProduct)
     const handleCreateBaseProduct = () => {
         if (!baseProductName.trim()) {
             toast.warning('Please enter a product name');
@@ -30,7 +31,8 @@ const AddBaseProductModel = ({ setShowAddBaseProductDialog }: AddBaseProductMode
         mutate(
             { title: baseProductName, storeId },
             {
-                onSuccess: () => {
+                onSuccess: (data:BaseProduct) => {
+                    addBaseProduct(data)
                     toast.success("Base Product Added Successfully");
                     setBaseProductName('');
                     setStoreId('');

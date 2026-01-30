@@ -26,13 +26,11 @@ export default function LoginModal({ isOpen, setIsOpen, becomeASeller }: { isOpe
     setIsOpen(false);
   };
 
-  
+
   const handleCopyOtp = async () => {
    try {
     await navigator.clipboard.writeText(String(recievedOtp));
     setCopied(true);
-    toast.success("OTP copied to clipboard!");
-
     setTimeout(() => setCopied(false), 2000);
   } catch (err: unknown) {
     if (err instanceof Error) {
@@ -41,6 +39,7 @@ export default function LoginModal({ isOpen, setIsOpen, becomeASeller }: { isOpe
       toast.error("Failed to copy OTP");
     }
   }
+
   };
 
   const handleContinue = async () => {
@@ -73,6 +72,7 @@ export default function LoginModal({ isOpen, setIsOpen, becomeASeller }: { isOpe
           toast.success("Login successful!");
           setRecievedOtp('')
           setMobileNumber('')
+          setShowOtpInput(false)
           setOtp('')
           setIsOpen(false);
         },

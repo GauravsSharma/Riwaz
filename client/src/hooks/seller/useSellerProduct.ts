@@ -52,10 +52,11 @@ export const useUpdateProduct = () => {
     });
 };
 export const useAddBaseProduct = () => {
+    
     return useMutation({
         mutationFn: async (data: BaseProductPayload) => {
             const res = await api.post("/parentProduct", data);
-            return res.data;
+            return res.data.parentProduct;
         },
     });
 };
@@ -68,12 +69,14 @@ export const useUploadMedia = (productId: string) => {
     });
 };
 export const useDeleteProduct = (productId: string) => {
+    const deleteVarient = useSellerProducts(s=>s.deleteVariant)
     return useMutation({
         mutationFn: async () => {
             const res = await api.delete(`/product/${productId}`);
-            return res.data;
+            return res.data.id;
         },
-        onSuccess: () => {
+        onSuccess: (id:string) => {
+            deleteVarient(id)
             toast.success("Product deleted successfully");
         },
 

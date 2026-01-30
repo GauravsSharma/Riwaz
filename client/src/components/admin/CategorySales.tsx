@@ -15,7 +15,7 @@ interface SalesBreakdownProps {
 
 const SalesBreakdown: React.FC<SalesBreakdownProps> = ({ title, subtitle, data }) => {
   if(!data || data.length === 0) {
-    return <div>No data available</div>;
+    return;
   }
   return  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-shadow">
     <div className="mb-6">

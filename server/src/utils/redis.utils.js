@@ -36,28 +36,36 @@ export function generateProductCacheKey(queryParams) {
     return keyParts.join(':');
 }
 
-// Example outputs:
-// "products:nosearch:type:Banarasi:fabric:Silk:nowork:nocolor:nomin:nomax:sort:createdAt:desc:page:1:limit:10"
-// "products:search:red saree:notype:nofabric:nowork:color:red:min:1000:max:5000:sort:price:asc:page:1:limit:10"
-
 export async function invalidateProductCaches(productId = null) {
     try {
         console.log('🗑️ Starting cache invalidation...');
-
-        // ✅ STEP 1: Delete specific product cache (if productId provided)
         if (productId) {
             await redisClient.del(`product:${productId}`);
             console.log(`✅ Deleted: product:${productId}`);
         }
 
-        // for type 
-        await redisClient.del('product-by-type:*')
-        console.log("Type keys deleted");
-        
+       
+        let typeCursor = '0'; 
+        let typeDeletedCount = 0;
 
-        // ✅ STEP 2: Delete all product listing caches
-        // Use SCAN instead of KEYS for production (better performance)
-        let cursor = 0;
+        do {
+            const typeResult = await redisClient.scan(typeCursor, {
+                MATCH: 'product-by-type:*',
+                COUNT: 100
+            });
+
+            typeCursor = typeResult.cursor;
+
+            if (typeResult.keys.length > 0) {
+                await redisClient.del(typeResult.keys);
+                typeDeletedCount += typeResult.keys.length;
+            }
+
+        } while (typeCursor !== '0'); 
+
+        console.log(`✅ Deleted ${typeDeletedCount} product-by-type caches`);
+
+        let cursor = '0'; 
         let deletedCount = 0;
 
         do {
@@ -71,16 +79,13 @@ export async function invalidateProductCaches(productId = null) {
             if (result.keys.length > 0) {
                 await redisClient.del(result.keys);
                 deletedCount += result.keys.length;
-
             }
 
-        } while (cursor !== 0);
+        } while (cursor !== '0'); 
 
         console.log(`✅ Deleted ${deletedCount} product listing caches`);
 
     } catch (error) {
-        console.error('❌ Cache invalidation error:', error);
-        // Don't throw - cache errors shouldn't break the API
+        console.error('Cache invalidation error:', error);
     }
 }
-
