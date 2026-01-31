@@ -6,11 +6,8 @@ import ProductDetailed from '@/components/sections/ProductDetailed'
 import SareeCategorySection from '@/components/sections/SareeCategorySection'
 import SareeStoreSection from '@/components/sections/SareeStoreSection'
 import { useGetProductByType, useGetSingleProduct } from '@/hooks/buyer/useProducts'
-import { useGetCartSummary, useMergeCart } from '@/hooks/buyer/useUserCart'
-import { useUserCart } from '@/stores/buyer/cart.user'
-import { useUserStore } from '@/stores/user.store'
-import { useQueryClient } from '@tanstack/react-query'
-import { useEffect, useRef } from 'react'
+import { useGetCartSummary } from '@/hooks/buyer/useUserCart'
+
 
 const Page = () => {
   
