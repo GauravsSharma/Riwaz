@@ -19,44 +19,10 @@ const Page = () => {
   const { isPending: isSilkSareesLoading, data: silkSarees } = useGetProductByType("Bandhani");
   const { isLoading: singleProductLoading, data } = useGetSingleProduct()
   // console.log(data?.variants);
-  const user = useUserStore((s) => s.user);
-  const { mutate: mergeCart } = useMergeCart();
-  const queryClient = useQueryClient();
   useGetCartSummary()
-  const setCount = useUserCart((s) => s.setCount);
+  
 
-  const hasMergedRef = useRef(false);
- useEffect(() => {
-  if (!user) {
-    const guestCart = localStorage.getItem("guest-cart");
-    if (guestCart) {
-      const parsedCart = JSON.parse(guestCart);
-      setCount(parsedCart.length);
-    } else {
-      setCount(0);
-    }
-  }
-}, [user, setCount]);
-
-  useEffect(() => {
-
-    if (!user || user.userType !== "customer" || hasMergedRef.current) return;
-    const guestCart = localStorage.getItem("guest-cart");
-    if (!guestCart) return;
-    const parsedCart = JSON.parse(guestCart);
-    if (!parsedCart.length) return;
-    hasMergedRef.current = true;
-    mergeCart(parsedCart, {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['cart-summary-store'] });
-        localStorage.removeItem("guest-cart");
-      },
-    });
-  }, [user,mergeCart, queryClient]);
-
-
-
-
+ 
   return (
     <div>
       <HeroCarousel />

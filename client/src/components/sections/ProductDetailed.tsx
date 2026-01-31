@@ -99,6 +99,10 @@ const ProductDetailed = ({
         }
 
     }
+    const handleBuyNow =()=>{
+        handleAddToCart();
+        router.push("/cart")
+    }
 
     return (
         
@@ -298,8 +302,12 @@ const ProductDetailed = ({
                             ADD TO CART
                             {isPending && <FormSubmissionLoader />}
                         </button>
-                        <button className="w-full py-3 bg-purple-700 text-white font-semibold rounded-lg hover:bg-purple-800 transition">
+                        <button
+                        onClick={handleBuyNow}
+                        disabled={isPending}
+                        className={`w-full py-3 flex justify-center items-center gap-2 bg-purple-700 text-white font-semibold rounded-lg hover:bg-purple-800 transition ${isPending ? "opacity-50 pointer-events-none" : ""}`}>
                             BUY IT NOW
+                            {isPending && <FormSubmissionLoader />}
                         </button>
                     </div>
 

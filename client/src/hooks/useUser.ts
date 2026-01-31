@@ -74,8 +74,6 @@ export const useCurrentUser = () => {
     queryFn: async () => {
       const res = await api.get("/user")
       setUser(res.data.user);
-      console.log("Data------------>",res.data);
-      
       return res.data.user;
     },
   });

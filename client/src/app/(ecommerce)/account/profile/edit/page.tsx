@@ -1,9 +1,12 @@
 "use client";
 
+import FormSubmissionLoader from "@/components/loaders/FormSubmissionLoader";
 import { useUpdateOrEditProfile } from "@/hooks/useUser";
 import { useUserStore } from "@/stores/user.store";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ChangeEvent, useState } from "react";
+import { toast } from "react-toastify";
 
 type FormData = {
   firstName: string;
@@ -13,18 +16,18 @@ type FormData = {
 
 export default function ProfileEditForm() {
   const [formData, setFormData] = useState<FormData>({
-    firstName: "Barbara",
-    lastName: "Millicent",
-    email: "BarbaraMillicent23@gmail.com",
+    firstName: "",
+    lastName: "",
+    email: "",
     //alternatePhone: "",
     //dateOfBirth: "",
     //gender: ""
   });
 
 
-  const updateProfile = useUpdateOrEditProfile();
+  const {mutate,isPending} = useUpdateOrEditProfile();
   const setUser = useUserStore((s) => s.setUser); // moved to top-level
-
+ const router = useRouter()
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -33,34 +36,25 @@ export default function ProfileEditForm() {
     }));
   };
 
-  /* const handleGenderChange = (gender: string) => {
-    setFormData(prev => ({
-      ...prev,
-      gender
-    }));
-  }; */
 
-  // use of arrow function-call when save button is clicked
   const handleSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
 
-    console.log("Submitting form");
-    console.log(formData.firstName);
-    console.log(formData.lastName);
-    console.log(formData.email);
-
-    updateProfile.mutate(
+   mutate(
       {
         name: formData.firstName + " " + formData.lastName, // added space between names
         email: formData.email,
       },
       {
         onSuccess: (data) => {
-          console.log("Profile updated:", data);
-          setUser(data.user); // update Zustand store
+          toast.success("Profile updated.")
+          setUser(data.user); 
+          router.push("/account ")// update Zustand store
         },
-        onError: (error) =>
-          console.error(`Failed to update profile: ${error}`),
+        onError: () =>{
+          toast.error("Something went wrong")
+        } 
+        
       }
     );
   };
@@ -129,11 +123,15 @@ export default function ProfileEditForm() {
         </Link>
 
         <button
-          className="px-8 py-3 bg-red-500 text-white font-medium rounded-md hover:bg-red-600 transition-colors"
-          onClick={handleSubmit}
-        >
-          SAVE
-        </button>
+                  disabled={isPending}
+                  type="button"
+                  onClick={handleSubmit}
+                  className={`px-4 flex justify-center items-center gap-2 py-2 cursor-pointer bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors ${(isPending) ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                >
+                  Save
+                  {(isPending) && <FormSubmissionLoader />}
+                </button>
       </div>
     </div>
 

@@ -4,8 +4,8 @@ import { ShoppingBag, ArrowRight, CheckCircle2 } from 'lucide-react'
 
 const StoreNotFound = () => {
   return (
-    <div className='min-h-screen flex justify-center items-center bg-gradient-to-br from-purple-50 via-white to-pink-50 p-4'>
-      <div className='max-w-lg w-full mx-auto px-4 sm:px-6 text-center'>
+    <div className='min-h-screen  w-full flex justify-center items-center bg-gradient-to-br from-purple-50 via-white to-pink-50 p-4'>
+      <div className=' w-full mx-auto px-4 sm:px-6 text-center'>
         {/* Icon/Illustration */}
         <div className='mb-8 inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg'>
           <ShoppingBag className='w-12 h-12 text-white' strokeWidth={2} />

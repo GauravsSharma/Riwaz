@@ -6,6 +6,7 @@ import { rozarPayInstance } from '../config/rozarpay.js';
 import Address from '../models/Address.js';
 import Product from '../models/product.js';
 import Store from '../models/store.js';
+import subtractStock from '../utils/helper.js';
 // import { stripe } from "../../server.js";
 
 // you have to change the variant to productId
@@ -116,7 +117,13 @@ export const createAndConfirmOrder = async (req, res) => {
         message: "Cart is empty.",
       });
     }
-
+    const confirm  = await subtractStock(cart.products);
+    if(!confirm){
+      return res.status(400).json({
+          success:false,
+          message :"Eror in substracting the products."
+      })
+    }
     const totalAmount = cart.products.reduce(
       (acc, item) => acc + item.unitPrice * item.quantity,
       0
@@ -186,7 +193,13 @@ export const paymentVerification = async (req, res) => {
       });
     }
     const body = razorpay_order_id + "|" + razorpay_payment_id;
-
+     const confirm  = await subtractStock(userCart.products);
+    if(!confirm){
+      return res.status(400).json({
+          success:false,
+          message :"Eror in substracting the products."
+      })
+    }
     const expectedSignature = crypto
       .createHmac("sha256", process.env.ROZARPAY_SECRET)
       .update(body)
@@ -365,5 +378,5 @@ export const updateOrderStatus = async (req, res) => {
     res.status(200).json({ success: true, message: "Order status updated successfully.", order });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
-  } 
+  }
 };
