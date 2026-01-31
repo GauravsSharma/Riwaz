@@ -24,6 +24,12 @@ export const getProducts = async (req, res) => {
 // customers
 export const getSingleProduct = async (req, res) => {
   try {
+    const productKey = `single-product:product`
+    const cachedProduct = await redisClient.get(productKey);
+    if(cachedProduct){
+      const response = JSON.parse(cachedProduct);
+      return  res.status(200).json({...response});
+    }
     const product = await Product.find().limit(1)
       .populate({
         path: "tags",
@@ -37,11 +43,19 @@ export const getSingleProduct = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
+    
     const variants = await Product.find({
       parentId: product[0].parentId,
       _id: { $ne: product[0]._id }   // exclude current product
     }).select("thumbnail color _id");
-    res.status(200).json({ success: true, product: product[0], variants });
+
+   let response = { success: true, product: product[0], variants }
+
+   redisClient.set(productKey,JSON.stringify(response))
+   .then(()=>console.log("cached: single product"))
+   .catch(()=>console.log("Error in caching: single product"))
+   
+    res.status(200).json({...response});
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
@@ -87,8 +101,14 @@ export const getProductById = async (req, res) => {
       _id: { $ne: product._id }
     }).select("thumbnail color _id");
 
-    await redisClient.setEx(`product:${id}`, 500, JSON.stringify(product));
-    await redisClient.setEx(`product:varients:${id}`, 500, JSON.stringify(variants));
+    redisClient
+      .setEx(`product:${id}`, 500, JSON.stringify(product))
+      .catch(err => console.error("Redis product cache failed:", err.message));
+
+    redisClient
+      .setEx(`product:variants:${id}`, 500, JSON.stringify(variants))
+      .catch(err => console.error("Redis variants cache failed:", err.message));
+
 
     res.status(200).json({ success: true, product, variants });
   } catch (error) {
@@ -174,8 +194,11 @@ export const searchProducts = async (req, res) => {
       limit: Number(limit),
       products: products,
     }
-    await redisClient.setEx(cachedKey, 180, JSON.stringify(response))
-
+    redisClient.setEx(cachedKey, 180, JSON.stringify(response)).then(() => {
+      console.log("cached search products:");
+    }).catch(() => {
+      console.log("error in caching: search product");
+    });
     res.status(200).json({
       ...response
     });
@@ -219,7 +242,11 @@ export const useGetProductRecommendationByQuery = async (req, res) => {
       .select("title slug price thumbnail type")
       .limit(5);
 
-    await redisClient.setEx(queryKey, 90, JSON.stringify(products))
+    redisClient.setEx(queryKey, 90, JSON.stringify(products))
+    .then(()=>{console.log("cached: query recommendation");
+    })
+    .catch(()=>{console.log("Error in caching: query recommendation");
+    })
 
     res.status(200).json({ success: true, products });
   } catch (error) {
@@ -273,7 +300,10 @@ export const getSearchSuggestions = async (req, res) => {
       }
     });
     const suggestions = [...suggestionsSet].slice(0, 8);
-    await redisClient.setEx(queryKey, 120, JSON.stringify(suggestions));
+    redisClient.setEx(queryKey, 120, JSON.stringify(suggestions))
+    .then(()=>console.log("cached: search suggestions"))
+    .catch(()=>console.log("Error in caching: search suggestions"))
+    
     res.status(200).json({ success: true, suggestions });
   } catch (err) {
     console.error("Suggestion error:", err);
@@ -301,7 +331,9 @@ export const getProductsByType = async (req, res) => {
       .select("title price thumbnail originalPrice discountPercentage _id")
       .limit(4)
 
-    await redisClient.set(queryKey, JSON.stringify(products))
+    redisClient.set(queryKey, JSON.stringify(products))
+    .then(()=>console.log("cached: product by type"))
+    .catch(()=>console.log("Error in caching: product by type"))
 
     res.status(200).json({
       success: true,

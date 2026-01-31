@@ -82,6 +82,8 @@ export async function invalidateProductCaches(productId = null) {
             }
 
         } while (cursor !== '0'); 
+        
+        await redisClient.del("single-product:product")
 
         console.log(`✅ Deleted ${deletedCount} product listing caches`);
 

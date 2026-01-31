@@ -77,7 +77,7 @@ export const createProduct = async (req, res) => {
     await session.commitTransaction();
     const productWithRelations = await Product.findById(newProduct[0]._id)
       .populate('tags')
-    await invalidateProductCaches()
+    void invalidateProductCaches()
     return res.status(201).json({
       message: 'Product created successfully.',
       product: productWithRelations,
@@ -249,7 +249,7 @@ export const updateProduct = async (req, res) => {
     }
     await product.save();
 
-    await invalidateProductCaches(productId
+    void invalidateProductCaches(productId
 
     )
     return res.status(200).json({
@@ -304,8 +304,8 @@ export const deleteProduct = async (req, res) => {
     await parent.save();
     await product.deleteOne();
 
-    await invalidateProductCaches(productId)
-    await redisClient.del(`product:review:${productId}`)
+    void invalidateProductCaches(productId)
+    void redisClient.del(`product:review:${productId}`)
     return res.status(200).json({
       success: true,
       message: 'Product deleted',

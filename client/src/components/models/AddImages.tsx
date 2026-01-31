@@ -4,6 +4,7 @@ import { useUploadMedia } from '@/hooks/seller/useSellerProduct';
 import { toast } from 'react-toastify';
 import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
 import Image from 'next/image';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface ImageMetadata {
   id: string;
@@ -28,7 +29,7 @@ const ProductImageDialog: React.FC<ProductImageDialogProps> = ({
 }) => {
   // const [isOpen, setIsOpen] = useState(true);
   // console.log(productId);/
-  
+  const queryClient = useQueryClient()
   const [images, setImages] = useState<ImageUpload[]>([
     { id: '1', file: null, preview: null }
   ]);
@@ -84,6 +85,7 @@ const ProductImageDialog: React.FC<ProductImageDialogProps> = ({
       onSuccess: () => {
         toast.success("Images uploaded successfully!");
         handleClose();
+        queryClient.invalidateQueries({ queryKey: ['seller-product'] });
       },
       onError: () => {
         toast.error("Failed to upload images. Please try again.");
@@ -151,7 +153,7 @@ const ProductImageDialog: React.FC<ProductImageDialogProps> = ({
                           className="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition-colors bg-white"
                         >
                           {image.preview ? (
-                            <Image
+                            <img
                               src={image.preview}
                               alt="Preview"
                               className="h-full w-full object-contain rounded-lg"

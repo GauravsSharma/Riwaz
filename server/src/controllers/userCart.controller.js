@@ -80,11 +80,12 @@ export const getCart = async (req, res) => {
       })
     }
 
-    await redisClient.setEx(
+    redisClient.setEx(
       `cart:${userId}`,
       1800,
       JSON.stringify(userCart.products)
-    );
+    ).then(() => console.log("cached: user cart"))
+      .catch(() => console.log("Error in caching: user cart"))
 
 
     return res.status(200).json({
@@ -134,7 +135,9 @@ export const updateCart = async (req, res) => {
     for (const update of updates) {
       userCart.products[update.index].quantity = update.quantity;
     }
-    await redisClient.del(`cart:${userId}`);
+    redisClient.del(`cart:${userId}`)
+      .then(() => console.log("Deleted cached: user cart"))
+      .catch(() => console.log("Error in deleting cached: user cart"))
 
     await userCart.save();
     return res.status(200).json({
@@ -180,7 +183,9 @@ export const removeItemFromCart = async (req, res) => {
     userCart.products.splice(index, 1);
     await userCart.save()
 
-    await redisClient.del(`cart:${userId}`);
+    redisClient.del(`cart:${userId}`)
+      .then(() => console.log("Deleted cached: user cart"))
+      .catch(() => console.log("Error in deleting cached: user cart"))
 
     return res.status(200).json({
       success: true,
@@ -202,7 +207,9 @@ export const clearCart = async (req, res) => {
     userCart.products = [];
     await userCart.save();
 
-    await redisClient.del(`cart:${userId}`);
+    redisClient.del(`cart:${userId}`)
+      .then(() => console.log("Deleted cached: user cart"))
+      .catch(() => console.log("Error in deleting cached: user cart"))
 
     return res.status(200).json({
       success: true,
@@ -262,7 +269,9 @@ export const updateItemQuantity = async (req, res) => {
     userCart.products[index].quantity = quantity;
     await userCart.save();
 
-    await redisClient.del(`cart:${userId}`);
+    redisClient.del(`cart:${userId}`)
+      .then(() => console.log("Deleted cached: user cart"))
+      .catch(() => console.log("Error in deleting cached: user cart"))
 
     return res.status(200).json({
       success: true,
@@ -333,7 +342,9 @@ export const mergeCart = async (req, res) => {
 
     await userCart.save();
 
-    await redisClient.del(`cart:${userId}`);
+    redisClient.del(`cart:${userId}`)
+      .then(() => console.log("Deleted cached: user cart"))
+      .catch(() => console.log("Error in deleting cached: user cart"))
 
     return res.status(200).json({
       success: true,
