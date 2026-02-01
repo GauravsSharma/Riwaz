@@ -1,20 +1,16 @@
 "use client";
-
-import Error from "@/components/error/Error";
 import UsersFall from "@/components/fallback/UsersFall";
 import LogoutModel from "@/components/models/LogoutModel";
-import { useCurrentUser } from "@/hooks/useUser";
 import { useUserStore } from "@/stores/user.store";
 import Link from "next/link";
 import { useState } from "react";
 
 export default function Page() {
+  
   const [isLogoutModelOpen, setIsLogoutModelOpen] = useState(false);
   const user = useUserStore((s) => s.user);
-  const { isLoading, error } = useCurrentUser();
 
-  if (isLoading || !user) return <UsersFall />;
-  if (error) return <Error />;
+  if (!user) return <UsersFall />;
 
   return (
     <div className="p-6 bg-white w-full">

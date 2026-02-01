@@ -3,6 +3,7 @@ import { X, Copy, Check } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import FormSubmissionLoader from '../loaders/FormSubmissionLoader';
+import { useUserStore } from '@/stores/user.store';
 interface OTPResponse{
 success:boolean,
 otp:string,
@@ -21,7 +22,7 @@ export default function LoginModal({ isOpen, setIsOpen, becomeASeller }: { isOpe
   const [copied, setCopied] = useState(false);
   const { mutate: sendOtpMutation, isPending } = useSendOtp();
   const { mutate: verifyOtpMutation, isPending: isVerifyOptPending } = useVerifyOtp();
-
+ const setUser = useUserStore((s) => s.setUser);
   const handleClose = () => {
     setIsOpen(false);
   };
@@ -68,7 +69,8 @@ export default function LoginModal({ isOpen, setIsOpen, becomeASeller }: { isOpe
         userType: becomeASeller ? "seller" : "customer",
       },
       {
-        onSuccess: () => {
+        onSuccess: (data:User) => {
+          setUser(data)
           toast.success("Login successful!");
           setRecievedOtp('')
           setMobileNumber('')

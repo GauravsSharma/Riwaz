@@ -15,8 +15,7 @@ export const useGetAddresses = () => {
       const res = await api.get("/user/address");
       setAddresses(res.data.addresses);
       return res.data.addresses;
-    },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    } // 5 minutes
   });
 };
 

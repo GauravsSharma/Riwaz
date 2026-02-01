@@ -25,11 +25,9 @@ const Layout = ({
   const { mutate: mergeCart } = useMergeCart();
   const hasMergedRef = useRef(false);
 
-// console.log("User",user);
+  // console.log("User",user);
 
   useEffect(() => {
-  
-    
     if (!isLoading && user?.userType === "seller") {
       router.push("/admin/dashboard");
     }
@@ -47,17 +45,22 @@ const Layout = ({
     }
   }, [user, setCount]);
 
+
+
+
   useEffect(() => {
+        console.log("m aya tha.", hasMergedRef.current, user);
     if (!user || user.userType !== "customer" || hasMergedRef.current) return;
     const guestCart = localStorage.getItem("guest-cart");
-    console.log("m aya tha.",hasMergedRef.current);
-    if (!guestCart) return;
+    if (!guestCart) return; 
+
     const parsedCart = JSON.parse(guestCart);
     if (!parsedCart.length) return;
     hasMergedRef.current = true;
     mergeCart(parsedCart, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['cart-summary-store'] });
+        queryClient.invalidateQueries({ queryKey: ['cart-store'] });
         localStorage.removeItem("guest-cart");
       },
     });

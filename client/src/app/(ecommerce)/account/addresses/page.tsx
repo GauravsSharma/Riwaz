@@ -11,15 +11,15 @@ import { useState } from "react";
 
 export default function Page() {
   const { isLoading } = useGetAddresses();
-  const addresses = useAddressStore(s=>s.addresses)
+  const addresses = useAddressStore(s => s.addresses)
   const [isOpen, setIsOpen] = useState(false);
-  const[isDeleteDialogOpen,setIsDeleteDialogOpen]=useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const handleAddNewAddress = () => setIsOpen(true);
- const user = useUserStore((s) => s.user);
-  const handleRemove = (id:string) => {
+  const user = useUserStore((s) => s.user);
+  const handleRemove = (id: string) => {
     setSelectedAddressId(id)
-     setIsDeleteDialogOpen(true)
+    setIsDeleteDialogOpen(true)
   };
   if (isLoading) return <div className="flex justify-center items-center w-full">
     <div className="lds-ring"><div></div><div></div><div></div><div></div></div>
@@ -32,7 +32,7 @@ export default function Page() {
         <h1 className="text-2xl font-semibold text-gray-900">
           My Addresses
         </h1>
-      {user &&  <button
+        {user && <button
           onClick={handleAddNewAddress}
           className="flex items-center cursor-pointer space-x-2 text-red-500 hover:text-red-600 font-medium transition-colors"
         >
@@ -44,7 +44,7 @@ export default function Page() {
       {/* Address List */}
       <div className="space-y-4">
         {addresses &&
-        addresses.length > 0 ? (
+          addresses.length > 0 ? (
           addresses.map((add: Address) => (
             <AddressCard
               key={add._id}
@@ -70,10 +70,10 @@ export default function Page() {
       </div>
 
       {/* Add New Address Form */}
-     {isOpen && (
+      {isOpen && (
         <AddNewAddressForm isOpen={isOpen} setIsOpen={setIsOpen} />
       )}
-     {isDeleteDialogOpen && selectedAddressId&&(
+      {isDeleteDialogOpen && selectedAddressId && (
         <DeleteAddressDialog isOpen={isDeleteDialogOpen} setIsOpen={setIsDeleteDialogOpen} addressId={selectedAddressId} />
       )}
     </div>

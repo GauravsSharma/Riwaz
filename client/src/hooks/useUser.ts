@@ -95,7 +95,7 @@ export const useSendOtp = () => {
 // Verify OTP → return token + user
 // ------------------------
 export const useVerifyOtp = () => {
-  const setUser = useUserStore((s) => s.setUser);
+ 
 
   return useMutation({
     mutationFn: async (data: VerifyOtpPayload) => {
@@ -103,10 +103,7 @@ export const useVerifyOtp = () => {
         "/user/verify-otp",
         data
       );
-      return res.data;
-    },
-    onSuccess: (data) => {
-      setUser(data.user);
+      return res.data.user;
     },
   });
 };

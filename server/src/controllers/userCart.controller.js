@@ -261,7 +261,7 @@ export const updateItemQuantity = async (req, res) => {
     const userCart = await UserCart.findOne({ userId });
     const index = userCart.products.findIndex((pro) => pro.productId.toString() === productId);
     if (index === -1) {
-      return res.status(200).json({
+      return res.status(400).json({
         success: false,
         message: `Product not found in user cart`
       })
