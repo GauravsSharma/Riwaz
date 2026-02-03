@@ -68,8 +68,13 @@ export const getProductById = async (req, res) => {
     if (!id) {
       return res.status(400).json({ message: "Product ID is required" });
     }
-
+     const start = Date.now();
+  
     const productCache = await redisClient.get(`product:${id}`);
+    const data = await redisClient.get('products');
+  
+  console.log('Query time:', Date.now() - start, 'ms');
+  
     if (productCache) {
       console.log("Caches hit");
       const response = JSON.parse(productCache);
