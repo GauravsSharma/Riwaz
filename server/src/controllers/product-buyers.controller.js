@@ -70,15 +70,11 @@ export const getProductById = async (req, res) => {
     }
 
     const productCache = await redisClient.get(`product:${id}`);
-    const varientCache = await redisClient.get(`product:varients:${id}`);
-
-    if (productCache && varientCache) {
-      const product = JSON.parse(productCache);
-      const variants = JSON.parse(varientCache);
+    if (productCache) {
+      console.log("Caches hit");
+      const response = JSON.parse(productCache);
       return res.status(200).json({
-        success: true,
-        product,
-        variants
+      ...response
       })
     }
 
@@ -100,17 +96,12 @@ export const getProductById = async (req, res) => {
       parentId: product.parentId,
       _id: { $ne: product._id }
     }).select("thumbnail color _id");
-
+    const response = { success: true, product, variants }
     redisClient
-      .setEx(`product:${id}`, 500, JSON.stringify(product))
+      .setEx(`product:${id}`, 500, JSON.stringify(response))
       .catch(err => console.error("Redis product cache failed:", err.message));
 
-    redisClient
-      .setEx(`product:variants:${id}`, 500, JSON.stringify(variants))
-      .catch(err => console.error("Redis variants cache failed:", err.message));
-
-
-    res.status(200).json({ success: true, product, variants });
+    res.status(200).json({...response});
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
