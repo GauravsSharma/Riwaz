@@ -1,5 +1,4 @@
 import express from 'express';
-import { authMiddleware } from '../middlewares/auth.js';
 import { getProductById, getProductsByType, getProducts, getSingleProduct, searchProducts, useGetProductRecommendationByQuery, getSearchSuggestions } from '../controllers/product-buyers.controller.js';
 import { addVariant, createProduct, deleteProduct, getStoreProducts, updateProduct, uploadMedia } from '../controllers/product-admin.controller.js';
 import { sellerMiddleware } from '../middlewares/seller.js';
@@ -13,6 +12,7 @@ router.get('/search', searchProducts);
 router.get("/search/suggestions", getSearchSuggestions); // /search/suggestions?q=your-query
 router.get('/query', useGetProductRecommendationByQuery);// /query?q=your-query
 router.get('/single', getSingleProduct);
+// router.get('/type', getProductsByMultipleTypes);
 router.get('/type/:type', getProductsByType);
 router.get('/id/:id', getProductById);
 

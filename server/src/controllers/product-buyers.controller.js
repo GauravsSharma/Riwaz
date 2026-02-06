@@ -26,9 +26,9 @@ export const getSingleProduct = async (req, res) => {
   try {
     const productKey = `single-product:product`
     const cachedProduct = await redisClient.get(productKey);
-    if(cachedProduct){
+    if (cachedProduct) {
       const response = JSON.parse(cachedProduct);
-      return  res.status(200).json({...response});
+      return res.status(200).json({ ...response });
     }
     const product = await Product.find().limit(1)
       .populate({
@@ -43,19 +43,19 @@ export const getSingleProduct = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
-    
+
     const variants = await Product.find({
       parentId: product[0].parentId,
       _id: { $ne: product[0]._id }   // exclude current product
     }).select("thumbnail color _id");
 
-   let response = { success: true, product: product[0], variants }
+    let response = { success: true, product: product[0], variants }
 
-   redisClient.set(productKey,JSON.stringify(response))
-   .then(()=>console.log("cached: single product"))
-   .catch(()=>console.log("Error in caching: single product"))
-   
-    res.status(200).json({...response});
+    redisClient.set(productKey, JSON.stringify(response))
+      .then(() => console.log("cached: single product"))
+      .catch(() => console.log("Error in caching: single product"))
+
+    res.status(200).json({ ...response });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
@@ -68,18 +68,17 @@ export const getProductById = async (req, res) => {
     if (!id) {
       return res.status(400).json({ message: "Product ID is required" });
     }
-     const start = Date.now();
-  
+    const start = Date.now();
+
     const productCache = await redisClient.get(`product:${id}`);
-    const data = await redisClient.get('products');
-  
-  console.log('Query time:', Date.now() - start, 'ms');
-  
+
+    console.log('Query time:', Date.now() - start, 'ms');
+
     if (productCache) {
       console.log("Caches hit");
       const response = JSON.parse(productCache);
       return res.status(200).json({
-      ...response
+        ...response
       })
     }
 
@@ -106,7 +105,7 @@ export const getProductById = async (req, res) => {
       .setEx(`product:${id}`, 500, JSON.stringify(response))
       .catch(err => console.error("Redis product cache failed:", err.message));
 
-    res.status(200).json({...response});
+    res.status(200).json({ ...response });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
@@ -115,7 +114,7 @@ export const getProductById = async (req, res) => {
 // customers
 export const searchProducts = async (req, res) => {
   try {
-    const {
+    let {
       limit = 10,
       search,
       priceMin,
@@ -130,9 +129,23 @@ export const searchProducts = async (req, res) => {
     } = req.query;
 
     const query = { isActive: true };
-
+    type = type?.split(",").map(t => t.trim()) || [];
+    work = work?.split(",").map(t => t.trim()) || [];
+    fabric = fabric?.split(",").map(t => t.trim()) || [];
     if (search) {
       query.$text = { $search: search };
+    }
+
+    if (type.length > 0) {
+      query.type = { $in: type };
+    }
+
+    if (fabric.length > 0) {
+      query.fabric = { $in: fabric };
+    }
+
+    if (work.leangth > 0) {
+      query.work = { $in: work };
     }
 
     if (priceMin || priceMax) {
@@ -144,18 +157,6 @@ export const searchProducts = async (req, res) => {
     if (color) {
       query.color = { $regex: color, $options: 'i' };
     }
-
-    if (type) {
-      query.type = type;
-    }
-
-    if (fabric) {
-      query.fabric = fabric;
-    }
-
-    if (work) {
-      query.work = work;
-    }
     const skip = (Number(page) - 1) * Number(limit);
 
     const sort = {};
@@ -163,8 +164,6 @@ export const searchProducts = async (req, res) => {
       sort.score = { $meta: 'textScore' };
     }
     sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
-
-    console.log(query);
     const cachedKey = generateProductCacheKey(req.query)
     const cachedData = await redisClient.get(cachedKey);
     if (cachedData) {
@@ -179,7 +178,7 @@ export const searchProducts = async (req, res) => {
       .sort(sort)
       .skip(skip)
       .limit(limit)
-      .lean();
+      .lean()
 
     // Get total count for pagination
     const total = await Product.countDocuments(query);
@@ -239,10 +238,12 @@ export const useGetProductRecommendationByQuery = async (req, res) => {
       .limit(5);
 
     redisClient.setEx(queryKey, 90, JSON.stringify(products))
-    .then(()=>{console.log("cached: query recommendation");
-    })
-    .catch(()=>{console.log("Error in caching: query recommendation");
-    })
+      .then(() => {
+        console.log("cached: query recommendation");
+      })
+      .catch(() => {
+        console.log("Error in caching: query recommendation");
+      })
 
     res.status(200).json({ success: true, products });
   } catch (error) {
@@ -297,9 +298,9 @@ export const getSearchSuggestions = async (req, res) => {
     });
     const suggestions = [...suggestionsSet].slice(0, 8);
     redisClient.setEx(queryKey, 120, JSON.stringify(suggestions))
-    .then(()=>console.log("cached: search suggestions"))
-    .catch(()=>console.log("Error in caching: search suggestions"))
-    
+      .then(() => console.log("cached: search suggestions"))
+      .catch(() => console.log("Error in caching: search suggestions"))
+
     res.status(200).json({ success: true, suggestions });
   } catch (err) {
     console.error("Suggestion error:", err);
@@ -327,9 +328,10 @@ export const getProductsByType = async (req, res) => {
       .select("title price thumbnail originalPrice discountPercentage _id")
       .limit(4)
 
+
     redisClient.set(queryKey, JSON.stringify(products))
-    .then(()=>console.log("cached: product by type"))
-    .catch(()=>console.log("Error in caching: product by type"))
+      .then(() => console.log("cached: product by type"))
+      .catch(() => console.log("Error in caching: product by type"))
 
     res.status(200).json({
       success: true,
@@ -340,3 +342,5 @@ export const getProductsByType = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+

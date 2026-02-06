@@ -102,7 +102,7 @@ productSchema.index({ title: 'text', description: 'text' });
 
 productSchema.index({ type: 1, fabric: 1, work: 1 });
 
-
+  
 productSchema.pre('save', function (next) {
   if (!this.slug && this.title) {
     this.slug = this.title
