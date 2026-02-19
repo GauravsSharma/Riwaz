@@ -1,0 +1,31 @@
+name : Deploy node.js backend to AWS EC2
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps: 
+
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Deploye via SSH
+      uses: appleboy/ssh-action@v1.0.3
+
+      with:
+        host: ${{secrets.SSH_HOST}}
+        username: ubuntu
+        key: ${{secrets.SSH_KEY}}
+        script: | 
+          cd Riwaz/server
+          git fetch origin
+          git reset --hard origin/main
+          export NVM_DIR="$HOME/.nvm"
+          source $NVM_DIR/nvm.sh
+          nvm use 24.13.1
+          pm2 reload riwaz-backend
