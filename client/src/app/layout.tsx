@@ -4,7 +4,7 @@ import { Figtree,Fraunces } from "next/font/google";
 import { ToastContainer } from "react-toastify";
 import QueryProvider from "./QueryProvider";
 import NextTopLoader from "nextjs-toploader";
-
+import Script from "next/script";
 const figtree = Figtree({
   variable: "--font-figtree",
   subsets: ["latin"],
@@ -36,7 +36,10 @@ export default function RootLayout({
           {children}
           <ToastContainer />
         </QueryProvider>
-
+ <Script src="https://syntra-one.vercel.app/widget.js"
+          data-id="ec424f6e-dd1c-482d-8058-a5b0e4121669"
+          defer>
+        </Script>
       </body>
     </html>
   );
