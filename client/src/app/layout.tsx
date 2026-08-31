@@ -36,7 +36,7 @@ export default function RootLayout({
           {children}
           <ToastContainer />
         </QueryProvider>
- <Script src="https://syntra-one.vercel.app/widget.js"
+ <Script  id="syntra-widget" src="https://syntra-one.vercel.app/widget.js"
           data-id="ec424f6e-dd1c-482d-8058-a5b0e4121669"
           defer>
         </Script>
